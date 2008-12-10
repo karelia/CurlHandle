@@ -4,7 +4,7 @@
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
 //  This is in the public domain, but please report any improvements back to the author.
 //
-//	The current version of CURLHandle is 1.9.
+//	The current version of CURLHandle is 2.0
 //
 
 #import "CURLHandle.h"
@@ -12,8 +12,6 @@
 #define NSS(s) (NSString *)(s)
 #include <SystemConfiguration/SystemConfiguration.h>
 
-#warning # If you build with a curl that was built under 10.2, the result will not be 10.1-compatible.
-#warning # ... so For 10.1 compatibility, please build curl under 10.1.
 
 
 // Un-comment these to do some debugging things
@@ -248,6 +246,24 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	if (NULL != mPutFile) {
 		fseek(mPutFile, offset, SEEK_SET);
 	}
+}
+
+- (void) setPutFile:(NSString *)path resumeUploadFromOffset:(off_t)offset_ {
+	mPutFile = fopen([path fileSystemRepresentation], "r");
+	if (NULL == mPutFile) {
+		NSLog(@"CURLHandle: setPutFile:resumeUploadFromOffset: couldn't find file at %@", path);
+		return;
+	}
+	
+	fseek(mPutFile, 0, SEEK_END);
+	off_t fileSize = ftello(mPutFile);
+	rewind(mPutFile);
+	
+	curl_easy_setopt([self curl], CURLOPT_PUT, 1L);
+	curl_easy_setopt([self curl], CURLOPT_UPLOAD, 1L);
+	curl_easy_setopt([self curl], CURLOPT_INFILE, mPutFile);
+	curl_easy_setopt([self curl], CURLOPT_INFILESIZE_LARGE, fileSize);
+	curl_easy_setopt([self curl], CURLOPT_RESUME_FROM_LARGE, offset_);
 }
 
 /*"	Return the cookie array from the latest request.  Equivalent to getting a property of COOKIES.

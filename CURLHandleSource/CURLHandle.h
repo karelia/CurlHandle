@@ -91,6 +91,7 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 + (void) setAllowsProxy:(BOOL) inBool;
 - (void) setPutFile:(NSString *)path;
 - (void) setPutFileOffset:(int)offset;
+- (void) setPutFile:(NSString *)path resumeUploadFromOffset:(off_t)offset_;
 - (NSArray *)getResponseCookies;
 + (NSString *) curlVersion;
 
