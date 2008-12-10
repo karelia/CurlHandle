@@ -1,0 +1,74 @@
+------------------------------------------------------------------------------
+CURLHandle Notes
+------------------------------------------------------------------------------
+
+There are two versions of the framework and tester applications bundled here -- one for Mac OS X version 10.1 and up; another for 10.2 and up.  Use the former if you want your application to work under 10.1; use the latter if your app requires 10.2, or if you need SSL or IPv6 support.
+
+CURLHandle runs just fine under 10.3.  I have never tried to build the framework under 10.3, however!
+
+To run the CURLHandleTester application, just double-click on it.  This is an example of an application that is completely self-contained, and has CURL functionality built in.
+
+------------------------------------------------------------------------------
+INSTALLING THE HEADERS
+------------------------------------------------------------------------------
+
+IF YOU ARE RUNNING MAC OS X 10.3 --
+
+As mentioned above, I have not yet tried to build CURLHandle under 10.3.  You may find that doing so restricts your application to run under 10.3, just as building under 10.2 diallows your application from running under 10.1.  So if you want 10.2 support, it may be safer to build under 10.2.
+
+
+IF YOU ARE RUNNING MAC OS X 10.2 --
+
+The curl headers (though not from the latest version) are already installed on Mac OS X.  You might not need to download curl at all.  It wouldn't hurt to download the newest curl by following the instructions below for 10.1.
+
+
+
+IF YOU ARE RUNNING MAC OS X 10.1 (or you want the latest headers installed) --
+
+You need to download curl (the current version as of this writing is 7.11.1) from one of these sites:
+
+http://curl.haxx.se/download.html  (original site, Sweden)
+http://curl.sourceforge.net/download.html (U.S. Mirror)
+
+Then, you need to configure, make, and install curl.  From the command line, in the curl directory you've downloaded, type:
+	./configure
+	make
+	
+Then, to install the curl headers, do the following:
+
+	cd include
+	make install  (you might need to use sudo if you don't have privileges)
+
+------------------------------------------------------------------------------
+INSTALLING THE CURLHANDLE FRAMEWORK
+------------------------------------------------------------------------------
+
+Move the appropraite CURLHandle.framework into /Library/Frameworks.  You can then add the framework to your project, and be sure to copy the framework into your application "Frameworks" directory using a copy-files build phase in Project Builder.  This is what CURLHandleTester does, so that it won't require any installation of curl or CURLHandle.framework in order to run.
+
+
+
+------------------------ BELOW THIS POINT IS OPTIONAL ------------------------
+
+
+
+
+------------------------------------------------------------------------------
+RE-BUILDING THE CURLHANDLE FRAMEWORK
+------------------------------------------------------------------------------
+
+If you want to modify CURLHandle, or if you've gotten a newer version of libcurl, it should be pretty easy to re-build CURLHandle.framework.
+
+Be sure curl is fully installed -- follow the "installing the headers" steps above, but skip the "cd include" step.  This will install the entire package, not just the headers.
+
+**** IMPORTANT NOTE: If you want your application to be compatible with Mac OS X 10.1 as well as 10.2 (and 10.3), you need to build curl under 10.1.  When you 'configure' curl, it looks at the capabilities of the OS and builds differently based on whether you are on 10.1 or 10.2.   If you build it under 10.2, it will not run under 10.1 because it assumes certain functionality added to 10.2 will be there, and therefore *crash* on 10.1 (with a message logged about missing symbols _getnameinfo, _strtok_r, _localtime_r, _strlcat, and _gmtime_r.)
+
+**** When CURLHandle and curl are built under 10,1, there is no SSL or IPv6 support.  There may be some way to get the appropriate libraries and headers installed in order to cause "configure" to cause curl to be built with support for those; I just haven't explored that path yet.
+
+Now you can just build the CURLHandle.pbproj project, and then install your new CURLHandle.framework as above.  To build a "deployment" build, use the command line command "pbxbuild install" whilst in the directory containing the project.  You will have to fish around in your intermediate build directory's "UninstalledProducts" directory to find the framework, though, since it isn't actually installed.
+
+You will probably want to verify that the framework is prebound.  From the command line, go into the CURLHandle.framework directory and type "otool -vh CURLHandle".  You should see "PREBOUND" in the list of flags.
+
+Let me know if you have any questions ... I've gone through a lot to figure this out, so there's no point in you wasting time figuring out the same issues!  :-)
+
+-- Dan Wood
+dwood@karelia.com

@@ -1,0 +1,59 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {go = id; stop = id; useBigFile = id; useSSLTest = id; useSnoop = id; }; 
+            CLASS = TestController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                oBackground = id; 
+                oBody = id; 
+                oCookieDictionary = id; 
+                oCookieFileString = id; 
+                oCookieParseCheckbox = id; 
+                oCookieResult = id; 
+                oFollow = id; 
+                oGoButton = id; 
+                oHeader = id; 
+                oHeaderParseCheckbox = id; 
+                oPassword = id; 
+                oPostCheckbox = id; 
+                oPostDictionary = id; 
+                oProgress = NSProgressIndicator; 
+                oRenderHTMLCheckbox = id; 
+                oResultCode = id; 
+                oSSL = id; 
+                oStatus = id; 
+                oStopButton = id; 
+                oURL = id; 
+                oUserID = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                findNext = id; 
+                findNextAndOrderFindPanelOut = id; 
+                findPrevious = id; 
+                jumpToSelection = id; 
+                orderFrontFindPanel = id; 
+                replace = id; 
+                replaceAll = id; 
+                replaceAndFind = id; 
+                takeFindStringFromSelection = id; 
+            }; 
+            CLASS = TextFinder; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                findNextButton = id; 
+                findTextField = id; 
+                ignoreCaseButton = id; 
+                replaceAllScopeMatrix = id; 
+                replaceTextField = id; 
+                statusField = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

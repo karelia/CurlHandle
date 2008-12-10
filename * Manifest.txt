@@ -1,0 +1,17 @@
+CURLHandle Manifest
+
+This package contains the following top-level items:
+
+* 10.1+ compatible -- A copy of CURLHandle.framework and CURLHandleTester.app built (along with libcurl) under 10.1, so it's compatible with 10.1 and up.  But there isn't SSL and IPv6 support.
+
+* 10.2+ compatible -- A copy of CURLHandle.framework and CURLHandleTester.app built (along with libcurl) under 10.2; it's not compatible with 10.1, but it offers SSL and IPv6 support.
+
+* CURLHandleSource -- folder containing project that makes CURLHandle.framework.
+
+* CURLHandleTesterSource -- folder containing project that makes CURLHandleTester.app; a useful "template" for making sure your own projects properly include CURLHandle framework.
+
+DevNotes.txt -- how to develop with CURLHandle
+
+Documentation -- HTML pages documenting CURLHandle header files.
+
+ReleaseNotes.txt -- What has changed in CURLHandle.
