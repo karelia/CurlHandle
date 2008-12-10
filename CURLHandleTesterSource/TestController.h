@@ -2,6 +2,9 @@
 //  This is in the public domain, but please report any improvements back to the author.
 
 #import <Cocoa/Cocoa.h>
+#import <CURLHandle/CURLHandle.h>
+#import <CURLHandle/CURLHandle+extras.h>
+#import "NSData+plist.h"
 
 @class CURLHandle;
 

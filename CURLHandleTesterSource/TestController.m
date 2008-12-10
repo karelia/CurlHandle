@@ -2,9 +2,6 @@
 //  This is in the public domain, but please report any improvements back to the author.
 
 #import "TestController.h"
-#import <CURLHandle/CURLHandle.h>
-#import <CURLHandle/CURLHandle+extras.h>
-#import "NSData+plist.h"
 
 @interface TestController ( private )
 
@@ -99,17 +96,17 @@
 
 - (IBAction) useSnoop:(id)sender
 {
-	[oURL setObjectValue:@"http://www.pds.nysed.gov/servlet/SnoopServlet?happy=yes"];
+	[oURL setObjectValue:@"http://www.entropy.ch/software/MacOSX/php/test.php?happy=yes"];
 }
 
 - (IBAction) useBigFile:(id)sender
 {
-	[oURL setObjectValue:@"http://www.karelia.com/download/Watson.dmg"];
+	[oURL setObjectValue:@"http://www.karelia.com/files/Sandvox.dmg"];
 }
 
 - (IBAction) useSSLTest:(id)sender
 {
-	[oURL setObjectValue:@"https://www.stanford.edu/group/idg/leland/samples/secure/test.html"];
+	[oURL setObjectValue:@"https://www.fortify.net/sslcheck.html"];
 }
 
 
