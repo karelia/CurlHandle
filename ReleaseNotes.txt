@@ -1,5 +1,13 @@
 
+Version 2.0, December 10, 2008
 
+Yes, I know it's been 4 years.  But I figured I'd collect the various intel-compatible modifications out there and bring them "home."
+
+This version incorporates some goodies from Jonathan "Wolf" Rentzsch: -setPutFile:resumeUploadFromOffset: and the class ResumableHTTPUploader.
+
+And it's an Xcode project, and builds fat binary.
+
+I have taken out references to building your own CURL, and being 10.1-compatible.
 
 Version 1.9, 1 April 2004
 
