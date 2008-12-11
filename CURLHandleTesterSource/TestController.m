@@ -106,7 +106,7 @@
 
 - (IBAction) useSSLTest:(id)sender
 {
-	[oURL setObjectValue:@"https://www.fortify.net/sslcheck.html"];
+	[oURL setObjectValue:@"https://www.fortify.net/cgi/ssl_3.pl"];
 }
 
 
