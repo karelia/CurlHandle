@@ -296,6 +296,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	[mPort setDelegate:nil];
 	// And remove the port from the runloop
 	[[NSRunLoop currentRunLoop] removePort:mPort forMode:(NSString *)kCFRunLoopCommonModes];
+	[mPort invalidate];
     [mPort release];
 	
 	[mMainThread release];
@@ -373,28 +374,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 		mPort = [[NSPort port] retain];
 		[mPort setDelegate:self];
 
-#if 1
-#warning # this may be leaking ... there are two retains going on here.  Apple bug report #2885852, still open after TWO YEARS!
 		[[NSRunLoop currentRunLoop] addPort:mPort forMode:(NSString *)kCFRunLoopCommonModes];
-#else
-#warning # This attempt to compensate for the leak causes crashes....
-{
-			int oldCount = [mPort retainCount];
-			int newCount;
-			[[NSRunLoop currentRunLoop] addPort:mPort forMode:(NSString *)kCFRunLoopCommonModes];
-			newCount = [mPort retainCount];
-
-			if (newCount - oldCount > 1)
-			{
-				[mPort release];
-//#ifdef DEBUGCURL
-				NSLog(@"Extra NSPort retain; released %@",mPort);
-//#endif
-			}
-			
-}
-#endif
-
 		mCURL = curl_easy_init();
 		if (nil == mCURL)
 		{
