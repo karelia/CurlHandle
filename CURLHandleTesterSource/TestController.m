@@ -322,7 +322,7 @@
 
 		if ([oHeaderParseCheckbox state])
 		{
-			headers = [headers allHTTPHeaderDicts];
+			headers = [headers allHTTPHeaderFields];
 		}
 		[[oHeader textStorage] replaceCharactersInRange:
 			NSMakeRange(0,[[[oHeader textStorage] string] length])
@@ -340,11 +340,11 @@
 
 		[oHeader setNeedsDisplay:YES];
 
-		cookies = [mURLHandle propertyForKey:@"COOKIES"];
 		if ([oCookieParseCheckbox state])
 		{
 			// convert the array of strings into a dictionary
-			cookies = [cookies parsedCookies];
+            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:[headers allHTTPHeaderFields] forURL:[mURLHandle url]];
+			cookies = [cookies valueForKey:@"properties"];
 		}
 		
 		[[oCookieResult textStorage] replaceCharactersInRange:

@@ -88,7 +88,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (void) setPutFile:(NSString *)path;
 - (void) setPutFileOffset:(int)offset;
 - (void) setPutFile:(NSString *)path resumeUploadFromOffset:(off_t)offset_;
-- (NSArray *)getResponseCookies;
 + (NSString *) curlVersion;
 
 /*" NSURLRequest-based API "*/
@@ -123,12 +122,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (NSString *) formatForHTTP;
 - (NSString *) formatForHTTPUsingEncoding:(NSStringEncoding)inEncoding;
 - (NSString *) formatForHTTPUsingEncoding:(NSStringEncoding)inEncoding ordering:(NSArray *)inOrdering;
-
-@end
-
-@interface NSArray ( CurlHTTPExtensions )
-
-- (NSDictionary *)parsedCookies;
 
 @end
 

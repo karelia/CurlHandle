@@ -248,14 +248,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	curl_easy_setopt([self curl], CURLOPT_RESUME_FROM_LARGE, offset_);
 }
 
-/*"	Return the cookie array from the latest request.  Equivalent to getting a property of COOKIES.
-"*/
-- (NSArray *)getResponseCookies
-{
-	NSArray *result = [[self headerString] headersMatchingKey:@"set-cookie"];
-	return result;
-}
-
 + (NSString *) curlVersion
 {
 	return [NSString stringWithCString: curl_version()];
@@ -462,10 +454,6 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	else if ([propertyKey isEqualToString:@"HEADER"])
 	{
 		result = [self headerString];
-	}
-	else if ([propertyKey isEqualToString:@"COOKIES"])
-	{
-		result = [self getResponseCookies];
 	}
 	else	// Now see if we can find any headers loaded with that property as the "title"
 			// and if we do, get the value from the first match (unlikely to be more than 
@@ -912,70 +900,6 @@ the headers are read; the entire header is cached into a string after converting
 		[s deleteCharactersInRange:NSMakeRange([s length]-1, 1)];
 	}
 	return s;	
-}
-
-@end
-
-@implementation NSArray ( CurlHTTPExtensions )
-
-/*"	This category on NSArray adds methods for header and cookie access.
-"*/
-
-
-/*"	Parse the array of cookie lines, turning it into a dictionary of key/values
-(suitable for passing to #setRequestCookies:).
-
-For instance, this will turn
-
-( "B=96lr6csucjt99&b=2; expires=Thu, 15 Apr 2010 20:00:00 GMT; path=/; domain=.yahoo.com"; )
-
-into
-
-{
-	B = {
-		value = "96lr6csucjt99&b=2";
-		expires = "Thu, 15 Apr 2010 20:00:00 GMT";
-		path = "/";
-		domain = ".yahoo.com";
-	}
-}
-
-"*/
-- (NSDictionary *)parsedCookies
-{
-	NSMutableDictionary *result = [NSMutableDictionary dictionary];
-	NSEnumerator *theEnum = [self objectEnumerator];
-	NSString *cookieLine;
-
-	while (nil != (cookieLine = [theEnum nextObject]) )
-	{
-		NSArray *components = [cookieLine componentsSeparatedByString:@"; "];
-		NSEnumerator *theEnum = [components objectEnumerator];
-		NSString *thePair;
-		BOOL firstOne = YES;		// the first one is handled specially
-		NSMutableDictionary *attributesDictionary = [NSMutableDictionary dictionary];
-
-		while (nil != (thePair = [theEnum nextObject]) )
-		{
-			NSRange whereEquals = [thePair rangeOfString:@"="];
-			if (NSNotFound != whereEquals.location)
-			{
-				NSString *key = [thePair substringToIndex:whereEquals.location];
-				NSString *val = [thePair substringFromIndex:whereEquals.location + 1];
-				if (firstOne)
-				{
-					[result setObject:attributesDictionary forKey:key];
-					[attributesDictionary setObject:val forKey:@"value"];
-					firstOne = NO;
-				}
-				else
-				{
-					[attributesDictionary setObject:val forKey:key];
-				}
-			}
-		}
-	}
-	return result;
 }
 
 @end
