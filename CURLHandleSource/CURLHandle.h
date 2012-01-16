@@ -62,8 +62,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 
 	NSDictionary	*mProxies;	/*" Dictionary of proxy information; it's released when the handle is deallocated since it's needed for the transfer."*/
 
-	NSMutableDictionary		*mHTTPHeaders;	/*" Dictionary of & values (NSStrings) for additional HTTP headers.  We store the options in a dictionary and then make use of them right before the #curl_easy_perform so that we can retain their memory until it is needed."*/
-
 	id					mProgressIndicator;		/*" A progress indicator, to animate during foreground loads.  This will help give some indication of loading progress, though of course you're better off loading in the background. "*/
 
 	// Backgrounding support
@@ -85,7 +83,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption;
 - (void) setStringOrNumberObject:(id)inString forKey:(CURLoption) inCurlOption;
 - (NSURL *)url;
-- (void) setHTTPHeaders:(NSDictionary *)inDict;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
 - (void) setPutFile:(NSString *)path;

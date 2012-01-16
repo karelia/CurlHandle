@@ -203,18 +203,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	[mStringOptions setObject:inObject forKey:[NSNumber numberWithInt:inCurlOption]];
 }
 
-/*"	Add these to the list of HTTP headers (besides cookie, user agent, referer -- see CURLOPT_HTTPHEADER).
-"*/
-
-- (void) setHTTPHeaders:(NSDictionary *)inDict
-{
-	if (nil == mHTTPHeaders)
-	{
-		mHTTPHeaders = [[NSMutableDictionary alloc] init];
-	}
-	[mHTTPHeaders addEntriesFromDictionary:inDict];
-}
-
 /*"	Set the file to be PUT
 "*/
 - (void) setPutFile:(NSString *)path
@@ -302,7 +290,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	[mHeaderString release];
 	[mStringOptions release];
 	[mProxies release];
-	[mHTTPHeaders release];
 	[super dealloc];
 }
 
@@ -664,14 +651,12 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	
 	// Set the HTTP Headers.  (These will override options set with above)
 	{
-		NSEnumerator *theEnum = [mHTTPHeaders keyEnumerator];
-		id theKey;
-		while (nil != (theKey = [theEnum nextObject]) )
-		{
-			id theValue = [mHTTPHeaders objectForKey:theKey];
+        for (NSString *theKey in [_request allHTTPHeaderFields])
+        {
+            NSString *theValue = [_request valueForHTTPHeaderField:theKey];
 			NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
 			httpHeaders = curl_slist_append( httpHeaders, [pair cString] );
-		}
+        }
 		curl_easy_setopt(mCURL, CURLOPT_HTTPHEADER, httpHeaders);
 	}
 
