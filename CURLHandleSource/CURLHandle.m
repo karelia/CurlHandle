@@ -1071,7 +1071,7 @@ the rest of the data on line (following ":")
 	return result;
 }
 
-/*" Given a line of a header, e.g. "Foo: Bar", return the key in lowercase form, e.g. "foo". "*/
+/*" Given a line of a header, e.g. "Foo: Bar" "*/
 
 - (NSString *) headerKey
 {
@@ -1079,7 +1079,7 @@ the rest of the data on line (following ":")
 	NSRange whereColon = [self rangeOfString:@": "];
 	if (NSNotFound != whereColon.location)
 	{
-		result = [[self substringToIndex:whereColon.location] lowercaseString];
+		result = [self substringToIndex:whereColon.location];
 	}
 	return result;
 }
