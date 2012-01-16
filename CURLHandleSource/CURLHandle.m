@@ -371,7 +371,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 		}
 		mErrorBuffer[0] = 0;	// initialize the error buffer to empty
 		mHeaderBuffer = [[NSMutableData alloc] init];
-		mHeaderString = nil;	// not using yet
 		mStringOptions = [[NSMutableDictionary alloc] init];
 				
 		// SET OPTIONS -- NOTE THAT WE DON'T SET ANY STRINGS DIRECTLY AT THIS STAGE.
