@@ -261,21 +261,20 @@
 /*"	Notification that data is available.  Set the progress bar if progress is known.
 "*/
 
-- (void)URLHandle:(NSURLHandle *)sender resourceDataDidBecomeAvailable:(NSData *)newBytes
+- (void)URLHandle:(CURLHandle *)sender resourceDataDidBecomeAvailable:(NSData *)newBytes
 {
 	[self updateStatus];
 
 	if (nil != oProgress)
 	{
-		id contentLength = [sender propertyForKeyIfAvailable:@"content-length"];
+		long long contentLength = [[sender response] expectedContentLength];
 	
 		mBytesRetrievedSoFar += [newBytes length];
 	
-		if (nil != contentLength)
+		if (contentLength > 0)
 		{
-			double total = [contentLength doubleValue];
 			[oProgress setIndeterminate:NO];
-			[oProgress setMaxValue:total];
+			[oProgress setMaxValue:contentLength];
 			[oProgress setDoubleValue:mBytesRetrievedSoFar];
 		}
 	}
@@ -317,21 +316,17 @@
 	// Process Header & status & Cookies
 	{
 		id cookies;
-		id headers = [mURLHandle propertyForKey:@"HEADER"];
-		id httpCode = [mURLHandle propertyForKeyIfAvailable:NSHTTPPropertyStatusCodeKey];
+		NSDictionary *headers = [[mURLHandle response] allHeaderFields];
+        NSInteger statusCode = [[mURLHandle response] statusCode];
 
-		if ([oHeaderParseCheckbox state])
-		{
-			headers = [headers allHTTPHeaderFields];
-		}
 		[[oHeader textStorage] replaceCharactersInRange:
 			NSMakeRange(0,[[[oHeader textStorage] string] length])
 			withString:[headers description]];
 		
-		[oResultCode setObjectValue:httpCode];
+		[oResultCode setIntegerValue:statusCode];
 		[oResultCode setNeedsDisplay:YES];
 		
-		[oResultReason setObjectValue: [mURLHandle propertyForKey: NSHTTPPropertyStatusReasonKey]];
+		[oResultReason setObjectValue: [NSHTTPURLResponse localizedStringForStatusCode:statusCode]];
 		[oResultReason setNeedsDisplay:YES];
 		[oResultLocation setObjectValue: [mURLHandle propertyForKey: NSHTTPPropertyRedirectionHeadersKey]];
 		[oResultLocation setNeedsDisplay:YES];
@@ -343,7 +338,7 @@
 		if ([oCookieParseCheckbox state])
 		{
 			// convert the array of strings into a dictionary
-            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:[headers allHTTPHeaderFields] forURL:[mURLHandle url]];
+            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:[mURLHandle url]];
 			cookies = [cookies valueForKey:@"properties"];
 		}
 		

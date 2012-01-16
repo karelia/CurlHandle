@@ -34,6 +34,32 @@ NSString *CURLHandleCacheChangeNotification = @"CURLHandleCacheChangeNotificatio
 NSString *CURLHandleCacheCreateNotification = @"CURLHandleCacheCreateNotification";
 NSString *CURLHandleCreatedNotification		= @"CURLHandleCreatedNotification";
 
+
+@interface CURLResponse : NSHTTPURLResponse
+{
+@private
+    NSInteger       _statusCode;
+    NSDictionary    *_headerFields;
+}
+
+- (id)initWithURL:(NSURL *)URL statusCode:(NSInteger)statusCode headerString:(NSString *)headerString;
+
+@end
+
+@interface NSString ( CurlHTTPExtensions )
+
+- (NSString *) headerStatus;
+- (NSString *) headerHTTPVersion;
+- (NSString *) headerMatchingKey:(NSString *)inKey;
+- (NSArray *) headersMatchingKey:(NSString *)inKey;
+- (NSDictionary *) allHTTPHeaderFields;
+- (NSString *) headerKey;
+- (NSString *) headerValue;
+- (NSArray *) componentsSeparatedByLineSeparators;
+
+@end
+
+
 /*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
 	we can use that to get back into Objective C and do the work with the class.
 "*/
@@ -279,7 +305,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	[mProgressIndicator release];
 	[_request release];
 	[mHeaderBuffer release];			mHeaderBuffer = 0;
-	[mHeaderString release];
+	[_response release];
 	[mStringOptions release];
 	[mProxies release];
 	[super dealloc];
@@ -425,43 +451,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 
 - (id)propertyForKeyIfAvailable:(NSString *)propertyKey
 {
-	id result = nil;
-	long resultLong;
-	if ([propertyKey hasPrefix:@"NSHTTPProperty"])
-	{
-		if ([propertyKey isEqualToString:NSHTTPPropertyStatusCodeKey])
-		{
-			mResult = curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &resultLong );
-			result = [NSNumber numberWithLong:resultLong];
-		}
-		else if ([propertyKey isEqualToString:NSHTTPPropertyStatusReasonKey])
-		{
-			result = [[self headerString] headerStatus];
-		}
-		else if ([propertyKey isEqualToString:NSHTTPPropertyServerHTTPVersionKey])
-		{
-			result = [[self headerString] headerHTTPVersion];
-		}
-		else if ([propertyKey isEqualToString:NSHTTPPropertyRedirectionHeadersKey])
-		{
-			result = [[self headerString] headerMatchingKey:@"location"];
-		}
-		else if ([propertyKey isEqualToString:NSHTTPPropertyErrorPageDataKey])
-		{
-			result = @"NSHTTPPropertyErrorPageDataKey -- needs to be the body information sent.";
-		}
-	}
-	else if ([propertyKey isEqualToString:@"HEADER"])
-	{
-		result = [self headerString];
-	}
-	else	// Now see if we can find any headers loaded with that property as the "title"
-			// and if we do, get the value from the first match (unlikely to be more than 
-			// one match if the client is using this mechanism to get a specific header value.
-	{
-		result = [[self headerString] headerMatchingKey:[propertyKey lowercaseString]];
-	}
-	return result;
+	return nil;
 }
 
 /*" %{The last three methods, loadInForeground, beginLoadInBackground, and endLoadInBackground do the meaty work of your subclass. They are called from resourceData, loadInBackground, and cancelLoadInBackground respectively, after checking the status of the handle. (For instance, resourceData will not call loadInForeground if the handle has already been loaded; it will simply return the existing data.) (?source)}
@@ -655,8 +645,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	}
 	// clear the buffers
 	[mHeaderBuffer setLength:0];	// empty out header buffer
-	[mHeaderString release];		// release and invalidate any cached string of header
-	mHeaderString = nil;
+	[_response release]; _response = nil;		// release and invalidate any cached string of header
 	
 	// Do the transfer
 	mResult = curl_easy_perform(mCURL);
@@ -812,15 +801,20 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 /*" Return the current header, as a string. This is meant to be invoked after all
 the headers are read; the entire header is cached into a string after converting from raw data. "*/
 
-- (NSString *)headerString
+- (NSHTTPURLResponse *)response
 {
 #warning We can't really assume a header encoding, trying 7-bit ASCII only.  Maybe there is some way to know?
 
-	if (nil == mHeaderString)		// Has it not been initialized yet?
+	if (!_response)		// Has it not been initialized yet?
 	{
-		mHeaderString = [[NSString alloc] initWithData:mHeaderBuffer encoding:NSASCIIStringEncoding];
+        NSInteger resultLong;
+        mResult = curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &resultLong );
+        
+		NSString *headerString = [[NSString alloc] initWithData:mHeaderBuffer encoding:NSASCIIStringEncoding];
+        _response = [[CURLResponse alloc] initWithURL:[self url] statusCode:resultLong headerString:headerString];
+        [headerString release];
 	}
-	return mHeaderString;
+	return _response;
 }
 
 
@@ -1034,3 +1028,25 @@ the headers are read; the entire header is cached into a string after converting
 }
 @end
 
+
+@implementation CURLResponse
+
+- (id)initWithURL:(NSURL *)URL statusCode:(NSInteger)statusCode headerString:(NSString *)headerString;
+{
+    NSDictionary *fields = [headerString allHTTPHeaderFields];
+    
+    if (self = [self initWithURL:URL
+                        MIMEType:[fields objectForKey:@"Content-Type"]
+           expectedContentLength:[[fields objectForKey:@"Content-Length"] integerValue]
+                textEncodingName:[fields objectForKey:@"Content-Encoding"]])
+    {
+        _statusCode = statusCode;
+        _headerFields = [fields copy];
+    }
+    return self;
+}
+
+- (NSInteger)statusCode; { return _statusCode; }
+- (NSDictionary *)allHeaderFields; { return _headerFields; }
+
+@end

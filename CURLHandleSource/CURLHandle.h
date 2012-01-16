@@ -56,7 +56,7 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 
 	NSMutableData	*mHeaderBuffer;			/*" The buffer that is filled with data from the header as the download progresses; it's appended to one line at a time. "*/
 
-	NSString		*mHeaderString;			/*" The header buffer, converted into a string, upon demand. "*/
+	NSHTTPURLResponse   *_response;			/*" The header buffer, converted into a response, upon demand. "*/
 
 	NSMutableDictionary	*mStringOptions;	/*" Dictionary of keys(ints) & values (NSStrings) for performing curl_easy_setopt.  We store the options in a dictionary and then invoke #curl_easy_setopt on each option right before the #curl_easy_perform so that we can retain their memory until it is needed."*/
 
@@ -92,6 +92,7 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 
 /*" NSURLRequest-based API "*/
 - (void)setRequest:(NSURLRequest *)request;
+- (NSHTTPURLResponse *)response;
 
 /*" NSURLHandle overrides "*/
 
@@ -113,7 +114,7 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (void) curlThreadBackgroundLoad:(id)inParam;
 - (void) prepareAndPerformCurl;
 - (void)handlePortMessage:(NSPortMessage *)portMessage;
-- (NSString *)headerString;
+//- (NSString *)headerString;
 
 @end
 
@@ -122,19 +123,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (NSString *) formatForHTTP;
 - (NSString *) formatForHTTPUsingEncoding:(NSStringEncoding)inEncoding;
 - (NSString *) formatForHTTPUsingEncoding:(NSStringEncoding)inEncoding ordering:(NSArray *)inOrdering;
-
-@end
-
-@interface NSString ( CurlHTTPExtensions )
-
-- (NSString *) headerStatus;
-- (NSString *) headerHTTPVersion;
-- (NSString *) headerMatchingKey:(NSString *)inKey;
-- (NSArray *) headersMatchingKey:(NSString *)inKey;
-- (NSDictionary *) allHTTPHeaderFields;
-- (NSString *) headerKey;
-- (NSString *) headerValue;
-- (NSArray *) componentsSeparatedByLineSeparators;
 
 @end
 

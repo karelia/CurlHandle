@@ -116,7 +116,7 @@
 		case ResumableHTTPUploaderHEAD: {
 			//	HTTP HEAD success.
 			uint64_t localFileSize = [[[NSFileManager defaultManager] fileAttributesAtPath:filePath traverseLink:NO] fileSize];
-			uint64_t remoteFileSize = atoll([[[curlHandle headerString] headerMatchingKey:@"content-length"] UTF8String]);
+			uint64_t remoteFileSize = atoll([[[[curlHandle response] allHeaderFields] objectForKey:@"Content-Length"] UTF8String]);
 			if (remoteFileSize < localFileSize) {
 				//	Need to upload the rest of the file.
 				[curlHandle setNoBody:NO]; // HTTP PUT
