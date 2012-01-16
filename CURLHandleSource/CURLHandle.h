@@ -138,7 +138,7 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (NSString *) headerHTTPVersion;
 - (NSString *) headerMatchingKey:(NSString *)inKey;
 - (NSArray *) headersMatchingKey:(NSString *)inKey;
-- (NSArray *) allHTTPHeaderDicts;
+- (NSDictionary *) allHTTPHeaderFields;
 - (NSString *) headerKey;
 - (NSString *) headerValue;
 - (NSArray *) componentsSeparatedByLineSeparators;

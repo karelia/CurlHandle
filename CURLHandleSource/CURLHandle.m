@@ -1041,20 +1041,12 @@ into
 }
 
 
-/*"	Create an array of dictionaries from the HTTP headers. 
-(lowercasing header titles for ease of comparison)
+/*"	Create a dictionary from the HTTP headers. "*/
 
-The array consists of any number of
-single-item dictionaries, with each dictionary consisting of a single key
-corresponding to the header title (e.g. "set-cookie") and value corresponding to
-the rest of the data on line (following ":")
-
-"*/
-
-- (NSArray *) allHTTPHeaderDicts
+- (NSDictionary *) allHTTPHeaderFields;
 {
-	NSMutableArray *result = [NSMutableArray array];
 	NSArray *components = [self componentsSeparatedByLineSeparators];
+	NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:[components count] - 1];
 	
 	NSEnumerator *theEnum = [components objectEnumerator];
 	NSString *theLine = [theEnum nextObject];		// result code -- ignore
@@ -1065,7 +1057,7 @@ the rest of the data on line (following ":")
 		if (nil != key && nil != value)
 		{
 			// Add a single dictionary for this header name/value
-			[result addObject:[NSDictionary dictionaryWithObject:value forKey:key]];
+			[result setObject:value forKey:key];
 		}
 	}
 	return result;
