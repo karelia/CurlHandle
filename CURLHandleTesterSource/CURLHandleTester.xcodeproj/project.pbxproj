@@ -19,6 +19,23 @@
 		CE885B260EF08D5200B6E545 /* curl.icns in Resources */ = {isa = PBXBuildFile; fileRef = CE885B250EF08D5200B6E545 /* curl.icns */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		27456A0714C47570008ADF9F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27456A0014C4756F008ADF9F /* CURLHandle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = CURLHandle;
+		};
+		27456A0914C475AE008ADF9F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27456A0014C4756F008ADF9F /* CURLHandle.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = CURLHandle;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		2F7C0D0E09D9BF2B00FE334E /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -36,6 +53,7 @@
 /* Begin PBXFileReference section */
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		27456A0014C4756F008ADF9F /* CURLHandle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CURLHandle.xcodeproj; path = ../CURLHandleSource/CURLHandle.xcodeproj; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -107,12 +125,29 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		274569FF14C47543008ADF9F /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				27456A0014C4756F008ADF9F /* CURLHandle.xcodeproj */,
+			);
+			name = Dependencies;
+			sourceTree = "<group>";
+		};
+		27456A0114C4756F008ADF9F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				27456A0814C47570008ADF9F /* CURLHandle.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		29B97314FDCFA39411CA2CEA /* CURLHandleTester */ = {
 			isa = PBXGroup;
 			children = (
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
+				274569FF14C47543008ADF9F /* Dependencies */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -163,6 +198,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				27456A0A14C475AE008ADF9F /* PBXTargetDependency */,
 			);
 			name = CURLHandleTester;
 			productInstallPath = "$(HOME)/Applications";
@@ -187,12 +223,28 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CURLHandleTester */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 27456A0114C4756F008ADF9F /* Products */;
+					ProjectRef = 27456A0014C4756F008ADF9F /* CURLHandle.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* CURLHandleTester */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		27456A0814C47570008ADF9F /* CURLHandle.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = CURLHandle.framework;
+			remoteRef = 27456A0714C47570008ADF9F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D1107290486CEB800E47090 /* Resources */ = {
@@ -220,6 +272,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		27456A0A14C475AE008ADF9F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CURLHandle;
+			targetProxy = 27456A0914C475AE008ADF9F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
