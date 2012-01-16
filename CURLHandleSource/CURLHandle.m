@@ -174,29 +174,18 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	return mCURL;
 }
 
-- (void)setRequest:(NSURLRequest *)request;
-{
-    [self setURL:[request URL]];
-}
-
-/*"	Set the URL related to this CURLHandle.  This can actually be changed so the same CURL is used
+/*"	Set the URL request related to this CURLHandle.  This can actually be changed so the same CURL is used
 	for different URLs, though they must be done sequentially.  (See libcurl documentation.)
 	Note that doing so will confuse the cache, since cache is still keyed by original URL.
 "*/
 
-- (void) setURL:(NSURL *)inURL
+- (void)setRequest:(NSURLRequest *)request;
 {
-	[inURL retain];
-	[mNSURL release];
-	mNSURL = inURL;
+    if (request == _request) return;
+    [_request release]; _request = [request copy];
 }
 
-/*"	return the NSURL associated with this CURLHandle
-"*/
-- (NSURL *)url
-{
-	return mNSURL;
-}
+- (NSURL *)url { return [_request URL]; }
 
 /*"	Set an option given a !{CURLoption} key.  Before transfer, the string will be used to invoke %curl_easy_setopt.  Categories with convenient APIs can make use of this.
 "*/
@@ -308,7 +297,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	curl_easy_cleanup(mCURL);
 	mCURL = nil;
 	[mProgressIndicator release];
-	[mNSURL release];
+	[_request release];
 	[mHeaderBuffer release];			mHeaderBuffer = 0;
 	[mHeaderString release];
 	[mStringOptions release];
@@ -385,7 +374,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 		{
 			return nil;
 		}
-		[self setURL:anURL];
+		[self setRequest:[NSURLRequest requestWithURL:anURL]];
 		
 		// Store the URL
 		if (willCache)
@@ -628,7 +617,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	{
 		NSString *proxyHost = nil;
 		NSNumber *proxyPort = nil;
-		NSString *scheme = [[mNSURL scheme] lowercaseString];
+		NSString *scheme = [[[self url] scheme] lowercaseString];
 
 		// Allocate and keep the proxy dictionary
 		if (nil == mProxies)
@@ -687,7 +676,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	}
 
 	// Set the URL
-	mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[mNSURL absoluteString] cString]);
+	mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[self url] absoluteString] cString]);
 	if (0 != mResult)
 	{
 		return;
