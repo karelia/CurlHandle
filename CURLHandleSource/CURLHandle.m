@@ -174,6 +174,11 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	return mCURL;
 }
 
+- (void)setRequest:(NSURLRequest *)request;
+{
+    [self setURL:[request URL]];
+}
+
 /*"	Set the URL related to this CURLHandle.  This can actually be changed so the same CURL is used
 	for different URLs, though they must be done sequentially.  (See libcurl documentation.)
 	Note that doing so will confuse the cache, since cache is still keyed by original URL.

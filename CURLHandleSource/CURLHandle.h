@@ -95,6 +95,9 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (NSArray *)getResponseCookies;
 + (NSString *) curlVersion;
 
+/*" NSURLRequest-based API "*/
+- (void)setRequest:(NSURLRequest *)request;
+
 /*" NSURLHandle overrides "*/
 
 + (BOOL)canInitWithURL:(NSURL *)anURL;
