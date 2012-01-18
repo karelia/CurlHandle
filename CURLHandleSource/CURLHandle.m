@@ -26,11 +26,6 @@ NSMutableDictionary *sCurlCache = nil;		// not static, so we can examine it exte
 SCDynamicStoreRef	sSCDSRef = NULL;
 NSString			*sProxyUserIDAndPassword = nil;
 
-NSString *CURLHandleCacheDeleteNotification = @"CURLHandleCacheDeleteNotification";
-NSString *CURLHandleCacheChangeNotification = @"CURLHandleCacheChangeNotification";
-NSString *CURLHandleCacheCreateNotification = @"CURLHandleCacheCreateNotification";
-NSString *CURLHandleCreatedNotification		= @"CURLHandleCreatedNotification";
-
 
 @interface CURLResponse : NSHTTPURLResponse
 {
@@ -118,7 +113,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 + (void) curlGoodbye
 {
 	curl_global_cleanup();
-	[[NSNotificationCenter defaultCenter] postNotificationName:CURLHandleCacheDeleteNotification object:self];
 	[sCurlCache release];
 	[sAcceptedURLs release];
 }
@@ -144,7 +138,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	CURLcode rc;
 	sAcceptAllHTTP = inAcceptAllHTTP;
 	sCurlCache = [[NSMutableDictionary alloc] init];		// set up static cache
-	[[NSNotificationCenter defaultCenter] postNotificationName:CURLHandleCacheCreateNotification object:self];
 	sAcceptedURLs = [[NSMutableSet alloc] init];			// set up static list of URLs this handles
 	[NSURLHandle registerURLHandleClass:self];
 	rc = curl_global_init(CURL_GLOBAL_ALL);
@@ -185,7 +178,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 + (void)curlFlushEntireCache
 {
 	[sCurlCache removeAllObjects];
-	[[NSNotificationCenter defaultCenter] postNotificationName:CURLHandleCacheChangeNotification object:sCurlCache];
 }
 
 /*"	Return the CURL object assocated with this, so categories can have other methods
@@ -371,7 +363,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 		if (willCache)
 		{
 			[sCurlCache setObject:self forKey:anURL];
-			[[NSNotificationCenter defaultCenter] postNotificationName:CURLHandleCacheChangeNotification object:sCurlCache];
 		}
 		mErrorBuffer[0] = 0;	// initialize the error buffer to empty
 		mHeaderBuffer = [[NSMutableData alloc] init];
@@ -397,12 +388,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 			if(mResult) return nil;
 		mResult = curl_easy_setopt(mCURL, CURLOPT_FILE, self);
 			if(mResult) return nil;
-
-			// Finally, post a notification that the CURLHandle was created.
-			// This is so that handles created behind our back, like images in an HTML view,
-			// can be given a client to pay attention to their being loaded.
-
-		[[NSNotificationCenter defaultCenter] postNotificationName:CURLHandleCreatedNotification object:self];
 	}
 	return self;
 }

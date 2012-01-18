@@ -10,19 +10,6 @@
 #import <Foundation/Foundation.h>
 #import <curl/curl.h>
 
-	/*" The cache has been removed "*/
-extern	NSString *CURLHandleCacheDeleteNotification;
-
-	/*" The cache has been created "*/
-extern	NSString *CURLHandleCacheCreateNotification;
-
-	/*" The cache has been changed "*/
-extern	NSString *CURLHandleCacheChangeNotification;
-
-	/*" A handle has been created; the object is the handle itself. "*/
-
-extern	NSString *CURLHandleCreatedNotification;
-
 	/*" Cache of URL contents, keyed by URL "*/
 extern 	NSMutableDictionary *sCurlCache;
 
