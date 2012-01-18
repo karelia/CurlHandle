@@ -8,7 +8,6 @@
 //
 
 #import "CURLHandle.h"
-#import <Cocoa/Cocoa.h>
 #define NSS(s) (NSString *)(s)
 #include <SystemConfiguration/SystemConfiguration.h>
 
