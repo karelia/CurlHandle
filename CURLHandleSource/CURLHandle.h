@@ -65,8 +65,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 	id					mProgressIndicator;		/*" A progress indicator, to animate during foreground loads.  This will help give some indication of loading progress, though of course you're better off loading in the background. "*/
 
 	// Backgrounding support
-	NSPort			*mPort;						/*" A port for communicating between the background thread and the foreground thread. "*/
-
 	BOOL			mAbortBackground;		/*" A flag that is set by the foreground thread and read by the background thread; it's an indicator that the user has cancelled. "*/
 
 	FILE *mPutFile;  /*" The FILE stream if putFile: is used.  It's only saved so it can be closed after perform "*/
@@ -109,10 +107,9 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 
 /*" Support Methods "*/
 
-- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber message:(int)inMessageID;
+- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 - (void) curlThreadBackgroundLoad:(id)inParam;
 - (void) prepareAndPerformCurl;
-- (void)handlePortMessage:(NSPortMessage *)portMessage;
 //- (NSString *)headerString;
 
 @end

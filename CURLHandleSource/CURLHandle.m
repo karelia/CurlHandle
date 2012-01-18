@@ -18,7 +18,7 @@
 //#define DEBUGCURL 1
 //#define DEBUGCURL_SLOW
 
-enum { DONE = 0, BAD = 0xBAD, HEAD = 0xEAD, BODY = 0xB0D };	// Clever, eh?
+enum { DONE = 0 };	// Clever, eh?
 
 enum { NOT_LOADING, LOADING };
 
@@ -66,7 +66,7 @@ NSString *CURLHandleCreatedNotification		= @"CURLHandleCreatedNotification";
 
 size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 {
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb message:BODY];
+	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:NO];
 }
 
 /*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
@@ -75,7 +75,7 @@ size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 
 size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 {
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb message:HEAD];
+	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:YES];
 }
 
 @implementation CURLHandle
@@ -292,13 +292,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 
 - (void) dealloc
 {
-	// First, clear out the port's delegate, so it won't try to send message to deleted CURLHandle
-	[mPort setDelegate:nil];
-	// And remove the port from the runloop
-	[[NSRunLoop currentRunLoop] removePort:mPort forMode:(NSString *)kCFRunLoopCommonModes];
-	[mPort invalidate];
-    [mPort release];
-	
 	[_thread release];
 	curl_easy_cleanup(mCURL);
 	mCURL = nil;
@@ -370,15 +363,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	{
 		_thread = [[NSThread currentThread] retain];	// remember main thread
 
-		mPort = [[NSPort port] retain];
-		[mPort setDelegate:self];
-
-		[[NSRunLoop currentRunLoop] addPort:mPort forMode:(NSString *)kCFRunLoopCommonModes];
-		mCURL = curl_easy_init();
-		if (nil == mCURL)
-		{
-			return nil;
-		}
 		[self setRequest:[NSURLRequest requestWithURL:anURL]];
 		
 		// Store the URL
@@ -669,6 +653,11 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	until the thread is done executing.
 "*/
 
+- (void)didFinishLoading;
+{
+    [self didLoadBytes:nil loadComplete:YES];
+}
+
 - (void) curlThreadBackgroundLoad:(id)notUsed
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -682,17 +671,14 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	// (Aborting should not let backgroundLoadDidFailWithReason get called)
 	if (!mAbortBackground)
 	{
-		BOOL sent = NO;
-		NSPortMessage *message
-			= [[NSPortMessage alloc] initWithSendPort:mPort
-				receivePort:mPort components:nil];
-		[message setMsgid:(0 == mResult) ? DONE : BAD ];
-		sent = [message sendBeforeDate:[NSDate dateWithTimeIntervalSinceNow:60.0]];
-		if (!sent)
-		{
-			NSLog(@"CURLHandle couldn't send DONE message" );
-		}
-		[message release];
+        if (0 == mResult)
+        {
+            [self performSelector:@selector(didFinishLoading) onThread:_thread withObject:nil waitUntilDone:YES];
+        }
+        else
+        {
+            [self performSelector:@selector(backgroundLoadDidFailWithReason:) onThread:_thread withObject:[self curlError] waitUntilDone:YES];
+        }
 	}
 
 	[pool release];
@@ -701,7 +687,12 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 /*"	Continue the writing callback in Objective C; now we have our instance variables.
 "*/
 
-- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber message:(int)inMessageID
+- (void)didLoadBytes:(NSData *)newBytes
+{
+    [self didLoadBytes:newBytes loadComplete:NO];
+}
+
+- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 {
 	size_t written = inSize*inNumber;
 	NSData *data = [NSData dataWithBytes:inPtr length:written];
@@ -713,17 +704,14 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	}
 	else if ([NSThread currentThread] != _thread)	// in background if in different thread
 	{
-		BOOL sent = NO;
-		NSArray *dataArray		= [NSArray arrayWithObject:data];
-		NSPortMessage *message	= [[NSPortMessage alloc] initWithSendPort:mPort
-			receivePort:mPort components:dataArray];
-		[message setMsgid:inMessageID];
-		sent = [message sendBeforeDate:[NSDate dateWithTimeIntervalSinceNow:60.0]];
-		if (!sent)
+        if (header)
 		{
-			NSLog(@"CURLHandle couldn't send message, data length = %d", [data length] );
+			[mHeaderBuffer performSelector:@selector(appendData:) onThread:_thread withObject:data waitUntilDone:YES];
 		}
-		[message release];
+		else	// notify superclass of new bytes
+		{
+			[self performSelector:@selector(didLoadBytes:) onThread:_thread withObject:data waitUntilDone:YES];
+		}
 	}
 	else	// Foreground, just write the bytes
 	{
@@ -733,56 +721,16 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 			[mProgressIndicator display];
 		}
 
-		if (HEAD == inMessageID)
+		if (header)
 		{
 			[mHeaderBuffer appendData:data];
 		}
-		else if (BODY == inMessageID)	// notify superclass of new bytes
+		else	// notify superclass of new bytes
 		{
 			[self didLoadBytes:data loadComplete:NO];
 		}
 	}
 	return written;
-}
-
-/*" NSPortDelegate method gets called in the foreground thread.  Now we're ready to call our
-	data-processor, which is called from both head and body.
-"*/
-
-- (void)handlePortMessage:(NSPortMessage *)portMessage
-{
-    int message = [portMessage msgid];
-	NSArray *components	= [portMessage components];
-
-	if (!mAbortBackground)	// only process if we haven't aborted
-	{
-		switch (message)
-		{
-			case DONE:
-	#ifdef DEBUGCURL
-				NSLog(@"+++++DONE load: %@",mNSURL);
-	#endif
-				[self didLoadBytes:nil loadComplete:YES];
-				break;
-			case BAD:
-				// "As a background load progresses, subclasses should call these methods"
-				// "Sends the failure message to clients"
-				[self backgroundLoadDidFailWithReason:[self curlError]];
-				break;
-			case BODY:
-				if (nil != components)
-				{
-					[self didLoadBytes:[components objectAtIndex:0] loadComplete:NO];	// notify foreground loading
-				}
-				break;
-			case HEAD:
-				if (nil != components)
-				{
-					[mHeaderBuffer appendData:[components objectAtIndex:0]];
-				}
-				break;
-		}
-	}
 }
 
 /*"	Convert curl's error buffer into an NSString if possible, or return the result code number as a string.  This is pass into #backgroundLoadDidFailWithReason to set the failureReason string.
