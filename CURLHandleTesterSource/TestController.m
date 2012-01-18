@@ -230,7 +230,7 @@
 		{
 			[self updateStatus];
 			[mURLHandle setConnectionTimeout:4];
-			[mURLHandle setProgressIndicator:oProgress];
+
 			[oProgress startAnimation:self];
 			// directly call up the results
 			[self URLHandleResourceDidFinishLoading:mURLHandle];

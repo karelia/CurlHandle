@@ -18,19 +18,6 @@
 "*/
 
 // -----------------------------------------------------------------------------
-#pragma mark -- OTHER GOODIES
-// -----------------------------------------------------------------------------
-
-/*"	Set a progress indicator for showing foreground load progress.
-"*/
-- (void) setProgressIndicator:(id)inProgressIndicator
-{
-	[inProgressIndicator retain];
-	[mProgressIndicator release];
-	mProgressIndicator = inProgressIndicator;
-}
-
-// -----------------------------------------------------------------------------
 #pragma mark -- CURL OPTION SETTERS
 // -----------------------------------------------------------------------------
 

@@ -295,7 +295,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	[_thread release];
 	curl_easy_cleanup(mCURL);
 	mCURL = nil;
-	[mProgressIndicator release];
 	[_request release];
 	[mHeaderBuffer release];			mHeaderBuffer = 0;
 	[_response release];
@@ -457,23 +456,12 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	NSData *result = nil;
 	mAbortBackground = NO;
 
-	if (nil != mProgressIndicator)	// make progress indicator be indeterminate
-	{
-		wasIndeterminate = [mProgressIndicator isIndeterminate];
-		[mProgressIndicator setIndeterminate:YES];
-		[mProgressIndicator display];
-	}
 	[self prepareAndPerformCurl];
 	
 	// HACK: in some circumstances, the retain count of self->_data is OK, but we crash in [super resourceData]
 	// if we don't bump up the retain count.  So I'm going to try to autorelease this to make sure
 	// it isn't nuked.
 	[[(self->_data) retain] autorelease];
-
-	if (nil != mProgressIndicator)	// restore progress indicator to previous state
-	{
-		[mProgressIndicator setIndeterminate:wasIndeterminate];
-	}
 
 	if (0 == mResult)
 	{
@@ -721,12 +709,6 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	}
 	else	// Foreground, just write the bytes
 	{
-		if (nil != mProgressIndicator)
-		{
-			[mProgressIndicator animate:nil];
-			[mProgressIndicator display];
-		}
-
 		if (header)
 		{
 			[mHeaderBuffer appendData:data];

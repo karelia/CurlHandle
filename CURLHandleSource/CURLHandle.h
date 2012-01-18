@@ -62,8 +62,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 
 	NSDictionary	*mProxies;	/*" Dictionary of proxy information; it's released when the handle is deallocated since it's needed for the transfer."*/
 
-	id					mProgressIndicator;		/*" A progress indicator, to animate during foreground loads.  This will help give some indication of loading progress, though of course you're better off loading in the background. "*/
-
 	// Backgrounding support
 	BOOL			mAbortBackground;		/*" A flag that is set by the foreground thread and read by the background thread; it's an indicator that the user has cancelled. "*/
 

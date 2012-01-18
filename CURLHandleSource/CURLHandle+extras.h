@@ -12,10 +12,6 @@
 
 @interface CURLHandle ( extras )
 
-/*" Miscellaneous functions "*/
-
-- (void) setProgressIndicator:(id)inProgressIndicator;
-
 /*" Set options for the transfer "*/
 
 - (void) setConnectionTimeout:(long) inSeconds;
