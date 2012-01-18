@@ -8,7 +8,7 @@
 
 @class CURLHandle;
 
-@interface TestController : NSObject <NSURLHandleClient>
+@interface TestController : NSObject <CURLHandleDelegate>
 {
     IBOutlet id oBackground;
     IBOutlet id oFollow;
@@ -39,10 +39,11 @@
 	IBOutlet id oStatus;
 
 	CURLHandle *mURLHandle;
-	
-	int mBytesRetrievedSoFar;
-	
+    
+	NSMutableData       *_dataReceived;
+	NSURLHandleStatus   _theStatus;
 }
+
 - (IBAction)go:(id)sender;
 - (IBAction)stop:(id)sender;
 - (IBAction)useSnoop:(id)sender;
