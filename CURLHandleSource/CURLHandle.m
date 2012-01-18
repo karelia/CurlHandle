@@ -17,8 +17,6 @@
 //#define DEBUGCURL 1
 //#define DEBUGCURL_SLOW
 
-enum { DONE = 0 };	// Clever, eh?
-
 enum { NOT_LOADING, LOADING };
 
 NSMutableSet		*sAcceptedURLs = nil;
