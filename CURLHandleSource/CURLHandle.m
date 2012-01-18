@@ -449,7 +449,6 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 
 - (NSData *)loadInForeground
 {
-	BOOL wasIndeterminate = NO;
 	NSData *result = nil;
 	mAbortBackground = NO;
 
