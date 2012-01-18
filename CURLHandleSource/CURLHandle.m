@@ -363,7 +363,13 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	{
 		_thread = [[NSThread currentThread] retain];	// remember main thread
 
-		[self setRequest:[NSURLRequest requestWithURL:anURL]];
+		mCURL = curl_easy_init();
+		if (nil == mCURL)
+		{
+			return nil;
+		}
+        
+        [self setRequest:[NSURLRequest requestWithURL:anURL]];
 		
 		// Store the URL
 		if (willCache)
