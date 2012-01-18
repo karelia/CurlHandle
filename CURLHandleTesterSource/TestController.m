@@ -176,8 +176,9 @@
 	// Process Header & status & Cookies
 	{
 		id cookies;
-		NSDictionary *headers = [[mURLHandle response] allHeaderFields];
-        NSInteger statusCode = [[mURLHandle response] statusCode];
+		NSHTTPURLResponse *response = [mURLHandle response];
+        NSDictionary *headers = [response allHeaderFields];
+        NSInteger statusCode = [response statusCode];
         
 		[[oHeader textStorage] replaceCharactersInRange:
          NSMakeRange(0,[[[oHeader textStorage] string] length])
@@ -198,7 +199,7 @@
 		if ([oCookieParseCheckbox state])
 		{
 			// convert the array of strings into a dictionary
-            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:[mURLHandle url]];
+            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:[response URL]];
 			cookies = [cookies valueForKey:@"properties"];
 		}
 		

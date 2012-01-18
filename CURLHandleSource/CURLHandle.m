@@ -158,11 +158,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
     [_request release]; _request = [request copy];
 }
 
-- (NSURL *)url { return [_request URL]; }
-
-/*"	Set an option given a !{CURLoption} key.  Before transfer, the string will be used to invoke %curl_easy_setopt.  Categories with convenient APIs can make use of this.
-"*/
-
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption
 {
 	[mStringOptions setObject:inString forKey:[NSNumber numberWithInt:inCurlOption]];
@@ -385,7 +380,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	{
 		NSString *proxyHost = nil;
 		NSNumber *proxyPort = nil;
-		NSString *scheme = [[[self url] scheme] lowercaseString];
+		NSString *scheme = [[[_request URL] scheme] lowercaseString];
 
 		// Allocate and keep the proxy dictionary
 		if (nil == mProxies)
@@ -442,7 +437,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	}
 
 	// Set the URL
-	mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[self url] absoluteString] UTF8String]);
+	mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[_request URL] absoluteString] UTF8String]);
 	if (0 != mResult)
 	{
 		return;
@@ -519,7 +514,7 @@ the headers are read; the entire header is cached into a string after converting
         mResult = curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &resultLong );
         
 		NSString *headerString = [[NSString alloc] initWithData:mHeaderBuffer encoding:NSASCIIStringEncoding];
-        _response = [[CURLResponse alloc] initWithURL:[self url] statusCode:resultLong headerString:headerString];
+        _response = [[CURLResponse alloc] initWithURL:[_request URL] statusCode:resultLong headerString:headerString];
         [headerString release];
 	}
 	return _response;

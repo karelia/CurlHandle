@@ -59,7 +59,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (CURL *) curl;
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption;
 - (void) setStringOrNumberObject:(id)inString forKey:(CURLoption) inCurlOption;
-- (NSURL *)url;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
 - (void) setPutFile:(NSString *)path;
