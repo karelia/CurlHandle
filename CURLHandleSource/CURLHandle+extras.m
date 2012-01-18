@@ -415,7 +415,7 @@ headers = {body = "Content-Type: text/html; filename = \"hello.html\""}
 {
 	char url[1024];
 	curl_easy_getinfo([self curl], CURLINFO_EFFECTIVE_URL, url);
-	return [NSString stringWithCString:url];
+	return [NSString stringWithUTF8String:url];
 }
 
 /*"	Return the last received HTTP code.

@@ -276,7 +276,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 
 + (NSString *) curlVersion
 {
-	return [NSString stringWithCString: curl_version()];
+	return [NSString stringWithCString: curl_version() encoding:NSASCIIStringEncoding];
 }
 
 
@@ -599,13 +599,13 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 		
 		if (proxyHost && proxyPort)
 		{
-			mResult = curl_easy_setopt(mCURL, CURLOPT_PROXY, [proxyHost cString]);
+			mResult = curl_easy_setopt(mCURL, CURLOPT_PROXY, [proxyHost UTF8String]);
 			mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYPORT, [proxyPort longValue]);
 
 			// Now, provide a user/password if one is globally set.
 			if (nil != sProxyUserIDAndPassword)
 			{
-				mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYUSERPWD, [sProxyUserIDAndPassword cString] );
+				mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYUSERPWD, [sProxyUserIDAndPassword UTF8String] );
 			}
 		}
 	}
@@ -616,13 +616,13 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         {
             NSString *theValue = [_request valueForHTTPHeaderField:theKey];
 			NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
-			httpHeaders = curl_slist_append( httpHeaders, [pair cString] );
+			httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
         }
 		curl_easy_setopt(mCURL, CURLOPT_HTTPHEADER, httpHeaders);
 	}
 
 	// Set the URL
-	mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[self url] absoluteString] cString]);
+	mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[self url] absoluteString] UTF8String]);
 	if (0 != mResult)
 	{
 		return;
@@ -738,7 +738,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 
 - (NSString *)curlError
 {
-	NSString *result = [NSString stringWithCString:mErrorBuffer];
+	NSString *result = [NSString stringWithUTF8String:mErrorBuffer];
 	if (nil == result)
 	{
 		result = [NSString stringWithFormat:@"(curl result code # %d)", mResult];
