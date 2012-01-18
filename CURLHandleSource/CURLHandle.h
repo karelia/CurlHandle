@@ -13,6 +13,8 @@
 @protocol CURLHandleDelegate;
 
 
+extern NSString * const CURLErrorDomain;
+
 /*" YES if CURLHandle will allow use of a proxy server "*/
 extern	BOOL				sAllowsProxy;
 
@@ -73,8 +75,7 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 
 /*" NSURLHandle overrides "*/
 
-- (BOOL)loadInForeground;
-- (NSString *)curlError;
+- (BOOL)load:(NSError **)error;
 - (id)propertyForKey:(NSString *)propertyKey;
 - (id)propertyForKeyIfAvailable:(NSString *)propertyKey;
 

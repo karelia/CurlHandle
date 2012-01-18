@@ -18,6 +18,8 @@
 //#define DEBUGCURL_SLOW
 
 
+NSString * const CURLErrorDomain = @"se.haxx.curl";
+
 BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
 SCDynamicStoreRef	sSCDSRef = NULL;
 NSString			*sProxyUserIDAndPassword = nil;
@@ -324,141 +326,146 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 #pragma mark ----- CURL DATA LOADING SUPPORT
 // -----------------------------------------------------------------------------
 
+/*""*/
+
 /*" %{Loads the receiver's data in the synchronously.}
  
- "*/
-
-- (BOOL)loadInForeground;
-{
-	BOOL result = NO;
-	_cancelled = NO;
-    
-	[self prepareAndPerformCurl];
-	
-	if (0 == mResult) result = YES;
-	
-	return result;
-}
-
-/*"	Actually set up for loading and do the perform.  This happens in either
+ 	Actually set up for loading and do the perform.  This happens in either
 	the foreground or background thread.  Before doing the perform, we collect up
 	all the saved-up string-valued options, and set them right before the perform.
 	This is because we create temporary (autoreleased) c-strings.
 "*/
 
-- (void) prepareAndPerformCurl
+- (BOOL)load:(NSError **)error;
 {
-	struct curl_slist *httpHeaders = nil;
-	// Set the options
-	NSEnumerator *theEnum = [mStringOptions keyEnumerator];
-	NSString *theKey;
-	while (nil != (theKey = [theEnum nextObject]) )
-	{
-		id theObject = [mStringOptions objectForKey:theKey];
-
-		if ([theObject isKindOfClass:[NSNumber class]])
-		{
-			mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject intValue]);
-		}
-		else if ([theObject respondsToSelector:@selector(cString)])
-		{
-			mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject cString]);
-		}
-		else
-		{
-			NSLog(@"Ignoring CURL option of type %@ for key %@", [theObject class], theKey);
-			mResult = 0;	// ignore the option, so don't have an error.
-		}
-		if (0 != mResult)
-		{
-			return;
-		}
-	}
-
-	// Set the proxy info.  Ignore errors -- just don't do proxy if errors.
-	if (sAllowsProxy)	// normally this is YES.
-	{
-		NSString *proxyHost = nil;
-		NSNumber *proxyPort = nil;
-		NSString *scheme = [[[_request URL] scheme] lowercaseString];
-
-		// Allocate and keep the proxy dictionary
-		if (nil == mProxies)
-		{
-			mProxies = (NSDictionary *) SCDynamicStoreCopyProxies(sSCDSRef);
-		}
-
-
-		if (mProxies
-			&& [scheme isEqualToString:@"http"]
-			&& [[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPEnable)] boolValue] )
-		{
-			proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesHTTPProxy)];
-			proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPPort)];
-		}
-		if (mProxies
-			&& [scheme isEqualToString:@"https"]
-			&& [[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSEnable)] boolValue] )
-		{
-			proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSProxy)];
-			proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSPort)];
-		}
-
-		if (mProxies
-			&& [scheme isEqualToString:@"ftp"]
-			&& [[mProxies objectForKey:NSS(kSCPropNetProxiesFTPEnable)] boolValue] )
-		{
-			proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesFTPProxy)];
-			proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesFTPPort)];
-		}
-		
-		if (proxyHost && proxyPort)
-		{
-			mResult = curl_easy_setopt(mCURL, CURLOPT_PROXY, [proxyHost UTF8String]);
-			mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYPORT, [proxyPort longValue]);
-
-			// Now, provide a user/password if one is globally set.
-			if (nil != sProxyUserIDAndPassword)
-			{
-				mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYUSERPWD, [sProxyUserIDAndPassword UTF8String] );
-			}
-		}
-	}
-	
-	// Set the HTTP Headers.  (These will override options set with above)
-	{
-        for (NSString *theKey in [_request allHTTPHeaderFields])
+	_cancelled = NO;
+    
+    @try {
+        struct curl_slist *httpHeaders = nil;
+        // Set the options
+        NSEnumerator *theEnum = [mStringOptions keyEnumerator];
+        NSString *theKey;
+        while (nil != (theKey = [theEnum nextObject]) )
         {
-            NSString *theValue = [_request valueForHTTPHeaderField:theKey];
-			NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
-			httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
+            id theObject = [mStringOptions objectForKey:theKey];
+            
+            if ([theObject isKindOfClass:[NSNumber class]])
+            {
+                mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject intValue]);
+            }
+            else if ([theObject respondsToSelector:@selector(cString)])
+            {
+                mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject cString]);
+            }
+            else
+            {
+                NSLog(@"Ignoring CURL option of type %@ for key %@", [theObject class], theKey);
+                mResult = 0;	// ignore the option, so don't have an error.
+            }
+            if (0 != mResult)
+            {
+                return NO;
+            }
         }
-		curl_easy_setopt(mCURL, CURLOPT_HTTPHEADER, httpHeaders);
-	}
-
-	// Set the URL
-	mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[_request URL] absoluteString] UTF8String]);
-	if (0 != mResult)
-	{
-		return;
-	}
-	// clear the buffers
-	[mHeaderBuffer setLength:0];	// empty out header buffer
-	[_response release]; _response = nil;		// release and invalidate any cached string of header
-	
-	// Do the transfer
-	mResult = curl_easy_perform(mCURL);
-
-	if (nil != mPutFile)
-	{
-		fclose(mPutFile);
-		mPutFile = nil;
-	}
-
-	if (nil != httpHeaders)
-	{
-		curl_slist_free_all(httpHeaders);
-	}
+        
+        // Set the proxy info.  Ignore errors -- just don't do proxy if errors.
+        if (sAllowsProxy)	// normally this is YES.
+        {
+            NSString *proxyHost = nil;
+            NSNumber *proxyPort = nil;
+            NSString *scheme = [[[_request URL] scheme] lowercaseString];
+            
+            // Allocate and keep the proxy dictionary
+            if (nil == mProxies)
+            {
+                mProxies = (NSDictionary *) SCDynamicStoreCopyProxies(sSCDSRef);
+            }
+            
+            
+            if (mProxies
+                && [scheme isEqualToString:@"http"]
+                && [[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPEnable)] boolValue] )
+            {
+                proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesHTTPProxy)];
+                proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPPort)];
+            }
+            if (mProxies
+                && [scheme isEqualToString:@"https"]
+                && [[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSEnable)] boolValue] )
+            {
+                proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSProxy)];
+                proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSPort)];
+            }
+            
+            if (mProxies
+                && [scheme isEqualToString:@"ftp"]
+                && [[mProxies objectForKey:NSS(kSCPropNetProxiesFTPEnable)] boolValue] )
+            {
+                proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesFTPProxy)];
+                proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesFTPPort)];
+            }
+            
+            if (proxyHost && proxyPort)
+            {
+                mResult = curl_easy_setopt(mCURL, CURLOPT_PROXY, [proxyHost UTF8String]);
+                mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYPORT, [proxyPort longValue]);
+                
+                // Now, provide a user/password if one is globally set.
+                if (nil != sProxyUserIDAndPassword)
+                {
+                    mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYUSERPWD, [sProxyUserIDAndPassword UTF8String] );
+                }
+            }
+        }
+        
+        // Set the HTTP Headers.  (These will override options set with above)
+        {
+            for (NSString *theKey in [_request allHTTPHeaderFields])
+            {
+                NSString *theValue = [_request valueForHTTPHeaderField:theKey];
+                NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
+                httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
+            }
+            curl_easy_setopt(mCURL, CURLOPT_HTTPHEADER, httpHeaders);
+        }
+        
+        // Set the URL
+        mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[_request URL] absoluteString] UTF8String]);
+        if (0 != mResult)
+        {
+            return NO;
+        }
+        // clear the buffers
+        [mHeaderBuffer setLength:0];	// empty out header buffer
+        [_response release]; _response = nil;		// release and invalidate any cached string of header
+        
+        // Do the transfer
+        mResult = curl_easy_perform(mCURL);
+        
+        if (nil != mPutFile)
+        {
+            fclose(mPutFile);
+            mPutFile = nil;
+        }
+        
+        if (nil != httpHeaders)
+        {
+            curl_slist_free_all(httpHeaders);
+        }
+    }
+    @finally
+    {
+        if (0 != mResult && error)
+        {
+            NSString *description = [NSString stringWithUTF8String:mErrorBuffer];
+            
+            *error = [NSError errorWithDomain:CURLErrorDomain
+                                         code:mResult
+                                     userInfo:[NSDictionary dictionaryWithObjectsAndKeys:description, NSLocalizedDescriptionKey, nil]];
+        }
+    }
+    
+    return (0 == mResult);
 }
 
 /*"	Continue the writing callback in Objective C; now we have our instance variables.
@@ -486,19 +493,6 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 		}
 	}
 	return written;
-}
-
-/*"	Convert curl's error buffer into an NSString if possible, or return the result code number as a string.
-"*/
-
-- (NSString *)curlError
-{
-	NSString *result = [NSString stringWithUTF8String:mErrorBuffer];
-	if (nil == result)
-	{
-		result = [NSString stringWithFormat:@"(curl result code # %d)", mResult];
-	}
-	return result;
 }
 
 /*" Return the current header, as a string. This is meant to be invoked after all

@@ -401,7 +401,9 @@
 			[self updateStatus];
 
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                BOOL result = [mURLHandle loadInForeground];
+                
+                NSError *error;
+                BOOL result = [mURLHandle load:&error];
                 
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     if (result)
@@ -420,11 +422,13 @@
 
 			[oProgress startAnimation:self];
 			// directly call up the results
-            BOOL result = [mURLHandle loadInForeground];
-			[self URLHandleResourceDidFinishLoading:mURLHandle];
+            NSError *error;
+            BOOL result = [mURLHandle load:&error];
+			
+            [self URLHandleResourceDidFinishLoading:mURLHandle];
 			if (!result)
 			{
-				[oResultCode setStringValue:[mURLHandle curlError]];
+				[oResultCode setStringValue:[error localizedDescription]];
 			}
 			[self updateStatus];
 		}
