@@ -299,7 +299,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	[mPort invalidate];
     [mPort release];
 	
-	[mMainThread release];
+	[_thread release];
 	curl_easy_cleanup(mCURL);
 	mCURL = nil;
 	[mProgressIndicator release];
@@ -368,7 +368,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 #endif
 	if (self = [super initWithURL:anURL cached:willCache])
 	{
-		mMainThread = [[NSThread currentThread] retain];	// remember main thread
+		_thread = [[NSThread currentThread] retain];	// remember main thread
 
 		mPort = [[NSPort port] retain];
 		[mPort setDelegate:self];
@@ -711,7 +711,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 		written = -1;		// signify to Curl that we are stopping
 							// Do NOT send message; see "cancelLoadInBackground" comments
 	}
-	else if ([NSThread currentThread] != mMainThread)	// in background if in different thread
+	else if ([NSThread currentThread] != _thread)	// in background if in different thread
 	{
 		BOOL sent = NO;
 		NSArray *dataArray		= [NSArray arrayWithObject:data];
