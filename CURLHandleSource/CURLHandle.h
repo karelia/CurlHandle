@@ -103,7 +103,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (id) initWithURL:(NSURL *)anURL cached:(BOOL)willCache;
 - (id)propertyForKey:(NSString *)propertyKey;
 - (id)propertyForKeyIfAvailable:(NSString *)propertyKey;
-- (void) dealloc;
 - (void)beginLoadInBackground;
 - (void)cancelLoadInBackground;
 - (void)endLoadInBackground;
