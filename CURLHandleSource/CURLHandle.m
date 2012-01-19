@@ -150,16 +150,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	return mCURL;
 }
 
-/*"	Set the URL request related to this CURLHandle.  This can actually be changed so the same CURL is used
-	for different URLs, though they must be done sequentially.  (See libcurl documentation.)
-"*/
-
-- (void)setRequest:(NSURLRequest *)request;
-{
-    if (request == _request) return;
-    [_request release]; _request = [request copy];
-}
-
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption
 {
 	[mStringOptions setObject:inString forKey:[NSNumber numberWithInt:inCurlOption]];
@@ -232,7 +222,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 {
 	curl_easy_cleanup(mCURL);
 	mCURL = nil;
-	[_request release];
 	[mHeaderBuffer release];			mHeaderBuffer = 0;
 	[_response release];
 	[mStringOptions release];
@@ -245,12 +234,12 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	#{TODO: initWithRequest ought to clean up better if init failed; release what was allocated.}
 "*/
 
-- (id)initWithRequest:(NSURLRequest *)request;
+- (id)init
 {
 #ifdef DEBUGCURL
 	NSLog(@"...initWithURL: %@",[request URL]);
 #endif
-	if (self = [self init])
+	if (self = [super init])
 	{
 		mCURL = curl_easy_init();
 		if (nil == mCURL)
@@ -258,9 +247,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 			return nil;
 		}
         
-        [self setRequest:request];
-		
-		mErrorBuffer[0] = 0;	// initialize the error buffer to empty
+        mErrorBuffer[0] = 0;	// initialize the error buffer to empty
 		mHeaderBuffer = [[NSMutableData alloc] init];
 		mStringOptions = [[NSMutableDictionary alloc] init];
 				
@@ -336,7 +323,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	This is because we create temporary (autoreleased) c-strings.
 "*/
 
-- (BOOL)load:(NSError **)error;
+- (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 {
 	_cancelled = NO;
     
@@ -373,7 +360,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         {
             NSString *proxyHost = nil;
             NSNumber *proxyPort = nil;
-            NSString *scheme = [[[_request URL] scheme] lowercaseString];
+            NSString *scheme = [[[request URL] scheme] lowercaseString];
             
             // Allocate and keep the proxy dictionary
             if (nil == mProxies)
@@ -420,9 +407,9 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         
         // Set the HTTP Headers.  (These will override options set with above)
         {
-            for (NSString *theKey in [_request allHTTPHeaderFields])
+            for (NSString *theKey in [request allHTTPHeaderFields])
             {
-                NSString *theValue = [_request valueForHTTPHeaderField:theKey];
+                NSString *theValue = [request valueForHTTPHeaderField:theKey];
                 NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
                 httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
             }
@@ -430,7 +417,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         }
         
         // Set the URL
-        mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[_request URL] absoluteString] UTF8String]);
+        mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[request URL] absoluteString] UTF8String]);
         if (0 != mResult)
         {
             return NO;
@@ -442,6 +429,16 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         // Do the transfer
         mResult = curl_easy_perform(mCURL);
         
+        // Response
+#warning We can't really assume a header encoding, trying 7-bit ASCII only.  Maybe there is some way to know?
+        NSInteger resultLong;
+        mResult = curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &resultLong );
+        
+        NSString *headerString = [[NSString alloc] initWithData:mHeaderBuffer encoding:NSASCIIStringEncoding];
+        _response = [[CURLResponse alloc] initWithURL:[request URL] statusCode:resultLong headerString:headerString];
+        [headerString release];
+        
+        // PUT file
         if (nil != mPutFile)
         {
             fclose(mPutFile);
@@ -500,18 +497,7 @@ the headers are read; the entire header is cached into a string after converting
 
 - (NSHTTPURLResponse *)response
 {
-#warning We can't really assume a header encoding, trying 7-bit ASCII only.  Maybe there is some way to know?
-
-	if (!_response)		// Has it not been initialized yet?
-	{
-        NSInteger resultLong;
-        mResult = curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &resultLong );
-        
-		NSString *headerString = [[NSString alloc] initWithData:mHeaderBuffer encoding:NSASCIIStringEncoding];
-        _response = [[CURLResponse alloc] initWithURL:[_request URL] statusCode:resultLong headerString:headerString];
-        [headerString release];
-	}
-	return _response;
+return _response;
 }
 
 @synthesize delegate = _delegate;

@@ -343,7 +343,7 @@
 		[defaults synchronize];
 
 		// set some options based on user input
-		[self setURLHandle:[[[CURLHandle alloc] initWithRequest:[NSURLRequest requestWithURL:url]] autorelease]];
+		[self setURLHandle:[[[CURLHandle alloc] init] autorelease]];
         
         _theStatus = NSURLHandleLoadInProgress;
 		[self updateStatus];
@@ -403,7 +403,7 @@
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 
                 NSError *error;
-                BOOL result = [mURLHandle load:&error];
+                BOOL result = [mURLHandle loadRequest:[NSURLRequest requestWithURL:url] error:&error];
                 
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     if (result)
@@ -423,7 +423,7 @@
 			[oProgress startAnimation:self];
 			// directly call up the results
             NSError *error;
-            BOOL result = [mURLHandle load:&error];
+            BOOL result = [mURLHandle loadRequest:[NSURLRequest requestWithURL:url] error:&error];
 			
             [self URLHandleResourceDidFinishLoading:mURLHandle];
 			if (!result)
