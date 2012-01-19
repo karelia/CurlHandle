@@ -125,18 +125,6 @@
     [_dataReceived appendData:data];
     
 	[self updateStatus];
-    
-	if (nil != oProgress)
-	{
-		long long contentLength = [[handle response] expectedContentLength];
-        
-		if (contentLength > 0)
-		{
-			[oProgress setIndeterminate:NO];
-			[oProgress setMaxValue:contentLength];
-			[oProgress setDoubleValue:[_dataReceived length]];
-		}
-	}
 }
 
 /*"	_______
@@ -155,6 +143,67 @@
 /*"	_______
  "*/
 
+- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
+{
+    void (^work)(void) = ^{
+    
+        // Process Header & status & Cookies
+        id cookies;
+        NSDictionary *headers = [(NSHTTPURLResponse *)response allHeaderFields];
+        NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
+        
+        [[oHeader textStorage] replaceCharactersInRange:
+         NSMakeRange(0,[[[oHeader textStorage] string] length])
+                                             withString:[headers description]];
+        
+        [oResultCode setIntegerValue:statusCode];
+        [oResultCode setNeedsDisplay:YES];
+        
+        [oResultReason setObjectValue: [NSHTTPURLResponse localizedStringForStatusCode:statusCode]];
+        [oResultReason setNeedsDisplay:YES];
+        [oResultLocation setObjectValue: [handle propertyForKey: NSHTTPPropertyRedirectionHeadersKey]];
+        [oResultLocation setNeedsDisplay:YES];
+        [oResultVers setObjectValue: [handle propertyForKey: NSHTTPPropertyServerHTTPVersionKey]];
+        [oResultVers setNeedsDisplay:YES];
+        
+        [oHeader setNeedsDisplay:YES];
+        
+        if ([oCookieParseCheckbox state])
+        {
+            // convert the array of strings into a dictionary
+            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:[response URL]];
+            cookies = [cookies valueForKey:@"properties"];
+        }
+        
+        [[oCookieResult textStorage] replaceCharactersInRange:
+         NSMakeRange(0,[[[oCookieResult textStorage] string] length])
+                                                   withString:[cookies description]];
+        
+        
+        // Progress
+        if (nil != oProgress)
+        {
+            long long contentLength = [response expectedContentLength];
+            
+            if (contentLength > 0)
+            {
+                [oProgress setIndeterminate:NO];
+                [oProgress setMaxValue:contentLength];
+                [oProgress setDoubleValue:[_dataReceived length]];
+            }
+        }
+    };
+    
+    if ([NSThread isMainThread])
+    {
+        work();
+    }
+    else
+    {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:work];
+    }
+}
+
 - (void)URLHandleResourceDidFinishLoading:(CURLHandle *)sender
 {
     _theStatus = NSURLHandleLoadSucceeded;
@@ -172,41 +221,6 @@
     
 	[mURLHandle setDelegate:nil];
     
-	
-	// Process Header & status & Cookies
-	{
-		id cookies;
-		NSHTTPURLResponse *response = [mURLHandle response];
-        NSDictionary *headers = [response allHeaderFields];
-        NSInteger statusCode = [response statusCode];
-        
-		[[oHeader textStorage] replaceCharactersInRange:
-         NSMakeRange(0,[[[oHeader textStorage] string] length])
-                                             withString:[headers description]];
-		
-		[oResultCode setIntegerValue:statusCode];
-		[oResultCode setNeedsDisplay:YES];
-		
-		[oResultReason setObjectValue: [NSHTTPURLResponse localizedStringForStatusCode:statusCode]];
-		[oResultReason setNeedsDisplay:YES];
-		[oResultLocation setObjectValue: [mURLHandle propertyForKey: NSHTTPPropertyRedirectionHeadersKey]];
-		[oResultLocation setNeedsDisplay:YES];
-		[oResultVers setObjectValue: [mURLHandle propertyForKey: NSHTTPPropertyServerHTTPVersionKey]];
-		[oResultVers setNeedsDisplay:YES];
-        
-		[oHeader setNeedsDisplay:YES];
-        
-		if ([oCookieParseCheckbox state])
-		{
-			// convert the array of strings into a dictionary
-            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:[response URL]];
-			cookies = [cookies valueForKey:@"properties"];
-		}
-		
-		[[oCookieResult textStorage] replaceCharactersInRange:
-         NSMakeRange(0,[[[oCookieResult textStorage] string] length])
-                                                   withString:[cookies description]];
-	}
 	
 	// Process Body
 	if (_dataReceived)	// it might be nil if failed in the foreground thread, for instance
@@ -391,13 +405,13 @@
 
 		// And load, either in foreground or background...
         [_dataReceived setLength:0];
+        [mURLHandle setDelegate:self];
         
 		if ([oBackground state])
 		{
 			[oGoButton setEnabled:NO];
 			[oStopButton setEnabled:YES];
-			[mURLHandle setDelegate:self];
-
+			
 			[self updateStatus];
 
 			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

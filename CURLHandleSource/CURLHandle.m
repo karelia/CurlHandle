@@ -222,8 +222,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 {
 	curl_easy_cleanup(mCURL);
 	mCURL = nil;
-	[mHeaderBuffer release];			mHeaderBuffer = 0;
-	[_response release];
+	[_headerBuffer release];
 	[mStringOptions release];
 	[mProxies release];
 	[super dealloc];
@@ -248,7 +247,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 		}
         
         mErrorBuffer[0] = 0;	// initialize the error buffer to empty
-		mHeaderBuffer = [[NSMutableData alloc] init];
+		_headerBuffer = [[NSMutableData alloc] init];
 		mStringOptions = [[NSMutableDictionary alloc] init];
 				
 		// SET OPTIONS -- NOTE THAT WE DON'T SET ANY STRINGS DIRECTLY AT THIS STAGE.
@@ -422,21 +421,15 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         {
             return NO;
         }
+        
         // clear the buffers
-        [mHeaderBuffer setLength:0];	// empty out header buffer
-        [_response release]; _response = nil;		// release and invalidate any cached string of header
+        [_headerBuffer setLength:0];	// empty out header buffer
         
         // Do the transfer
         mResult = curl_easy_perform(mCURL);
         
         // Response
 #warning We can't really assume a header encoding, trying 7-bit ASCII only.  Maybe there is some way to know?
-        NSInteger resultLong;
-        mResult = curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &resultLong );
-        
-        NSString *headerString = [[NSString alloc] initWithData:mHeaderBuffer encoding:NSASCIIStringEncoding];
-        _response = [[CURLResponse alloc] initWithURL:[request URL] statusCode:resultLong headerString:headerString];
-        [headerString release];
         
         // PUT file
         if (nil != mPutFile)
@@ -482,22 +475,48 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	{
 		if (header)
 		{
-			[mHeaderBuffer appendData:data];
+			[_headerBuffer appendData:data];
 		}
 		else	// notify delegate of new bytes
 		{
+            if ([_headerBuffer length])
+            {
+                NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
+                [_headerBuffer setLength:0];
+                
+                long code;
+                if (curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
+                {
+                    char *urlBuffer;
+                    if (curl_easy_getinfo(mCURL, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
+                    {
+                        NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
+                        if (urlString)
+                        {
+                            NSURL *url = [[NSURL alloc] initWithString:urlString];
+                            if (url)
+                            {
+                                NSURLResponse *response = [[CURLResponse alloc] initWithURL:url
+                                                                                 statusCode:code
+                                                                               headerString:headerString];
+                                
+                                [[self delegate] handle:self didReceiveResponse:response];
+                                [response release];
+                                [url release];
+                            }
+                            
+                            [urlString release];
+                        }
+                        
+                    }
+                    [headerString release];
+                }
+            }
+            
 			[[self delegate] handle:self didReceiveData:data];
 		}
 	}
 	return written;
-}
-
-/*" Return the current header, as a string. This is meant to be invoked after all
-the headers are read; the entire header is cached into a string after converting from raw data. "*/
-
-- (NSHTTPURLResponse *)response
-{
-return _response;
 }
 
 @synthesize delegate = _delegate;
