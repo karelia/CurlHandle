@@ -2,13 +2,13 @@
 //  This is in the public domain, but please report any improvements back to the author.
 
 #import <Cocoa/Cocoa.h>
-#import <CURLHandle/CURLHandle.h>
+#import <CURLHandle/CURLProtocol.h>
 #import <CURLHandle/CURLHandle+extras.h>
 #import "NSData+plist.h"
 
 @class CURLHandle;
 
-@interface TestController : NSObject <CURLHandleDelegate>
+@interface TestController : NSObject <NSURLConnectionDelegate>
 {
     IBOutlet id oBackground;
     IBOutlet id oFollow;
@@ -38,9 +38,8 @@
     IBOutlet id oRenderHTMLCheckbox;
 	IBOutlet id oStatus;
 
-	CURLHandle *mURLHandle;
-    
-	NSMutableData       *_dataReceived;
+	NSURLConnection     *_connection;
+    NSMutableData       *_dataReceived;
 	NSURLHandleStatus   _theStatus;
 }
 

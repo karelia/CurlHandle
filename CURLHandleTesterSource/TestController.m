@@ -5,23 +5,12 @@
 
 @interface TestController ( private )
 
-- (void) setURLHandle:(CURLHandle *)inURLHandle;
 - (void) updateStatus;
 - (NSDictionary *)dictionaryfromCookieArray:(NSArray *)inArray;
 
 @end
 
 @implementation TestController
-
-/*"	Canonical setter: retain the new guy; release the old guy; set.
-"*/
-
-- (void) setURLHandle:(CURLHandle *)inURLHandle
-{
-	[inURLHandle retain];
-	[mURLHandle release];
-	mURLHandle = inURLHandle;
-}
 
 - (void) awakeFromNib
 {
@@ -53,20 +42,21 @@
 - (void) updateStatus
 {
 	NSString *status = nil;
-	if (nil == mURLHandle)
+	if (_connection)
+	{
+		NSArray *descriptions
+        = [NSArray arrayWithObjects:@"Not Loaded", @"Succeeded", @"In Progress", @"Failed", nil];
+        
+		status = [descriptions objectAtIndex:_theStatus];
+	}
+	else
 	{
 		status = @"(no CURLHandle)";
 		[oResultReason setStringValue: @""];
 		[oResultLocation setStringValue: @""];
 		[oResultVers setStringValue: @""];
 	}
-	else
-	{
-		NSArray *descriptions
-			= [NSArray arrayWithObjects:@"Not Loaded", @"Succeeded", @"In Progress", @"Failed", nil];
-
-		status = [descriptions objectAtIndex:_theStatus];
-	}
+    
 	[oStatus setObjectValue:status];
 	[oStatus display];
 }
@@ -84,7 +74,8 @@
 - (void)dealloc
 {
 	[self stop:nil];
-	[mURLHandle release];
+	[_connection release];
+    [_dataReceived release];
 	
 	[super dealloc];
 }
@@ -110,7 +101,7 @@
 /*"	Notification that data is available.  Set the progress bar if progress is known.
  "*/
 
-- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
     [_dataReceived appendData:data];
     
@@ -120,84 +111,89 @@
 /*"	_______
  "*/
 
-- (void)URLHandleResourceDidBeginLoading:(CURLHandle *)sender
+- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)response
 {
-	if (nil != oProgress)
-	{
-		[oProgress startAnimation:self];
-	}
-    _theStatus = NSURLHandleLoadInProgress;
-	[self updateStatus];
+    // Stop there if UI is set not to follow redirects. According to the docs this will cause the connection to return whatever data it's receiving directly, and then finish up. In practice this seems to be a dirty lie.
+    if (response && ![oFollow state])
+    {
+        request = nil;
+        [self connection:connection didReceiveResponse:response];
+    }
+    else
+    {
+        if (nil != oProgress)
+        {
+            [oProgress startAnimation:self];
+        }
+        _theStatus = NSURLHandleLoadInProgress;
+        [self updateStatus];
+    }
+    
+    return request;
 }
 
 /*"	_______
  "*/
 
-- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-    void (^work)(void) = ^{
+    // Process Header & status & Cookies if possible
+    NSDictionary *headers = nil;
+    NSInteger statusCode = 0;
     
-        // Process Header & status & Cookies
-        id cookies;
-        NSDictionary *headers = [(NSHTTPURLResponse *)response allHeaderFields];
-        NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
-        
-        [[oHeader textStorage] replaceCharactersInRange:
-         NSMakeRange(0,[[[oHeader textStorage] string] length])
-                                             withString:[headers description]];
-        
-        [oResultCode setIntegerValue:statusCode];
-        [oResultCode setNeedsDisplay:YES];
-        
-        [oResultReason setObjectValue: [NSHTTPURLResponse localizedStringForStatusCode:statusCode]];
-        [oResultReason setNeedsDisplay:YES];
-        [oResultLocation setObjectValue: [handle propertyForKey: NSHTTPPropertyRedirectionHeadersKey]];
-        [oResultLocation setNeedsDisplay:YES];
-        [oResultVers setObjectValue: [handle propertyForKey: NSHTTPPropertyServerHTTPVersionKey]];
-        [oResultVers setNeedsDisplay:YES];
-        
-        [oHeader setNeedsDisplay:YES];
-        
-        if ([oCookieParseCheckbox state])
-        {
-            // convert the array of strings into a dictionary
-            cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:[response URL]];
-            cookies = [cookies valueForKey:@"properties"];
-        }
-        
-        [[oCookieResult textStorage] replaceCharactersInRange:
-         NSMakeRange(0,[[[oCookieResult textStorage] string] length])
-                                                   withString:[cookies description]];
-        
-        
-        // Progress
-        if (nil != oProgress)
-        {
-            long long contentLength = [response expectedContentLength];
-            
-            if (contentLength > 0)
-            {
-                [oProgress setIndeterminate:NO];
-                [oProgress setMaxValue:contentLength];
-                [oProgress setDoubleValue:[_dataReceived length]];
-            }
-        }
-    };
-    
-    if ([NSThread isMainThread])
+    if ([response isKindOfClass:[NSHTTPURLResponse class]])
     {
-        work();
+        statusCode = [(NSHTTPURLResponse *)response statusCode];
+        headers = [(NSHTTPURLResponse *)response allHeaderFields];
     }
-    else
+    
+    [[oHeader textStorage] replaceCharactersInRange:
+     NSMakeRange(0,[[[oHeader textStorage] string] length])
+                                         withString:(headers ? [headers description] : @"")];
+    
+    [oResultCode setIntegerValue:statusCode];
+    [oResultCode setNeedsDisplay:YES];
+    
+    [oResultReason setObjectValue:[NSHTTPURLResponse localizedStringForStatusCode:statusCode]];
+    [oResultReason setNeedsDisplay:YES];
+    [oResultLocation setObjectValue:[response URL]];
+    [oResultLocation setNeedsDisplay:YES];
+    //[oResultVers setObjectValue:[mURLHandle propertyForKey: NSHTTPPropertyServerHTTPVersionKey]];
+    //[oResultVers setNeedsDisplay:YES];
+    
+    [oHeader setNeedsDisplay:YES];
+    
+    id cookies = nil;
+    if ([oCookieParseCheckbox state])
     {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:work];
+        // convert the array of strings into a dictionary
+        cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:headers forURL:[response URL]];
+        cookies = [cookies valueForKey:@"properties"];
+    }
+    
+    [[oCookieResult textStorage] replaceCharactersInRange:
+     NSMakeRange(0,[[[oCookieResult textStorage] string] length])
+                                               withString:(cookies ? [cookies description] : @"")];
+    
+    
+    // Progress
+    if (nil != oProgress)
+    {
+        long long contentLength = [response expectedContentLength];
+        
+        if (contentLength > 0)
+        {
+            [oProgress setIndeterminate:NO];
+            [oProgress setMaxValue:contentLength];
+            [oProgress setDoubleValue:[_dataReceived length]];
+        }
     }
 }
 
-- (void)URLHandleResourceDidFinishLoading:(CURLHandle *)sender
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     _theStatus = NSURLHandleLoadSucceeded;
-	NSString *contentType = [mURLHandle propertyForKeyIfAvailable:@"content-type"];
+	NSString *contentType = nil;//[mURLHandle propertyForKeyIfAvailable:@"content-type"];
     
 	if (nil != oProgress)
 	{
@@ -208,8 +204,6 @@
 	[oGoButton setEnabled:YES];
 	[oStopButton setEnabled:NO];
 	[oProgress setIndeterminate:YES];
-    
-	[mURLHandle setDelegate:nil];
     
 	
 	// Process Body
@@ -255,7 +249,7 @@
 /*"	_______
  "*/
 
-- (void)URLHandleResourceDidCancelLoading:(CURLHandle *)sender
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
 {
     _theStatus = NSURLHandleLoadFailed;
 	[oGoButton setEnabled:YES];
@@ -263,31 +257,11 @@
 	[oProgress setIndeterminate:YES];
 	[self updateStatus];
     
-	[mURLHandle setDelegate:nil];
 	if (nil != oProgress)
 	{
 		[oProgress stopAnimation:self];
 	}
-	[oResultCode setStringValue:@"You cancelled it"];
-}
-
-/*"	_______
- "*/
-
-- (void)URLHandle:(NSURLHandle *)sender resourceDidFailLoadingWithReason:(NSString *)reason
-{
-    _theStatus = NSURLHandleLoadFailed;
-	[oGoButton setEnabled:YES];
-	[oStopButton setEnabled:NO];
-	[oProgress setIndeterminate:YES];
-	[self updateStatus];
-    
-	[mURLHandle setDelegate:nil];
-	if (nil != oProgress)
-	{
-		[oProgress stopAnimation:self];
-	}
-	[oResultCode setStringValue:reason];
+	[oResultCode setStringValue:[error localizedDescription]];
 }
 
 #warning # can't assume any encoding for body.  Perhaps we could look for the encoding value in the header, and try again if it doesn't match?
@@ -347,13 +321,8 @@
 		[defaults synchronize];
 
 		// set some options based on user input
-		[self setURLHandle:[[[CURLHandle alloc] init] autorelease]];
-        
-        _theStatus = NSURLHandleLoadInProgress;
-		[self updateStatus];
-        
+        CURLHandle *mURLHandle = nil;  // keep compiles happy until requests support all these controls
 		[mURLHandle setFailsOnError:NO];		// don't fail on >= 300 code; I want to see real results.
-		[mURLHandle setFollowsRedirects:[oFollow state]];
 		[mURLHandle setCookieFile:[[oCookieFileString stringValue] stringByExpandingTildeInPath]];
 		[mURLHandle setUserName:[oUserID stringValue] password:[oPassword stringValue]];
 
@@ -393,49 +362,12 @@
 			[mURLHandle setPostDictionary:dict];
 		}
 
-		// And load, either in foreground or background...
-        [_dataReceived setLength:0];
-        [mURLHandle setDelegate:self];
+		// And load, in background...
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        //[request setShouldUseCurlHandle:YES];
         
-		if ([oBackground state])
-		{
-			[oGoButton setEnabled:NO];
-			[oStopButton setEnabled:YES];
-			
-			[self updateStatus];
-
-			dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                
-                NSError *error;
-                BOOL result = [mURLHandle loadRequest:[NSURLRequest requestWithURL:url] error:&error];
-                
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    if (result)
-                    {
-                        [self URLHandleResourceDidFinishLoading:mURLHandle];
-                    }
-                }];
-            });
-
-			[self updateStatus];
-		}
-		else
-		{
-			[self updateStatus];
-			[mURLHandle setConnectionTimeout:4];
-
-			[oProgress startAnimation:self];
-			// directly call up the results
-            NSError *error;
-            BOOL result = [mURLHandle loadRequest:[NSURLRequest requestWithURL:url] error:&error];
-			
-            [self URLHandleResourceDidFinishLoading:mURLHandle];
-			if (!result)
-			{
-				[oResultCode setStringValue:[error localizedDescription]];
-			}
-			[self updateStatus];
-		}
+        [_dataReceived setLength:0];
+        [_connection release]; _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 	}
 	else
 	{
@@ -449,9 +381,30 @@
 
 - (IBAction)stop:(id)sender
 {
-	[mURLHandle cancelLoadInBackground];
+	[_connection cancel];
+    
+    _theStatus = NSURLHandleLoadFailed;
+	[oGoButton setEnabled:YES];
+	[oStopButton setEnabled:NO];
+	[oProgress setIndeterminate:YES];
+    
+	if (nil != oProgress)
+	{
+		[oProgress stopAnimation:self];
+	}
+	[oResultCode setStringValue:@"You cancelled it"];
 	[self updateStatus];
 }
 
+
+@end
+
+
+@implementation NSURLResponse (FOO)
+
++ (id)allocWithZone:(NSZone *)zone;
+{
+    return [super allocWithZone:zone];
+}
 
 @end
