@@ -48,9 +48,13 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
     id <CURLHandleDelegate> _delegate;
 }
 
-/*" CURLHandle-specific interfaces. "*/
+- (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 
-+ (NSString *) curlVersion;
+@property(nonatomic, assign) id <CURLHandleDelegate> delegate;
+
++ (NSString *)curlVersion;
+
+/*" Old API "*/
 
 - (CURL *) curl;
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption;
@@ -60,12 +64,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 - (void) setPutFile:(NSString *)path;
 - (void) setPutFileOffset:(int)offset;
 - (void) setPutFile:(NSString *)path resumeUploadFromOffset:(off_t)offset_;
-
-/*" NSURLRequest-based API "*/
-- (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
-@property(nonatomic, assign) id <CURLHandleDelegate> delegate;
-
-/*" NSURLHandle overrides "*/
 
 - (id)propertyForKey:(NSString *)propertyKey;
 - (id)propertyForKeyIfAvailable:(NSString *)propertyKey;
