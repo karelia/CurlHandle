@@ -90,11 +90,6 @@
 }
 
 
-- (void) applicationWillTerminate:(NSNotification *) notif
-{
-	[CURLHandle curlGoodbye];	// to clean up
-}
-
 - (IBAction) useSnoop:(id)sender
 {
 	[oURL setObjectValue:@"http://www.entropy.ch/software/MacOSX/php/test.php?happy=yes"];

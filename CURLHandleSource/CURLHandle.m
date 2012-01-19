@@ -95,13 +95,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 // -----------------------------------------------------------------------------
 #pragma mark ----- ADDITIONAL CURLHANDLE INTERFACES
 // -----------------------------------------------------------------------------
-/*" You must call #curlGoodbye at end of program, for example in #{[NSApplication applicationWillTerminate:]}.
-"*/
-
-+ (void) curlGoodbye
-{
-	curl_global_cleanup();
-}
 
 /*" Initialize CURLHandle and the underlying CURL.  This can be invoked when the program is launched or before any loading is needed.
 "*/
