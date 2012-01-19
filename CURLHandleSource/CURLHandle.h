@@ -51,7 +51,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 /*" CURLHandle-specific interfaces. "*/
 
 + (void) curlGoodbye;
-+ (void)curlHelloSignature:(NSString *)inSignature;
 + (NSString *) curlVersion;
 
 - (CURL *) curl;

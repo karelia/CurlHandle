@@ -90,11 +90,6 @@
 }
 
 
-- (void) applicationDidFinishLaunching:(NSNotification *) notif
-{
-	[CURLHandle curlHelloSignature:@"XxXx"];	// to get CURLHandle registered for handling URLs
-}
-
 - (void) applicationWillTerminate:(NSNotification *) notif
 {
 	[CURLHandle curlGoodbye];	// to clean up

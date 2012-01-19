@@ -106,7 +106,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 /*" Initialize CURLHandle and the underlying CURL.  This can be invoked when the program is launched or before any loading is needed.
 "*/
 
-+ (void)curlHelloSignature:(NSString *)inSignature;
++ (void)initialize
 {
 	CURLcode rc;
 	rc = curl_global_init(CURL_GLOBAL_ALL);
@@ -115,8 +115,8 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 		NSLog(@"Didn't curl_global_init, result = %d",rc);
 	}
 	
-	// Now initialize System Config.
-	sSCDSRef = SCDynamicStoreCreate(NULL,(CFStringRef)inSignature,NULL, NULL);
+	// Now initialize System Config. I have no idea why this signature; it's just what was in tester app
+	sSCDSRef = SCDynamicStoreCreate(NULL,CFSTR("XxXx"),NULL, NULL);
 	if ( sSCDSRef == NULL )
 	{
 		NSLog(@"Didn't get SCDynamicStoreRef");
