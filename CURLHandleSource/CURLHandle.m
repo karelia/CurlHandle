@@ -320,6 +320,25 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	_cancelled = NO;
     
     @try {
+        
+        /*"	Zero disables connection timeout (it
+         will then only timeout on the system's internal
+         timeouts).
+         
+            According to man 3 curl_easy_setopt, CURLOPT_CONNECTTIMEOUT uses signals and thus isn't thread-safe. However, in the same man page it's stated that if you TURN OFF SIGNALLING, you can still use CURLOPT_CONNECTTIMEOUT! This will DISABLE any features that use signals, so beware! (But turning off the connection timeout by setting to zero will turn it back on.)
+         
+            According to man 3 curl_easy_setopt, CURLOPT_TIMEOUT uses signals and thus isn't thread-safe. However, in the same man page it's stated that if you TURN OFF SIGNALLING, you can still use CURLOPT_TIMEOUT! This will DISABLE any features that use signals, so beware! (But turning off the connection timeout by setting to zero will turn it back on.)
+         
+         "*/
+        
+        long timeout = [request timeoutInterval];
+        curl_easy_setopt([self curl], CURLOPT_NOSIGNAL, timeout != 0);
+        curl_easy_setopt([self curl], CURLOPT_CONNECTTIMEOUT, timeout);
+        curl_easy_setopt([self curl], CURLOPT_TIMEOUT, timeout);
+        
+        
+
+        
         struct curl_slist *httpHeaders = nil;
         // Set the options
         NSEnumerator *theEnum = [mStringOptions keyEnumerator];

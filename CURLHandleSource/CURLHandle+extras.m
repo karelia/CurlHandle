@@ -62,40 +62,6 @@ just the mime header.
 }
 
 
-/*"	Set the connection timeout.
-
-	Pass a long. It should contain the maximum time in
-	seconds that you allow the connection to the server
-	to take. This only limits the connection phase,
-	once it has connected, this option is of no more
-	use. Set to zero to disable connection timeout (it
-	will then only timeout on the system's internal
-	timeouts).
-			 
-	According to man 3 curl_easy_setopt, CURLOPT_CONNECTTIMEOUT uses signals and thus isn't thread-safe. However, in the same man page it's stated that if you TURN OFF SIGNALLING, you can still use CURLOPT_CONNECTTIMEOUT! This will DISABLE any features that use signals, so beware! (But turning off the connection timeout by setting to zero will turn it back on.)
-
-"*/
-
-- (void) setConnectionTimeout:(long) inSeconds	// only applies to foreground thread!
-{
-	curl_easy_setopt([self curl], CURLOPT_NOSIGNAL, inSeconds != 0);
-	curl_easy_setopt([self curl], CURLOPT_CONNECTTIMEOUT, inSeconds);
-}
-
-/*" Set the transfer timeout.
-
-Pass a long. It should contain the maximum time in seconds that you allow the transfer from the server to take.
-
-According to man 3 curl_easy_setopt, CURLOPT_TIMEOUT uses signals and thus isn't thread-safe. However, in the same man page it's stated that if you TURN OFF SIGNALLING, you can still use CURLOPT_TIMEOUT! This will DISABLE any features that use signals, so beware! (But turning off the connection timeout by setting to zero will turn it back on.)
-
-"*/
-- (void) setTransferTimeout:(long) inSeconds
-{
-	curl_easy_setopt([self curl], CURLOPT_NOSIGNAL, inSeconds != 0);
-	curl_easy_setopt([self curl], CURLOPT_TIMEOUT, inSeconds);
-}
-
-
 /*"	Set the user agent string.
 
 	Pass a string as parameter. It will be used to set the User-Agent: header

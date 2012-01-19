@@ -14,8 +14,6 @@
 
 /*" Set options for the transfer "*/
 
-- (void) setConnectionTimeout:(long) inSeconds;
-- (void) setTransferTimeout:(long) inSeconds;
 - (void) setCookieFile:(NSString *)inFilePath;
 - (void) setRequestCookies:(NSDictionary *)inDict;
 - (void) setFailsOnError:(BOOL)inFlag;
