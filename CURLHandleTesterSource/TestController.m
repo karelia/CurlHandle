@@ -398,13 +398,3 @@
 
 
 @end
-
-
-@implementation NSURLResponse (FOO)
-
-+ (id)allocWithZone:(NSZone *)zone;
-{
-    return [super allocWithZone:zone];
-}
-
-@end
