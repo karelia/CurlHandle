@@ -75,8 +75,6 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 /*" Support Methods "*/
 
 - (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
-- (void) prepareAndPerformCurl;
-//- (NSString *)headerString;
 
 @end
 
