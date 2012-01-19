@@ -88,24 +88,6 @@ just the mime header.
 	[self setString:inReferer forKey:CURLOPT_REFERER]; 
 }
 
-/*"	Set whether redirects are followed automatically. (Default to true)
-
-	A YES parameter tells the library to follow any
-	Location: header that the server sends as part of a
-	HTTP header.
-			 
-	NOTE: this means that the library will re-send the
-	same request on the new location and follow new
-	Location: headers all the way until no more such
-	headers are returned.
-
-"*/
-
-- (void) setFollowsRedirects:(BOOL)inFlag		// default to true
-{
-	mResult = curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, inFlag);
-}
-
 /*"	Set whether failure codes should return an error.
 
 	A YES parameter tells the library to fail

@@ -364,7 +364,7 @@
 
 		// And load, in background...
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-        //[request setShouldUseCurlHandle:YES];
+        [request setShouldUseCurlHandle:YES];
         
         [_dataReceived setLength:0];
         [_connection release]; _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
