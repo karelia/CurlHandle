@@ -68,6 +68,15 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:YES];
 }
 
+/*"	Callback to provide a chunk of data for sending.  Since we pass "self" in as the "data pointer",
+ we can use that to get back into Objective C and do the work with the class.
+ "*/
+
+size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
+{
+    return [self curlReadPtr:ptr size:size number:nmemb];
+}
+
 @implementation CURLHandle
 
 /*"	CURLHandle is a wrapper around a CURL.
@@ -258,11 +267,15 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 			if(mResult) return nil;
 		mResult = curl_easy_setopt(mCURL, CURLOPT_HEADERFUNCTION, curlHeaderFunction);
 			if(mResult) return nil;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_READFUNCTION, curlReadFunction);
+            if(mResult) return nil;
 		// pass self to the callback
 		mResult = curl_easy_setopt(mCURL, CURLOPT_WRITEHEADER, self);
 			if(mResult) return nil;
 		mResult = curl_easy_setopt(mCURL, CURLOPT_FILE, self);
-			if(mResult) return nil;
+            if(mResult) return nil;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_READDATA, self);
+            if(mResult) return nil;
 	}
 	return self;
 }
@@ -427,6 +440,24 @@ Otherwise, we try to get it by just getting a header with that property name (ca
             curl_easy_setopt(mCURL, CURLOPT_HTTPHEADER, httpHeaders);
         }
         
+        // Set the upload data
+        NSData *uploadData = [request HTTPBody];
+        if (uploadData)
+        {
+            _uploadStream = [[NSInputStream alloc] initWithData:uploadData];
+            mResult = curl_easy_setopt(mCURL, CURLOPT_INFILESIZE, [uploadData length]);
+        }
+        else
+        {
+            _uploadStream = [[request HTTPBodyStream] retain];
+        }
+        
+        if (_uploadStream)
+        {
+            [_uploadStream open];
+            mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 1L);
+        }
+        
         // Set the URL
         mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[request URL] absoluteString] UTF8String]);
         if (0 != mResult)
@@ -439,6 +470,7 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         
         // Do the transfer
         mResult = curl_easy_perform(mCURL);
+        [_uploadStream release]; _uploadStream = nil;
         
         // Response
 #warning We can't really assume a header encoding, trying 7-bit ASCII only.  Maybe there is some way to know?
@@ -529,6 +561,12 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 		}
 	}
 	return written;
+}
+
+- (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
+{
+    NSInteger result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
+    return result;
 }
 
 @synthesize delegate = _delegate;

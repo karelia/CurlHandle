@@ -25,8 +25,10 @@ extern NSString				*sProxyUserIDAndPassword;
 	we can use that to get back into Objective C and do the work with the class.
 "*/
 
+@class CURLHandle;
 extern size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
 extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
+extern size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
 
 @interface CURLHandle : NSObject
 {
@@ -42,6 +44,8 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 
 	// Backgrounding support
 	BOOL    _cancelled;		/*" A flag that is set by the foreground thread and read by the background thread; it's an indicator that the user has cancelled. "*/
+    
+    NSInputStream   *_uploadStream;
 
 	FILE *mPutFile;  /*" The FILE stream if putFile: is used.  It's only saved so it can be closed after perform "*/
     
@@ -71,6 +75,7 @@ extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inS
 /*" Support Methods "*/
 
 - (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
+- (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @end
 
