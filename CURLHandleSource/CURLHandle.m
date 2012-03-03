@@ -388,6 +388,17 @@ Otherwise, we try to get it by just getting a header with that property name (ca
             {
                 mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject cString]);
             }
+            else if ([theObject isKindOfClass:[NSArray class]])
+            {
+                struct curl_slist *list = NULL;
+                for (NSString *anOption in theObject)
+                {
+                    list = curl_slist_append(list, [anOption UTF8String]);
+                }
+                
+                mResult = curl_easy_setopt(mCURL, [theKey intValue], list);
+                //curl_slist_free_all(list); when do we do this?!
+            }
             else
             {
                 NSLog(@"Ignoring CURL option of type %@ for key %@", [theObject class], theKey);
