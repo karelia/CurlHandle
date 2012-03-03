@@ -29,6 +29,7 @@ extern NSString				*sProxyUserIDAndPassword;
 extern size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
 extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
 extern size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
+extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *handle);
 
 @interface CURLHandle : NSObject
 {
@@ -83,6 +84,9 @@ extern size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle 
 @protocol CURLHandleDelegate <NSObject>
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
+
+@optional
+- (void)handle:(CURLHandle *)handle appendStringToTranscript:(NSString *)string;
 @end
 
 

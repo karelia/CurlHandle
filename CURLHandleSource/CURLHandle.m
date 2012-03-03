@@ -77,6 +77,19 @@ size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
     return [self curlReadPtr:ptr size:size number:nmemb];
 }
 
+int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
+{
+    if (infoType != CURLINFO_HEADER_IN && infoType != CURLINFO_HEADER_OUT) return 0;
+    if (![[self delegate] respondsToSelector:@selector(handle:appendStringToTranscript:)]) return 0;
+    
+    
+    NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
+    [[self delegate] handle:self appendStringToTranscript:string];
+    [string release];
+    
+    return 0;
+}
+
 @implementation CURLHandle
 
 /*"	CURLHandle is a wrapper around a CURL.
@@ -275,6 +288,13 @@ size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 		mResult = curl_easy_setopt(mCURL, CURLOPT_FILE, self);
             if(mResult) return nil;
 		mResult = curl_easy_setopt(mCURL, CURLOPT_READDATA, self);
+            if(mResult) return nil;
+        
+		mResult = curl_easy_setopt(mCURL, CURLOPT_VERBOSE, 1);
+            if(mResult) return nil;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGFUNCTION, curlDebugFunction);
+            if(mResult) return nil;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGDATA, self);
             if(mResult) return nil;
 	}
 	return self;
