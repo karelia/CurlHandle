@@ -36,19 +36,6 @@ if the remote file isn't newer than inModDate.
 }
 
 
-/*"	Set the user and password.
-
-	Pass strings to use for the connection.
-"*/
-
-- (void) setUserName:(NSString*)inUserName password:(NSString *)inPassword	// default to none
-{
-	if (nil != inUserName && ![inUserName isEqualToString:@""])
-	{
-		[self setString:[NSString stringWithFormat:@"%@:%@",inUserName,inPassword] forKey:CURLOPT_USERPWD];
-	}
-}
-
 /*"	Set the cookie repository file.
 
 	Pass a string as parameter. It should contain the name of a file for holding 
