@@ -48,19 +48,6 @@ downloads. String in the form of X-Y or X-Y,N-M
 	[self setString:inRange forKey:CURLOPT_RANGE];
 }
 
-/*"	Set whether failure codes should return an error.
-
-	A YES parameter tells the library to fail
-	silently if the HTTP code returned is equal to or
-	larger than 300. The default action would be to
-	return the page normally, ignoring that code.
-"*/
-
-- (void) setFailsOnError:(BOOL)inFlag		// default to true.
-{
-	mResult = curl_easy_setopt([self curl], CURLOPT_FAILONERROR, inFlag);
-}
-
 /*"	Set the user and password.
 
 	Pass strings to use for the connection.
