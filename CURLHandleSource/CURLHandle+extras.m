@@ -62,19 +62,6 @@ just the mime header.
 }
 
 
-/*"	Set the user agent string.
-
-	Pass a string as parameter. It will be used to set the User-Agent: header
-	in the http request sent to the remote server. This
-	can be used to fool servers or scripts.
-
-"*/
-
-- (void) setUserAgent:(NSString *)inUserAgent
-{
-	[self setString:inUserAgent forKey:CURLOPT_USERAGENT]; 
-}
-
 /*"	Set the referer [sic] string.
 
 	Pass a string as parameter. It will be used to set the Referer: header in
