@@ -447,6 +447,10 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         {
             curl_easy_setopt(mCURL, CURLOPT_POST, 1);
         }
+        else
+        {
+            curl_easy_setopt(mCURL, CURLOPT_CUSTOMREQUEST, [method UTF8String]);
+        }
         
         // Set the HTTP Headers.  (These will override options set with above)
         {
