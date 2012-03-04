@@ -62,19 +62,6 @@ just the mime header.
 }
 
 
-/*"	Set the referer [sic] string.
-
-	Pass a string as parameter. It will be used to set the Referer: header in
-	the http request sent to the remote server. This can
-	be used to fool servers or scripts.
-
-"*/
-
-- (void) setReferer:(NSString *)inReferer
-{
-	[self setString:inReferer forKey:CURLOPT_REFERER]; 
-}
-
 /*"	Set whether failure codes should return an error.
 
 	A YES parameter tells the library to fail

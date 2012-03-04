@@ -20,7 +20,6 @@
 - (void) setPostString:(NSString *)inPostString;
 - (void) setPostDictionary:(NSDictionary *)inDictionary;
 - (void) setPostDictionary:(NSDictionary *)inDictionary encoding:(NSStringEncoding) inEncoding;
-- (void) setReferer:(NSString *)inReferer;
 - (void) setUserName:(NSString*)inUserName password:(NSString *)inPassword;
 - (void) setNoBody:(BOOL)inNoBody;
 - (void) setRange:(NSString *)inRange;
