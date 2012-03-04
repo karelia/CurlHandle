@@ -219,38 +219,6 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         mErrorBuffer[0] = 0;	// initialize the error buffer to empty
 		_headerBuffer = [[NSMutableData alloc] init];
 		mStringOptions = [[NSMutableDictionary alloc] init];
-				
-		// SET OPTIONS -- NOTE THAT WE DON'T SET ANY STRINGS DIRECTLY AT THIS STAGE.
-		// Put error messages here
-		mResult = curl_easy_setopt(mCURL, CURLOPT_ERRORBUFFER, &mErrorBuffer);
-			if(mResult) return nil;
-
-		mResult = curl_easy_setopt(mCURL, CURLOPT_FOLLOWLOCATION, YES);
-			if(mResult) return nil;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_FAILONERROR, YES);
-			if(mResult) return nil;
-
-		// send all data to the C function
-		mResult = curl_easy_setopt(mCURL, CURLOPT_WRITEFUNCTION, curlBodyFunction);
-			if(mResult) return nil;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_HEADERFUNCTION, curlHeaderFunction);
-			if(mResult) return nil;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_READFUNCTION, curlReadFunction);
-            if(mResult) return nil;
-		// pass self to the callback
-		mResult = curl_easy_setopt(mCURL, CURLOPT_WRITEHEADER, self);
-			if(mResult) return nil;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_FILE, self);
-            if(mResult) return nil;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_READDATA, self);
-            if(mResult) return nil;
-        
-		mResult = curl_easy_setopt(mCURL, CURLOPT_VERBOSE, 1);
-            if(mResult) return nil;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGFUNCTION, curlDebugFunction);
-            if(mResult) return nil;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGDATA, self);
-            if(mResult) return nil;
 	}
 	return self;
 }
@@ -319,7 +287,41 @@ Otherwise, we try to get it by just getting a header with that property name (ca
     
     @try {
         
-        //curl_easy_reset([self curl]);
+        curl_easy_reset([self curl]);
+        
+        
+		// SET OPTIONS -- NOTE THAT WE DON'T SET ANY STRINGS DIRECTLY AT THIS STAGE.
+		// Put error messages here
+		mResult = curl_easy_setopt(mCURL, CURLOPT_ERRORBUFFER, &mErrorBuffer);
+            if(mResult) return NO;
+        
+		mResult = curl_easy_setopt(mCURL, CURLOPT_FOLLOWLOCATION, YES);
+            if(mResult) return NO;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_FAILONERROR, YES);
+            if(mResult) return NO;
+        
+		// send all data to the C function
+		mResult = curl_easy_setopt(mCURL, CURLOPT_WRITEFUNCTION, curlBodyFunction);
+            if(mResult) return NO;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_HEADERFUNCTION, curlHeaderFunction);
+            if(mResult) return NO;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_READFUNCTION, curlReadFunction);
+            if(mResult) return NO;
+		// pass self to the callback
+		mResult = curl_easy_setopt(mCURL, CURLOPT_WRITEHEADER, self);
+            if(mResult) return NO;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_FILE, self);
+            if(mResult) return NO;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_READDATA, self);
+            if(mResult) return NO;
+        
+		mResult = curl_easy_setopt(mCURL, CURLOPT_VERBOSE, 1);
+            if(mResult) return NO;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGFUNCTION, curlDebugFunction);
+            if(mResult) return NO;
+		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGDATA, self);
+            if(mResult) return NO;
+        
         
         /*"	Zero disables connection timeout (it
          will then only timeout on the system's internal
