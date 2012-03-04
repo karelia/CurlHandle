@@ -340,6 +340,18 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 
 /*""*/
 
+- (NSError *)errorWithDomain:(NSString *)domain code:(NSInteger)code underlyingError:(NSError *)underlyingError;
+{
+    NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                              underlyingError, NSUnderlyingErrorKey,
+                              [underlyingError localizedDescription], NSLocalizedDescriptionKey,
+                              nil];
+    
+    NSError *result = [NSError errorWithDomain:domain code:code userInfo:userInfo];
+    [userInfo release];
+    return result;
+}
+
 /*" %{Loads the receiver's data in the synchronously.}
  
  	Actually set up for loading and do the perform.  This happens in either
@@ -552,6 +564,79 @@ Otherwise, we try to get it by just getting a header with that property name (ca
                                          code:mResult
                                      userInfo:userInfo];
             [userInfo release];
+            
+            
+            // Try to generate a Cocoa-friendly error on top of the raw libCurl one
+            switch (mResult)
+            {
+                case CURLE_UNSUPPORTED_PROTOCOL:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorUnsupportedURL underlyingError:*error];
+                    break;
+                    
+                case CURLE_URL_MALFORMAT:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorBadURL underlyingError:*error];
+                    break;
+                    
+                case CURLE_COULDNT_RESOLVE_HOST:
+                case CURLE_FTP_CANT_GET_HOST:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotFindHost underlyingError:*error];
+                    break;
+                    
+                case CURLE_COULDNT_CONNECT:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost underlyingError:*error];
+                    break;
+                    
+                case CURLE_WRITE_ERROR:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotWriteToFile underlyingError:*error];
+                    break;
+                    
+                //case CURLE_FTP_ACCEPT_TIMEOUT:    seems to have been added in a newer version of Curl than ours
+                case CURLE_OPERATION_TIMEDOUT:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorTimedOut underlyingError:*error];
+                    break;
+                    
+                case CURLE_SSL_CONNECT_ERROR:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorSecureConnectionFailed underlyingError:*error];
+                    break;
+                    
+                case CURLE_TOO_MANY_REDIRECTS:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorHTTPTooManyRedirects underlyingError:*error];
+                    break;
+                    
+                case CURLE_BAD_CONTENT_ENCODING:
+                    *error = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError underlyingError:*error];
+                    break;
+                    
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_2_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
+                case CURLE_FILESIZE_EXCEEDED:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorDataLengthExceedsMaximum underlyingError:*error];
+                    break;
+#endif
+                    
+#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED
+                case CURLE_SEND_FAIL_REWIND:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorRequestBodyStreamExhausted underlyingError:*error];
+                    break;
+#endif
+                    
+                case CURLE_LOGIN_DENIED:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorUserAuthenticationRequired underlyingError:*error];
+                    break;
+                    
+                case CURLE_REMOTE_DISK_FULL:
+                    *error = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteOutOfSpaceError underlyingError:*error];
+                    break;
+                    
+#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_5_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
+                case CURLE_REMOTE_FILE_EXISTS:
+                    *error = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError underlyingError:*error];
+                    break;
+#endif
+                    
+                case CURLE_REMOTE_FILE_NOT_FOUND:
+                    *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorResourceUnavailable underlyingError:*error];
+                    break;
+            }
         }
     }
     
