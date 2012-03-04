@@ -457,8 +457,19 @@ Otherwise, we try to get it by just getting a header with that property name (ca
             for (NSString *theKey in [request allHTTPHeaderFields])
             {
                 NSString *theValue = [request valueForHTTPHeaderField:theKey];
-                NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
-                httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
+                
+                // Range requests are a special case that should inform Curl directly
+#define HTTP_RANGE_PREFIX @"bytes="
+                if ([theKey caseInsensitiveCompare:@"Range"] == NSOrderedSame &&
+                    [theValue hasPrefix:HTTP_RANGE_PREFIX])
+                {
+                    curl_easy_setopt(mCURL, CURLOPT_RANGE, [[theValue substringFromIndex:[HTTP_RANGE_PREFIX length]] UTF8String]);
+                }
+                else
+                {
+                    NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
+                    httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
+                }
             }
             curl_easy_setopt(mCURL, CURLOPT_HTTPHEADER, httpHeaders);
         }

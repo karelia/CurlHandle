@@ -36,18 +36,6 @@ if the remote file isn't newer than inModDate.
 }
 
 
-/*"	Set the byte range.
-
-Pass a string as parameter. It will be used to set the Range: header in
-the http request sent to the remote server. This is used to get partial
-downloads. String in the form of X-Y or X-Y,N-M
-
-"*/
-- (void) setRange:(NSString *)inRange
-{
-	[self setString:inRange forKey:CURLOPT_RANGE];
-}
-
 /*"	Set the user and password.
 
 	Pass strings to use for the connection.

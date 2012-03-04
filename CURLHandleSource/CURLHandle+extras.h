@@ -19,7 +19,6 @@
 - (void) setPostDictionary:(NSDictionary *)inDictionary;
 - (void) setPostDictionary:(NSDictionary *)inDictionary encoding:(NSStringEncoding) inEncoding;
 - (void) setUserName:(NSString*)inUserName password:(NSString *)inPassword;
-- (void) setRange:(NSString *)inRange;
 - (void) setIfModSince:(NSDate *)inModDate;
 - (void) setLowSpeedTime:(long) inSeconds;
 - (void) setLowSpeedLimit:(long) inBytes;
