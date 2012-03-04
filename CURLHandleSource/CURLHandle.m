@@ -488,6 +488,10 @@ Otherwise, we try to get it by just getting a header with that property name (ca
             [_uploadStream open];
             mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 1L);
         }
+        else
+        {
+            mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 0);
+        }
         
         // Set the URL
         mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[request URL] absoluteString] UTF8String]);
