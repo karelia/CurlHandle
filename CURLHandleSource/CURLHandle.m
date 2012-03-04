@@ -178,51 +178,6 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 	[mStringOptions setObject:inObject forKey:[NSNumber numberWithInt:inCurlOption]];
 }
 
-/*"	Set the file to be PUT
-"*/
-- (void) setPutFile:(NSString *)path
-{
-	mPutFile = fopen([path fileSystemRepresentation], "r");
-	if (NULL == mPutFile) {
-		NSLog(@"CURLHandle: setPutFile couldn't find file at %@", path);
-		return;
-	}
-	fseek(mPutFile, 0, SEEK_END);
-	curl_easy_setopt([self curl], CURLOPT_PUT, 1L);
-	curl_easy_setopt([self curl], CURLOPT_UPLOAD, 1L);
-	curl_easy_setopt([self curl], CURLOPT_INFILE, mPutFile);
-	curl_easy_setopt([self curl], CURLOPT_INFILESIZE, ftell(mPutFile));
-	rewind(mPutFile);
-}
-
-/*"	Set the file offset for performing the PUT.
-"*/
-
-- (void) setPutFileOffset:(int)offset
-{
-	if (NULL != mPutFile) {
-		fseek(mPutFile, offset, SEEK_SET);
-	}
-}
-
-- (void) setPutFile:(NSString *)path resumeUploadFromOffset:(off_t)offset_ {
-	mPutFile = fopen([path fileSystemRepresentation], "r");
-	if (NULL == mPutFile) {
-		NSLog(@"CURLHandle: setPutFile:resumeUploadFromOffset: couldn't find file at %@", path);
-		return;
-	}
-	
-	fseek(mPutFile, 0, SEEK_END);
-	off_t fileSize = ftello(mPutFile);
-	rewind(mPutFile);
-	
-	curl_easy_setopt([self curl], CURLOPT_PUT, 1L);
-	curl_easy_setopt([self curl], CURLOPT_UPLOAD, 1L);
-	curl_easy_setopt([self curl], CURLOPT_INFILE, mPutFile);
-	curl_easy_setopt([self curl], CURLOPT_INFILESIZE_LARGE, fileSize);
-	curl_easy_setopt([self curl], CURLOPT_RESUME_FROM_LARGE, offset_);
-}
-
 + (NSString *) curlVersion
 {
 	return [NSString stringWithCString: curl_version() encoding:NSASCIIStringEncoding];
@@ -521,13 +476,6 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         
         // Response
 #warning We can't really assume a header encoding, trying 7-bit ASCII only.  Maybe there is some way to know?
-        
-        // PUT file
-        if (nil != mPutFile)
-        {
-            fclose(mPutFile);
-            mPutFile = nil;
-        }
         
         if (nil != httpHeaders)
         {

@@ -48,11 +48,12 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     
     NSInputStream   *_uploadStream;
 
-	FILE *mPutFile;  /*" The FILE stream if putFile: is used.  It's only saved so it can be closed after perform "*/
-    
-    id <CURLHandleDelegate> _delegate;
+	id <CURLHandleDelegate> _delegate;
 }
 
+// Loading respects as many of NSURLRequest's built-in features as possible, including:
+//  * Supply -HTTPBody or -HTTPBodyStream to switch Curl into uploading mode, regardless of protocol
+// 
 // Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. There will generally be a CURLErrorDomain error present; either directly, or as an underlying error (KSError <https://github.com/karelia/KSError> is handy for querying underlying errors)
 // The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate
 // At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
@@ -69,9 +70,6 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 - (void) setStringOrNumberObject:(id)inString forKey:(CURLoption) inCurlOption;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
-- (void) setPutFile:(NSString *)path;
-- (void) setPutFileOffset:(int)offset;
-- (void) setPutFile:(NSString *)path resumeUploadFromOffset:(off_t)offset_;
 
 - (id)propertyForKey:(NSString *)propertyKey;
 - (id)propertyForKeyIfAvailable:(NSString *)propertyKey;
