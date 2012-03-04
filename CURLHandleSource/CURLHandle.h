@@ -54,7 +54,8 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 }
 
 // Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. There will generally be a CURLErrorDomain error present; either directly, or as an underlying error (KSError <https://github.com/karelia/KSError> is handy for querying underlying errors)
-// The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code for CURLErrorDomain errors if appropriate
+// The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate
+// At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
 - (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 
 @property(nonatomic, assign) id <CURLHandleDelegate> delegate;

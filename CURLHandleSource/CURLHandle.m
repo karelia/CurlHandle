@@ -342,10 +342,8 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 
 - (NSError *)errorWithDomain:(NSString *)domain code:(NSInteger)code underlyingError:(NSError *)underlyingError;
 {
-    NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-                              underlyingError, NSUnderlyingErrorKey,
-                              [underlyingError localizedDescription], NSLocalizedDescriptionKey,
-                              nil];
+    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithDictionary:[underlyingError userInfo]];
+    [userInfo setObject:underlyingError forKey:NSUnderlyingErrorKey];
     
     NSError *result = [NSError errorWithDomain:domain code:code userInfo:userInfo];
     [userInfo release];
@@ -540,11 +538,13 @@ Otherwise, we try to get it by just getting a header with that property name (ca
     {
         if (0 != mResult && error)
         {
+            NSURL *url = [request URL];
             NSString *description = [NSString stringWithUTF8String:mErrorBuffer];
             
             NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                             description,
-                                             NSLocalizedDescriptionKey,
+                                             url, NSURLErrorFailingURLErrorKey,
+                                             [url absoluteString], NSURLErrorFailingURLStringErrorKey,
+                                             description, NSLocalizedDescriptionKey,
                                              nil];
             
             long responseCode;
