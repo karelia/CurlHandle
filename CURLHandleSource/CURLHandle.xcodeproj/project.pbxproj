@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
+		275707691503E21D00363512 /* CURLFTPSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 275707671503E21C00363512 /* CURLFTPSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 275707681503E21C00363512 /* CURLFTPSession.m */; };
 		7959468B0AA88D0000EBF548 /* ResumableHTTPUploader.h in Headers */ = {isa = PBXBuildFile; fileRef = 795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7959468C0AA88D0000EBF548 /* ResumableHTTPUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */; };
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
@@ -30,6 +32,8 @@
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
+		275707671503E21C00363512 /* CURLFTPSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLFTPSession.h; sourceTree = "<group>"; };
+		275707681503E21C00363512 /* CURLFTPSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLFTPSession.m; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLHandle_Prefix.pch; sourceTree = "<group>"; };
 		795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResumableHTTPUploader.h; sourceTree = "<group>"; };
 		7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResumableHTTPUploader.m; sourceTree = "<group>"; };
@@ -114,6 +118,8 @@
 				27229B3914C83905007D0FF1 /* CURLProtocol.m */,
 				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
 				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
+				275707671503E21C00363512 /* CURLFTPSession.h */,
+				275707681503E21C00363512 /* CURLFTPSession.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -161,6 +167,7 @@
 				79B96CC10A6360F90060AC12 /* CURLHandle+extras.h in Headers */,
 				27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */,
 				7959468B0AA88D0000EBF548 /* ResumableHTTPUploader.h in Headers */,
+				275707691503E21D00363512 /* CURLFTPSession.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +237,7 @@
 				79B96CC20A6360F90060AC12 /* CURLHandle+extras.m in Sources */,
 				7959468C0AA88D0000EBF548 /* ResumableHTTPUploader.m in Sources */,
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
+				2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
