@@ -25,7 +25,6 @@
 - (void) setIfModSince:(NSDate *)inModDate;
 - (void) setLowSpeedTime:(long) inSeconds;
 - (void) setLowSpeedLimit:(long) inBytes;
-- (void) setVerbose: (BOOL) beVerbose;
 
 /*" Get information about the transfer "*/
 

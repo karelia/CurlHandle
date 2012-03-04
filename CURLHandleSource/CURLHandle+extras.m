@@ -153,13 +153,6 @@ just the mime header.
 	curl_easy_setopt([self curl], CURLOPT_LOW_SPEED_LIMIT, inBytes);
 }
 
-/*" Set the verbosity of CURL.
-"*/
-- (void) setVerbose: (BOOL) beVerbose
-{
-	curl_easy_setopt([self curl], CURLOPT_VERBOSE, beVerbose);
-}
-
 // -----------------------------------------------------------------------------
 #pragma mark -- MULTIPART POST DICTIONARIES
 // -----------------------------------------------------------------------------
