@@ -429,6 +429,13 @@ Otherwise, we try to get it by just getting a header with that property name (ca
             }
         }
         
+        // HTTP method
+        NSString *method = [request HTTPMethod];
+        if ([method isEqualToString:@"HEAD"])
+        {
+            curl_easy_setopt(mCURL, CURLOPT_NOBODY, 1);
+        }
+        
         // Set the HTTP Headers.  (These will override options set with above)
         {
             for (NSString *theKey in [request allHTTPHeaderFields])

@@ -48,20 +48,6 @@ downloads. String in the form of X-Y or X-Y,N-M
 	[self setString:inRange forKey:CURLOPT_RANGE];
 }
 
-/*"	Set the http operation to HEAD instead of GET.
-
-Pass a BOOL as parameter. It will be used to set the verb to HEAD in the
-http request sent to the remote server. This means that no body will be returned,
-just the mime header.
-
-"*/
-
-- (void) setNoBody:(BOOL)inNoBody
-{
-	curl_easy_setopt([self curl], CURLOPT_NOBODY, (long)inNoBody);
-}
-
-
 /*"	Set whether failure codes should return an error.
 
 	A YES parameter tells the library to fail

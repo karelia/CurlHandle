@@ -76,7 +76,7 @@
     // Navigate to the directory above the one to be created
     // CURLOPT_NOBODY stops libcurl from trying to list the directory's contents
     NSMutableURLRequest *request = [self newMutableRequestWithPath:[path stringByDeletingLastPathComponent] isDirectory:YES];
-    [_handle setStringOrNumberObject:[NSNumber numberWithBool:YES] forKey:CURLOPT_NOBODY];
+    [request setHTTPMethod:@"HEAD"];
     
     // Custom command to delete the file once we're in the correct directory
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the delete command twice in my testing
@@ -94,7 +94,7 @@
     // Navigate to the directory containing the file
     // CURLOPT_NOBODY stops libcurl from trying to list the directory's contents
     NSMutableURLRequest *request = [self newMutableRequestWithPath:[path stringByDeletingLastPathComponent] isDirectory:YES];
-    [_handle setStringOrNumberObject:[NSNumber numberWithBool:YES] forKey:CURLOPT_NOBODY];
+    [request setHTTPMethod:@"HEAD"];
     
     // Custom command to delete the file once we're in the correct directory
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the delete command twice in my testing

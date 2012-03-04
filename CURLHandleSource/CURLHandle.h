@@ -52,6 +52,9 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 }
 
 // Loading respects as many of NSURLRequest's built-in features as possible, including:
+//
+//  * For non-HTTP requests, a method of @"HEAD" will still turn the CURLOPT_NOBODY option on
+//
 //  * Supply -HTTPBody or -HTTPBodyStream to switch Curl into uploading mode, regardless of protocol
 // 
 // Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. There will generally be a CURLErrorDomain error present; either directly, or as an underlying error (KSError <https://github.com/karelia/KSError> is handy for querying underlying errors)
