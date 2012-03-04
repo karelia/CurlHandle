@@ -80,11 +80,11 @@ size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
 {
     if (infoType != CURLINFO_HEADER_IN && infoType != CURLINFO_HEADER_OUT) return 0;
-    if (![[self delegate] respondsToSelector:@selector(handle:appendStringToTranscript:)]) return 0;
+    if (![[self delegate] respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)]) return 0;
     
     
     NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
-    [[self delegate] handle:self appendStringToTranscript:string];
+    [[self delegate] handle:self didReceiveDebugInformation:string ofType:infoType];
     [string release];
     
     return 0;
@@ -353,6 +353,8 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 	_cancelled = NO;
     
     @try {
+        
+        //curl_easy_reset([self curl]);
         
         /*"	Zero disables connection timeout (it
          will then only timeout on the system's internal
