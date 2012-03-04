@@ -435,6 +435,10 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         {
             curl_easy_setopt(mCURL, CURLOPT_NOBODY, 1);
         }
+        else if ([method isEqualToString:@"PUT"])
+        {
+            mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 1L);
+        }
         else if ([method isEqualToString:@"POST"])
         {
             curl_easy_setopt(mCURL, CURLOPT_POST, 1);

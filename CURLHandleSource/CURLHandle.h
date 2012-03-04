@@ -51,12 +51,13 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 	id <CURLHandleDelegate> _delegate;
 }
 
-// Loading respects as many of NSURLRequest's built-in features as possible, including:
-//
-//  * For non-HTTP requests, a method of @"HEAD" will still turn the CURLOPT_NOBODY option on
-//
-//  * Supply -HTTPBody or -HTTPBodyStream to switch Curl into uploading mode, regardless of protocol
-// 
+//  Loading respects as many of NSURLRequest's built-in features as possible, including:
+//  
+//    * An HTTP method of @"HEAD" turns on the CURLOPT_NOBODY option, regardless of protocol (e.g. handy for FTP)
+//    * Similarly, @"PUT" turns on the CURLOPT_UPLOAD option (again handy for FTP uploads)
+//  
+//    * Supply -HTTPBody or -HTTPBodyStream to switch Curl into uploading mode, regardless of protocol
+//  
 // Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. There will generally be a CURLErrorDomain error present; either directly, or as an underlying error (KSError <https://github.com/karelia/KSError> is handy for querying underlying errors)
 // The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate
 // At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
