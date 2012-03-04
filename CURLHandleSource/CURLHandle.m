@@ -530,9 +530,22 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         {
             NSString *description = [NSString stringWithUTF8String:mErrorBuffer];
             
+            NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                             description,
+                                             NSLocalizedDescriptionKey,
+                                             nil];
+            
+            long osErrorNumber = 0;
+            if (curl_easy_getinfo(mCURL, CURLINFO_OS_ERRNO, &osErrorNumber) == 0 && osErrorNumber)
+            {
+                [userInfo setObject:[NSError errorWithDomain:NSOSStatusErrorDomain code:osErrorNumber userInfo:nil]
+                             forKey:NSUnderlyingErrorKey];
+            }
+            
             *error = [NSError errorWithDomain:CURLErrorDomain
                                          code:mResult
-                                     userInfo:[NSDictionary dictionaryWithObjectsAndKeys:description, NSLocalizedDescriptionKey, nil]];
+                                     userInfo:userInfo];
+            [userInfo release];
         }
     }
     
