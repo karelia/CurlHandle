@@ -431,6 +431,10 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         
         // HTTP method
         NSString *method = [request HTTPMethod];
+        if ([method isEqualToString:@"GET"])
+        {
+            curl_easy_setopt(mCURL, CURLOPT_HTTPGET, 1);
+        }
         if ([method isEqualToString:@"HEAD"])
         {
             curl_easy_setopt(mCURL, CURLOPT_NOBODY, 1);
