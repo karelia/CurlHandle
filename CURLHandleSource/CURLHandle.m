@@ -535,6 +535,12 @@ Otherwise, we try to get it by just getting a header with that property name (ca
                                              NSLocalizedDescriptionKey,
                                              nil];
             
+            long responseCode;
+            if (curl_easy_getinfo(mCURL, CURLINFO_RESPONSE_CODE, &responseCode) == 0 && responseCode)
+            {
+                [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]];
+            }
+            
             long osErrorNumber = 0;
             if (curl_easy_getinfo(mCURL, CURLINFO_OS_ERRNO, &osErrorNumber) == 0 && osErrorNumber)
             {

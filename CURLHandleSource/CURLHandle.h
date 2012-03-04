@@ -53,6 +53,8 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     id <CURLHandleDelegate> _delegate;
 }
 
+// Errors are in the CURLErrorDomain
+// The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate
 - (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 
 @property(nonatomic, assign) id <CURLHandleDelegate> delegate;
