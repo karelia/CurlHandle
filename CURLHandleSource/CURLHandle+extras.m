@@ -276,36 +276,6 @@ headers = {body = "Content-Type: text/html; filename = \"hello.html\""}
 //
 //
 
-/*"	Return the last used effective URL. %{This doesn't ever seem to give me anything real}
-
-"*/
-
-- (NSString *)effectiveURL
-{
-	char url[1024];
-	curl_easy_getinfo([self curl], CURLINFO_EFFECTIVE_URL, url);
-	return [NSString stringWithUTF8String:url];
-}
-
-/*"	Return the last received HTTP code.
-
-"*/
-
-- (long)httpCode
-{
-	long aLong;
-	curl_easy_getinfo([self curl], CURLINFO_HTTP_CODE, &aLong);
-	return aLong;
-}
-
-/*"	Return the remote time
-	of the retrieved document. If you get 0, it can be
-	because of many reasons (unknown, the server hides
-	it or the server doesn't support the command that
-	tells document time etc) and the time of the document is unknown.
-
-"*/
-
 - (long)fileTime
 {
 	long aLong;

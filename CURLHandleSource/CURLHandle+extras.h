@@ -39,7 +39,6 @@
 - (double)uploadSpeed;
 - (long)fileTime;
 - (long)headerSize;
-- (long)httpCode;
 - (long)requestSize;
 
 /*" Multipart post operations "*/
