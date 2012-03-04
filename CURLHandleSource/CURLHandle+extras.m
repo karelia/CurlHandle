@@ -105,39 +105,6 @@ just the mime header.
 	}
 }
 
-/*"	Set the HTTP request's cookie data manually.
-	The Dictionary contains any number of entries where the key is the cookie name, as
-	identified in an incoming response header "Set-Cookie:" line, and the value is either the
-	cookie value as a string (the simple case) or an NSDictionary with the value of the cookie
-	stored under the "value" key; any other key/values representing other cookie attributes
-	will be ignored.
-"*/
-
-- (void) setRequestCookies:(NSDictionary *)inDict
-{
-	if (0 != [inDict count])
-	{
-		NSMutableString *buf = [NSMutableString string];
-		NSEnumerator *theEnum = [inDict keyEnumerator];
-		id key;
-	
-		while (nil != (key = [theEnum nextObject]) )
-		{
-			id value = [inDict objectForKey:key];
-			if ([value respondsToSelector:@selector(objectForKey:)])
-			{
-				// This is actually a dictionary, delve down to get the "value" key
-				value = [value objectForKey:@"value"];
-			}
-			[buf appendString:key];
-			[buf appendString:@"="];
-			[buf appendString:value];
-			[buf appendString:@"; "];
-		}
-		[self setString:buf forKey:CURLOPT_COOKIE];
-	}
-}
-
 /*"	Set post data as a string, for XML-RPC communication and such that doesn't want data pairs.
 "*/
 - (void) setPostString:(NSString *)inPostString

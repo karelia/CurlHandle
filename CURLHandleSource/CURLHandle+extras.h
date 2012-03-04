@@ -15,7 +15,6 @@
 /*" Set options for the transfer "*/
 
 - (void) setCookieFile:(NSString *)inFilePath;
-- (void) setRequestCookies:(NSDictionary *)inDict;
 - (void) setFailsOnError:(BOOL)inFlag;
 - (void) setPostString:(NSString *)inPostString;
 - (void) setPostDictionary:(NSDictionary *)inDictionary;
