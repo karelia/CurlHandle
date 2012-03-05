@@ -76,7 +76,6 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (CURL *) curl;
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption;
-- (void) setStringOrNumberObject:(id)inString forKey:(CURLoption) inCurlOption;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
 

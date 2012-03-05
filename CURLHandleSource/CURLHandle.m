@@ -170,14 +170,6 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 	[mStringOptions setObject:inString forKey:[NSNumber numberWithInt:inCurlOption]];
 }
 
-/*"	Set an option given a !{CURLoption} key.  Before transfer, the object, which  must be an NSString or an integer NSNumber will be used to invoke %curl_easy_setopt.  Categories with convenient APIs can make use of this.
-"*/
-
-- (void) setStringOrNumberObject:(id)inObject forKey:(CURLoption) inCurlOption
-{
-	[mStringOptions setObject:inObject forKey:[NSNumber numberWithInt:inCurlOption]];
-}
-
 + (NSString *) curlVersion
 {
 	return [NSString stringWithCString: curl_version() encoding:NSASCIIStringEncoding];
