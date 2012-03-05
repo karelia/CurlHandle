@@ -215,39 +215,6 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 	return self;
 }
 
-/*" %{Returns the property for key propertyKey; returns nil if there is no such key. Subclasses of NSURLHandle must override this method.}
-	
-	#{DO NOT INVOKE SUPERCLASS}.
-"*/
-
-- (id)propertyForKey:(NSString *)propertyKey
-{
-	id result = [self propertyForKeyIfAvailable:propertyKey];
-	if (nil == result)
-	{
-		// get some more expensive things...
-	}
-	return result;
-}
-
-/*" %{Returns the property for key propertyKey only if the value is already available, i.e., the client doesn't need to do any work.}
-
-	#{DO NOT INVOKE SUPERCLASS}.
-	
-	#{TODO: We can't assume any encoding for header.  Perhaps we could look for the encoding value in the header, and try again if it doesn't match?}
-
-	#{TODO: Apple defines some keys, but what the heck are they?  "Description Forthcoming"....}
-
-This first attempts to handle the Apple-defined NSHTTPProperty... keys.  Then if it's HEADER we just return the whole header string.  If it's COOKIES, we return the cookie as an array; this can be further parsed with #parsedCookies:.
-
-Otherwise, we try to get it by just getting a header with that property name (case-insensitive).
-"*/
-
-- (id)propertyForKeyIfAvailable:(NSString *)propertyKey
-{
-	return nil;
-}
-
 
 // -----------------------------------------------------------------------------
 #pragma mark ----- CURL DATA LOADING SUPPORT

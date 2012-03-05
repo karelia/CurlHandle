@@ -79,9 +79,6 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
 
-- (id)propertyForKey:(NSString *)propertyKey;
-- (id)propertyForKeyIfAvailable:(NSString *)propertyKey;
-
 /*" Support Methods "*/
 
 - (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
