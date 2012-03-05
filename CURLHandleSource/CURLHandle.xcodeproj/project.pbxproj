@@ -11,8 +11,6 @@
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		275707691503E21D00363512 /* CURLFTPSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 275707671503E21C00363512 /* CURLFTPSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 275707681503E21C00363512 /* CURLFTPSession.m */; };
-		7959468B0AA88D0000EBF548 /* ResumableHTTPUploader.h in Headers */ = {isa = PBXBuildFile; fileRef = 795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7959468C0AA88D0000EBF548 /* ResumableHTTPUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */; };
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		79B96CAD0A6360E00060AC12 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA80A6360E00060AC12 /* libcrypto.dylib */; };
 		79B96CAE0A6360E00060AC12 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA90A6360E00060AC12 /* libssl.dylib */; };
@@ -20,8 +18,6 @@
 		79B96CB00A6360E00060AC12 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CAB0A6360E00060AC12 /* libz.dylib */; };
 		79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 79B96CBB0A6360F90060AC12 /* CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
-		79B96CC10A6360F90060AC12 /* CURLHandle+extras.h in Headers */ = {isa = PBXBuildFile; fileRef = 79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		79B96CC20A6360F90060AC12 /* CURLHandle+extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */; };
 		79B96CD20A6362760060AC12 /* libcurl.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CD10A6362760060AC12 /* libcurl.3.dylib */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -164,9 +160,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */,
-				79B96CC10A6360F90060AC12 /* CURLHandle+extras.h in Headers */,
 				27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */,
-				7959468B0AA88D0000EBF548 /* ResumableHTTPUploader.h in Headers */,
 				275707691503E21D00363512 /* CURLFTPSession.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -234,8 +228,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */,
-				79B96CC20A6360F90060AC12 /* CURLHandle+extras.m in Sources */,
-				7959468C0AA88D0000EBF548 /* ResumableHTTPUploader.m in Sources */,
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
 				2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */,
 			);
