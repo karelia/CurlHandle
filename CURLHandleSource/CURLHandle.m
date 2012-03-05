@@ -357,17 +357,6 @@ Otherwise, we try to get it by just getting a header with that property name (ca
             {
                 mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject cString]);
             }
-            else if ([theObject isKindOfClass:[NSArray class]])
-            {
-                struct curl_slist *list = NULL;
-                for (NSString *anOption in theObject)
-                {
-                    list = curl_slist_append(list, [anOption UTF8String]);
-                }
-                
-                mResult = curl_easy_setopt(mCURL, [theKey intValue], list);
-                //curl_slist_free_all(list); when do we do this?!
-            }
             else
             {
                 NSLog(@"Ignoring CURL option of type %@ for key %@", [theObject class], theKey);
@@ -503,6 +492,23 @@ Otherwise, we try to get it by just getting a header with that property name (ca
             mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 0);
         }
         
+        // Post-quote
+        struct curl_slist *postQuoteCommands = NULL;
+        for (NSString *aCommand in [request curl_postTransferCommands])
+        {
+            postQuoteCommands = curl_slist_append(postQuoteCommands, [aCommand UTF8String]);
+        }
+        if (postQuoteCommands)
+        {
+            mResult = curl_easy_setopt(mCURL, CURLOPT_POSTQUOTE, postQuoteCommands);
+            if (mResult)
+            {
+                curl_slist_free_all(postQuoteCommands);
+                return NO;
+            }
+        }
+        
+        
         // Set the URL
         mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[request URL] absoluteString] UTF8String]);
         if (0 != mResult)
@@ -524,6 +530,8 @@ Otherwise, we try to get it by just getting a header with that property name (ca
         {
             curl_slist_free_all(httpHeaders);
         }
+        if (postQuoteCommands) curl_slist_free_all(postQuoteCommands);
+        
     }
     @finally
     {
@@ -708,6 +716,40 @@ Otherwise, we try to get it by just getting a header with that property name (ca
 // -----------------------------------------------------------------------------
 #pragma mark ----- CATEGORIES
 // -----------------------------------------------------------------------------
+
+#pragma mark -
+
+
+@implementation NSURLRequest (CURLRequest)
+
+- (NSArray *)curl_postTransferCommands;
+{
+    return [NSURLProtocol propertyForKey:@"curl_postTransferCommands" inRequest:self];
+}
+
+@end
+
+@implementation NSMutableURLRequest (CURLRequest)
+
+- (void)curl_setPostTransferCommands:(NSArray *)commands;
+{
+    if (commands)
+    {
+        commands = [commands copy];
+        [NSURLProtocol setProperty:commands forKey:@"curl_postTransferCommands" inRequest:self];
+        [commands release];
+    }
+    else
+    {
+        [NSURLProtocol removePropertyForKey:@"curl_postTransferCommands" inRequest:self];
+    }
+}
+
+@end
+
+
+#pragma mark -
+
 
 @implementation NSDictionary ( CurlHTTPExtensions )
 

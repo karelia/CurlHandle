@@ -100,6 +100,21 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 @end
 
 
+#pragma mark -
+
+
+@interface NSURLRequest (CURLRequest)
+- (NSArray *)curl_postTransferCommands;  // an array of strings to execute
+@end
+
+@interface NSMutableURLRequest (CURLRequest)
+- (void)curl_setPostTransferCommands:(NSArray *)commands;    // an array of strings. Run after the main request
+@end
+
+
+#pragma mark -
+
+
 @interface NSDictionary ( CurlHTTPExtensions )
 
 - (NSString *) formatForHTTP;

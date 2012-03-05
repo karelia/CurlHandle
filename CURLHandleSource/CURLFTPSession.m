@@ -80,8 +80,7 @@
     
     // Custom command to delete the file once we're in the correct directory
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the delete command twice in my testing
-    [_handle setStringOrNumberObject:[NSArray arrayWithObject:[@"MKD " stringByAppendingString:[path lastPathComponent]]]
-                                    forKey:CURLOPT_POSTQUOTE];
+    [request curl_setPostTransferCommands:[NSArray arrayWithObject:[@"MKD " stringByAppendingString:[path lastPathComponent]]]];
     
     
     BOOL result = [_handle loadRequest:request error:error];
@@ -98,8 +97,7 @@
     
     // Custom command to delete the file once we're in the correct directory
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the delete command twice in my testing
-    [_handle setStringOrNumberObject:[NSArray arrayWithObject:[@"DELE " stringByAppendingString:[path lastPathComponent]]]
-                                    forKey:CURLOPT_POSTQUOTE];
+    [request curl_setPostTransferCommands:[NSArray arrayWithObject:[@"DELE " stringByAppendingString:[path lastPathComponent]]]];
     
     BOOL result = [_handle loadRequest:request error:error];
     [request release];
