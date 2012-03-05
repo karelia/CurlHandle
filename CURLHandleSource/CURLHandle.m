@@ -465,6 +465,13 @@ Otherwise, we try to get it by just getting a header with that property name (ca
                 {
                     curl_easy_setopt(mCURL, CURLOPT_RANGE, [[theValue substringFromIndex:[HTTP_RANGE_PREFIX length]] UTF8String]);
                 }
+                
+                // Accept-Encoding requests are also special
+                else if ([theKey caseInsensitiveCompare:@"Accept-Encoding"] == NSOrderedSame)
+                {
+                    curl_easy_setopt(mCURL, CURLOPT_ENCODING, [theValue UTF8String]);
+                }
+                
                 else
                 {
                     NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];

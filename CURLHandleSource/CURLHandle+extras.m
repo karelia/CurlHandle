@@ -368,24 +368,4 @@ headers = {body = "Content-Type: text/html; filename = \"hello.html\""}
 	return aDouble;
 }
 
-/*"	Sets the accepted encodings. If encodings is a non-zero length string, then it is used as the
-value for the Accept-encoding header. If it is a zero length string, then all supported
-encodings are used (gzip, deflate at the time of writing). If it is nil, then the Accept-encoding
-header is cleared. gzip got support in version 7.10.5 or later of the curl library.
-"*/
-- (void)setAcceptEncoding:(NSString *)encodings
-{
-	[self setString:encodings forKey:CURLOPT_ENCODING];
-}
-
-/*"	Sets CURL to accept all supported encodings transparently.
-"*/
-- (void)setAcceptCompression:(BOOL)yorn
-{
-	if( yorn )
-		[self setAcceptEncoding:@""];
-	else
-		[self setAcceptEncoding:nil];
-}
-
 @end
