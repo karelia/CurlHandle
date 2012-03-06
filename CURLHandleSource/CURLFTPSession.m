@@ -56,7 +56,10 @@
 - (NSMutableURLRequest *)newMutableRequestWithPath:(NSString *)path isDirectory:(BOOL)isDirectory;
 {
     NSMutableURLRequest *request = [_request mutableCopy];
-    [request setURL:[[request URL] URLByAppendingPathComponent:path isDirectory:isDirectory]];
+    if ([path length])  // nil/empty paths should only occur when trying to CWD to the home directory
+    {
+        [request setURL:[[request URL] URLByAppendingPathComponent:path isDirectory:isDirectory]];
+    }
     
     return request;
 }
