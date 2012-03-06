@@ -106,11 +106,18 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 // An array of strings. Executed in turn once the main request is done
 @property(nonatomic, copy, readonly) NSArray *curl_postTransferCommands;
 
+// A value greater than 0 will cause Curl to create missing directories. I'm pretty certain this only applies when uploading
+// Default is 0
+// See CURLOPT_FTP_CREATE_MISSING_DIRS docs for full details
+@property(nonatomic, readonly) NSUInteger curl_createIntermediateDirectories;
+
 @end
 
 @interface NSMutableURLRequest (CURLOptionsFTP)
 
 @property(nonatomic, copy, readwrite, setter=curl_setPostTransferCommands:) NSArray *curl_postTransferCommands;
+@property(nonatomic, readwrite, setter=curl_setCreateIntermediateDirectories:) NSUInteger curl_createIntermediateDirectories;
+
 @end
 
 

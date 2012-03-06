@@ -451,6 +451,10 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
             mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 0);
         }
         
+        // Intermediate directories
+        mResult = curl_easy_setopt(mCURL, CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories]);
+        
+        
         // Post-quote
         struct curl_slist *postQuoteCommands = NULL;
         for (NSString *aCommand in [request curl_postTransferCommands])
@@ -693,6 +697,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     return [NSURLProtocol propertyForKey:@"curl_postTransferCommands" inRequest:self];
 }
 
+- (NSUInteger)curl_createIntermediateDirectories;
+{
+    return [[NSURLProtocol propertyForKey:@"curl_createIntermediateDirectories" inRequest:self] unsignedIntegerValue];
+}
+
 @end
 
 @implementation NSMutableURLRequest (CURLOptionsFTP)
@@ -709,6 +718,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     {
         [NSURLProtocol removePropertyForKey:@"curl_postTransferCommands" inRequest:self];
     }
+}
+
+- (void)curl_setCreateIntermediateDirectories:(NSUInteger)value;
+{
+    [NSURLProtocol setProperty:[NSNumber numberWithUnsignedInteger:value] forKey:@"curl_createIntermediateDirectories" inRequest:self];
 }
 
 @end
