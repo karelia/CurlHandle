@@ -133,10 +133,11 @@
     return result;
 }
 
-- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data permissions:(NSNumber *)permissions error:(NSError **)error;
+- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data permissions:(NSNumber *)permissions withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 {
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO];
     [request setHTTPBody:data];
+    [request curl_setCreateIntermediateDirectories:createIntermediates];
     
     BOOL result = [_handle loadRequest:request error:error];
     [request release];
@@ -144,12 +145,13 @@
     return result;
 }
 
-- (BOOL)createDirectoryAtPath:(NSString *)path error:(NSError **)error;
+- (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 {
     // Navigate to the directory above the one to be created
     // CURLOPT_NOBODY stops libcurl from trying to list the directory's contents
     NSMutableURLRequest *request = [self newMutableRequestWithPath:[path stringByDeletingLastPathComponent] isDirectory:YES];
     [request setHTTPMethod:@"HEAD"];
+    [request curl_setCreateIntermediateDirectories:createIntermediates];
     
     // Custom command to delete the file once we're in the correct directory
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the delete command twice in my testing
