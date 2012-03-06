@@ -58,7 +58,45 @@
     NSMutableURLRequest *request = [_request mutableCopy];
     if ([path length])  // nil/empty paths should only occur when trying to CWD to the home directory
     {
-        [request setURL:[[request URL] URLByAppendingPathComponent:path isDirectory:isDirectory]];
+        // Special case: Root directory when _request is a pathless URL (e.g. ftp://example.com ) needs a second slash to tell Curl it's absolute
+        //if ([path isEqualToString:@"/"]) path = @"//";
+        
+        if ([path isAbsolutePath])
+        {
+            // It turns out that to list root, you need a URL like ftp://example.com//./
+            if ([path length] == 1) path = @"/.";
+            
+            // Get back to the root directory
+            NSURL *homeDirectory = [NSURL URLWithString:@"/" relativeToURL:[request URL]];
+            
+            // Have to use -absoluteURL otherwise we end up with a relative string beginning @"//", and that resolves to be the wrong thing
+            CFURLRef url = CFURLCreateCopyAppendingPathComponent(NULL,
+                                                                 (CFURLRef)[homeDirectory absoluteURL],
+                                                                 (CFStringRef)path,
+                                                                 isDirectory);
+            
+            [request setURL:(NSURL *)url];
+            CFRelease(url);
+        }
+        else
+        {
+            if (isDirectory)
+            {
+                if (![path hasSuffix:@"/"] || [path isEqualToString:@"/"])
+                {
+                    path = [path stringByAppendingString:@"/"];
+                }
+            }
+            else
+            {
+                while ([path hasSuffix:@"/"])
+                {
+                    path = [path substringToIndex:[path length] - 1];
+                }
+            }
+            
+            [request setURL:[NSURL URLWithString:path relativeToURL:[request URL]]];
+        }
     }
     
     return request;
