@@ -188,6 +188,12 @@
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
 {
+    // Don't want to include password in transcripts!
+    if (type == CURLINFO_HEADER_OUT && [string hasPrefix:@"PASS"])
+    {
+        string = @"PASS ####";
+    }
+    
     [[self delegate] FTPSession:self didReceiveDebugInfo:string ofType:type];
 }
 
