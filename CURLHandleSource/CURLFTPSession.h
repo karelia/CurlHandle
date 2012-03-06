@@ -20,12 +20,18 @@
     NSURLCredential     *_credential;
     
     id <CURLFTPSessionDelegate> _delegate;
+    
+    NSMutableData   *_data;
 }
 
 // Returns nil if not a supported FTP URL
 - (id)initWithRequest:(NSURLRequest *)request;
 
 - (void)useCredential:(NSURLCredential *)credential;
+
+- (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
+// like -contentsOfDirectory:error: but returns an array of dictionaries, with keys like kCFFTPResourceName
+- (NSArray *)parsedResourceListingsOfDirectory:(NSString *)path error:(NSError **)error;
 
 - (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data permissions:(NSNumber *)permissions error:(NSError **)error;
 - (BOOL)createDirectoryAtPath:(NSString *)path error:(NSError **)error;

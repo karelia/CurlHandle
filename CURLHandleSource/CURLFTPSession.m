@@ -40,6 +40,7 @@
     [_handle release];
     [_request release];
     [_credential release];
+    [_data release];
     
     [super dealloc];
 }
@@ -58,6 +59,75 @@
     [request setURL:[[request URL] URLByAppendingPathComponent:path isDirectory:isDirectory]];
     
     return request;
+}
+
+- (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
+{
+    return [[self parsedResourceListingsOfDirectory:path error:error] valueForKey:(NSString *)kCFFTPResourceName];
+}
+
+- (NSArray *)parsedResourceListingsOfDirectory:(NSString *)path error:(NSError **)error;
+{
+    if (!path) path = @".";
+    
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
+    
+    _data = [[NSMutableData alloc] init];
+    BOOL success = [_handle loadRequest:request error:error];
+    
+    NSMutableArray *result = nil;
+    if (success)
+    {
+        result = [NSMutableArray array];
+        
+        // Process the data to make a directory listing
+        while (YES)
+        {
+            CFDictionaryRef parsedDict = NULL;
+            CFIndex bytesConsumed = CFFTPCreateParsedResourceListing(NULL,
+                                                                     [_data bytes], [_data length],
+                                                                     &parsedDict);
+            
+            if (bytesConsumed > 0)
+            {
+                // Make sure CFFTPCreateParsedResourceListing was able to properly
+                // parse the incoming data
+                if (parsedDict != NULL)
+                {
+                    [result addObject:(NSDictionary *)parsedDict];
+                    CFRelease(parsedDict);
+                }
+                
+                [_data replaceBytesInRange:NSMakeRange(0, bytesConsumed) withBytes:NULL length:0];
+            }
+            else if (bytesConsumed < 0)
+            {
+                // error!
+                if (error)
+                {
+                    NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                              [request URL], NSURLErrorFailingURLErrorKey,
+                                              [[request URL] absoluteString], NSURLErrorFailingURLStringErrorKey,
+                                              nil];
+                    
+                    *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
+                    [userInfo release];
+                }
+                result = nil;
+                break;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    
+    [request release];
+    [_data release]; _data = nil;
+    
+    
+    return result;
 }
 
 - (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data permissions:(NSNumber *)permissions error:(NSError **)error;
@@ -107,6 +177,11 @@
 #pragma mark Delegate
 
 @synthesize delegate = _delegate;
+
+- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
+{
+    [_data appendData:data];
+}
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
 {
