@@ -101,14 +101,14 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 #pragma mark -
 
 
-@interface NSURLRequest (CURLRequest)
+@interface NSURLRequest (CURLOptionsFTP)
 
 // An array of strings. Executed in turn once the main request is done
 @property(nonatomic, copy, readonly) NSArray *curl_postTransferCommands;
 
 @end
 
-@interface NSMutableURLRequest (CURLRequest)
+@interface NSMutableURLRequest (CURLOptionsFTP)
 
 @property(nonatomic, copy, readwrite, setter=curl_setPostTransferCommands:) NSArray *curl_postTransferCommands;
 @end

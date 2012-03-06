@@ -686,7 +686,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 #pragma mark -
 
 
-@implementation NSURLRequest (CURLRequest)
+@implementation NSURLRequest (CURLOptionsFTP)
 
 - (NSArray *)curl_postTransferCommands;
 {
@@ -695,7 +695,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 @end
 
-@implementation NSMutableURLRequest (CURLRequest)
+@implementation NSMutableURLRequest (CURLOptionsFTP)
 
 - (void)curl_setPostTransferCommands:(NSArray *)commands;
 {
