@@ -102,11 +102,15 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 
 @interface NSURLRequest (CURLRequest)
-- (NSArray *)curl_postTransferCommands;  // an array of strings to execute
+
+// An array of strings. Executed in turn once the main request is done
+@property(nonatomic, copy, readonly) NSArray *curl_postTransferCommands;
+
 @end
 
 @interface NSMutableURLRequest (CURLRequest)
-- (void)curl_setPostTransferCommands:(NSArray *)commands;    // an array of strings. Run after the main request
+
+@property(nonatomic, copy, readwrite, setter=curl_setPostTransferCommands:) NSArray *curl_postTransferCommands;
 @end
 
 
