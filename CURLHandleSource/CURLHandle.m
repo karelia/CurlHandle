@@ -618,10 +618,15 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 	{
 		if (header)
 		{
-			[_headerBuffer appendData:data];
+            // Delegate might not care about the response
+            if ([[self delegate] respondsToSelector:@selector(handle:didReceiveResponse:)])
+            {
+                [_headerBuffer appendData:data];
+            }
 		}
-		else	// notify delegate of new bytes
+		else
 		{
+            // Once the body starts arriving, we know we have the full header, so can report that
             if ([_headerBuffer length])
             {
                 NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
@@ -656,6 +661,8 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                 }
             }
             
+            
+            // Report regular body data
 			[[self delegate] handle:self didReceiveData:data];
 		}
 	}

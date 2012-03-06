@@ -88,11 +88,13 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 
 @protocol CURLHandleDelegate <NSObject>
-- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
-- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
 
+- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
 @optional
+- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
+
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
+
 @end
 
 
