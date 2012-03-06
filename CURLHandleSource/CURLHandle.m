@@ -383,7 +383,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         {
             curl_easy_setopt(mCURL, CURLOPT_HTTPGET, 1);
         }
-        if ([method isEqualToString:@"HEAD"])
+        else if ([method isEqualToString:@"HEAD"])
         {
             curl_easy_setopt(mCURL, CURLOPT_NOBODY, 1);
         }
