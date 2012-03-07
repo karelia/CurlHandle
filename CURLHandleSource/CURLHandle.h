@@ -115,8 +115,8 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 @interface NSMutableURLRequest (CURLOptionsFTP)
 
-@property(nonatomic, copy, readwrite, setter=curl_setPostTransferCommands:) NSArray *curl_postTransferCommands;
-@property(nonatomic, readwrite, setter=curl_setCreateIntermediateDirectories:) NSUInteger curl_createIntermediateDirectories;
+- (void)curl_setPostTransferCommands:(NSArray *)postTransferCommands;
+- (void)curl_setCreateIntermediateDirectories:(NSUInteger)createIntermediateDirectories;
 
 @end
 
