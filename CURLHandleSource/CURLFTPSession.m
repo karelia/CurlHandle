@@ -102,6 +102,19 @@
     return request;
 }
 
+- (NSString *)homeDirectoryPath;
+{
+    // Deliberately want a request that should avoid doing any work
+    NSMutableURLRequest *request = [_request mutableCopy];
+    [request setURL:[NSURL URLWithString:@"/" relativeToURL:[request URL]]];
+    [request setHTTPMethod:@"HEAD"];
+    
+    [_handle loadRequest:request error:NULL];
+    [request release];
+    
+    return [_handle initialFTPPath];
+}
+
 - (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
 {
     return [[self parsedResourceListingsOfDirectory:path error:error] valueForKey:(NSString *)kCFFTPResourceName];

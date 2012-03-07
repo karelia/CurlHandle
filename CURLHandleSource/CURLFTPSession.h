@@ -30,6 +30,8 @@
 
 - (void)useCredential:(NSURLCredential *)credential;
 
+- (NSString *)homeDirectoryPath;
+
 - (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
 // like -contentsOfDirectory:error: but returns an array of dictionaries, with keys like kCFFTPResourceName
 - (NSArray *)parsedResourceListingsOfDirectory:(NSString *)path error:(NSError **)error;

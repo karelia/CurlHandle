@@ -605,6 +605,14 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     return (0 == mResult);
 }
 
+- (NSString *)initialFTPPath;
+{
+    char *entryPath;
+    if (curl_easy_getinfo(mCURL, CURLINFO_FTP_ENTRY_PATH, &entryPath) != 0) return nil;
+    
+    return [NSString stringWithUTF8String:entryPath];
+}
+
 /*"	Continue the writing callback in Objective C; now we have our instance variables.
 "*/
 
