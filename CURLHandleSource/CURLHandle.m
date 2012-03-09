@@ -125,9 +125,8 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 + (void)initialize
 {
-	CURLcode rc;
-	rc = curl_global_init(CURL_GLOBAL_ALL);
-	if (0 != rc)
+	CURLcode rc = curl_global_init(CURL_GLOBAL_ALL);
+	if (rc != CURLE_OK)
 	{
 		NSLog(@"Didn't curl_global_init, result = %d",rc);
 	}
@@ -313,7 +312,6 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
             else
             {
                 NSLog(@"Ignoring CURL option of type %@ for key %@", [theObject class], theKey);
-                code = 0;	// ignore the option, so don't have an error.
             }
         }
         
@@ -486,13 +484,13 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                                                  nil];
                 
                 long responseCode;
-                if (curl_easy_getinfo(mCURL, CURLINFO_RESPONSE_CODE, &responseCode) == 0 && responseCode)
+                if (curl_easy_getinfo(mCURL, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
                 {
                     [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]];
                 }
                 
                 long osErrorNumber = 0;
-                if (curl_easy_getinfo(mCURL, CURLINFO_OS_ERRNO, &osErrorNumber) == 0 && osErrorNumber)
+                if (curl_easy_getinfo(mCURL, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
                 {
                     [userInfo setObject:[NSError errorWithDomain:NSOSStatusErrorDomain code:osErrorNumber userInfo:nil]
                                  forKey:NSUnderlyingErrorKey];
@@ -590,7 +588,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 - (NSString *)initialFTPPath;
 {
     char *entryPath;
-    if (curl_easy_getinfo(mCURL, CURLINFO_FTP_ENTRY_PATH, &entryPath) != 0) return nil;
+    if (curl_easy_getinfo(mCURL, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
     
     return [NSString stringWithUTF8String:entryPath];
 }
