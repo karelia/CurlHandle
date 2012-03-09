@@ -102,6 +102,28 @@
     return request;
 }
 
+- (BOOL)executeCustomCommands:(NSArray *)commands
+                  inDirectory:(NSString *)directory
+createIntermediateDirectories:(BOOL)createIntermediates
+                        error:(NSError **)error;
+{
+    // Navigate to the directory
+    // @"HEAD" => CURLOPT_NOBODY, which stops libcurl from trying to list the directory's contents
+    // If the connection is already at that directory then curl wisely does nothing
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:directory isDirectory:YES];
+    [request setHTTPMethod:@"HEAD"];
+    [request curl_setCreateIntermediateDirectories:createIntermediates];
+    
+    // Custom commands once we're in the correct directory
+    // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the command twice in my testing
+    [request curl_setPostTransferCommands:commands];
+    
+    
+    BOOL result = [_handle loadRequest:request error:error];
+    [request release];
+    return result;
+}
+
 - (NSString *)homeDirectoryPath;
 {
     // Deliberately want a request that should avoid doing any work
@@ -205,20 +227,10 @@
 
 - (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 {
-    // Navigate to the directory above the one to be created
-    // CURLOPT_NOBODY stops libcurl from trying to list the directory's contents
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:[path stringByDeletingLastPathComponent] isDirectory:YES];
-    [request setHTTPMethod:@"HEAD"];
-    [request curl_setCreateIntermediateDirectories:createIntermediates];
-    
-    // Custom command to delete the file once we're in the correct directory
-    // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the delete command twice in my testing
-    [request curl_setPostTransferCommands:[NSArray arrayWithObject:[@"MKD " stringByAppendingString:[path lastPathComponent]]]];
-    
-    
-    BOOL result = [_handle loadRequest:request error:error];
-    [request release];
-    return result;
+    return [self executeCustomCommands:[NSArray arrayWithObject:[@"MKD " stringByAppendingString:[path lastPathComponent]]]
+                           inDirectory:[path stringByDeletingLastPathComponent]
+         createIntermediateDirectories:createIntermediates
+                                 error:error];
 }
 
 - (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
@@ -229,20 +241,15 @@
     NSNumber *permissions = [attributes objectForKey:NSFilePosixPermissions];
     if (permissions)
     {
-        // Navigate to the directory above the item to be modified
-        // CURLOPT_NOBODY stops libcurl from trying to list the directory's contents
-        NSMutableURLRequest *request = [self newMutableRequestWithPath:[path stringByDeletingLastPathComponent] isDirectory:YES];
-        [request setHTTPMethod:@"HEAD"];
+        NSArray *commands = [NSArray arrayWithObject:[NSString stringWithFormat:
+                                                      @"SITE CHMOD %lo %@",
+                                                      [permissions unsignedLongValue],
+                                                      [path lastPathComponent]]];
         
-        // Custom command to set the permissions once we're in the correct directory
-        // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the command twice in my testing
-        [request curl_setPostTransferCommands:[NSArray arrayWithObject:[NSString stringWithFormat:
-                                                                        @"SITE CHMOD %lo %@",
-                                                                        [permissions unsignedLongValue],
-                                                                        [path lastPathComponent]]]];
-        
-        BOOL result = [_handle loadRequest:request error:error];
-        [request release];
+        BOOL result = [self executeCustomCommands:commands
+                                      inDirectory:[path stringByDeletingLastPathComponent]
+                    createIntermediateDirectories:NO
+                                            error:error];
         
         if (!result) return NO;
     }
@@ -252,18 +259,10 @@
 
 - (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
 {
-    // Navigate to the directory containing the file
-    // CURLOPT_NOBODY stops libcurl from trying to list the directory's contents
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:[path stringByDeletingLastPathComponent] isDirectory:YES];
-    [request setHTTPMethod:@"HEAD"];
-    
-    // Custom command to delete the file once we're in the correct directory
-    // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the delete command twice in my testing
-    [request curl_setPostTransferCommands:[NSArray arrayWithObject:[@"DELE " stringByAppendingString:[path lastPathComponent]]]];
-    
-    BOOL result = [_handle loadRequest:request error:error];
-    [request release];
-    return result;
+    return [self executeCustomCommands:[NSArray arrayWithObject:[@"DELE " stringByAppendingString:[path lastPathComponent]]]
+                           inDirectory:[path stringByDeletingLastPathComponent]
+         createIntermediateDirectories:NO
+                                 error:error];
 }
 
 #pragma mark Delegate
