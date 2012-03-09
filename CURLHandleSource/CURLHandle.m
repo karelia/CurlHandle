@@ -18,7 +18,9 @@
 //#define DEBUGCURL_SLOW
 
 
-NSString * const CURLErrorDomain = @"se.haxx.curl";
+NSString * const CURLcodeErrorDomain = @"se.haxx.curl.libcurl.CURLcode";
+NSString * const CURLMcodeErrorDomain = @"se.haxx.curl.libcurl.CURLMcode";
+NSString * const CURLSHcodeErrorDomain = @"se.haxx.curl.libcurl.CURLSHcode";
 
 BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
 SCDynamicStoreRef	sSCDSRef = NULL;
@@ -520,7 +522,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                              forKey:NSUnderlyingErrorKey];
             }
             
-            *error = [NSError errorWithDomain:CURLErrorDomain
+            *error = [NSError errorWithDomain:CURLcodeErrorDomain
                                          code:mResult
                                      userInfo:userInfo];
             [userInfo release];
