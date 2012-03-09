@@ -32,20 +32,32 @@
 
 - (NSString *)homeDirectoryPath;
 
+
+#pragma mark Discovering Directory Contents
+
 - (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
+
 // like -contentsOfDirectory:error: but returns an array of dictionaries, with keys like kCFFTPResourceName
 - (NSArray *)parsedResourceListingsOfDirectory:(NSString *)path error:(NSError **)error;
+
+
+#pragma mark Creating and Deleting Items
 
 - (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data permissions:(NSNumber *)permissions withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 
 - (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 
+- (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
+
+
+#pragma mark Setting Attributes
 // Only NSFilePosixPermissions is recognised at present. All other attributes are ignored
 - (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
 
-- (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
 
+#pragma mark Delegate
 @property(nonatomic, assign) id <CURLFTPSessionDelegate> delegate;
+
 
 @end
 

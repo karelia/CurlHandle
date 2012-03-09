@@ -11,6 +11,8 @@
 
 @implementation CURLFTPSession
 
+#pragma mark Lifecycle
+
 - (id)initWithRequest:(NSURLRequest *)request;
 {
     NSParameterAssert(request);
@@ -45,6 +47,8 @@
     [super dealloc];
 }
 
+#pragma mark Auth
+
 - (void)useCredential:(NSURLCredential *)credential
 {
     [_credential release]; _credential = [credential retain];
@@ -52,6 +56,8 @@
     [_handle setString:[credential user] forKey:CURLOPT_USERNAME];
     [_handle setString:[credential password] forKey:CURLOPT_PASSWORD];
 }
+
+#pragma mark Operations
 
 - (NSMutableURLRequest *)newMutableRequestWithPath:(NSString *)path isDirectory:(BOOL)isDirectory;
 {
