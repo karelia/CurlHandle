@@ -402,27 +402,27 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         
         // Set the HTTP Headers.  (These will override options set with above)
         {
-            for (NSString *headerKey in [request allHTTPHeaderFields])
+            for (NSString *aHeaderField in [request allHTTPHeaderFields])
             {
-                NSString *theValue = [request valueForHTTPHeaderField:headerKey];
+                NSString *theValue = [request valueForHTTPHeaderField:aHeaderField];
                 
                 // Range requests are a special case that should inform Curl directly
 #define HTTP_RANGE_PREFIX @"bytes="
-                if ([headerKey caseInsensitiveCompare:@"Range"] == NSOrderedSame &&
+                if ([aHeaderField caseInsensitiveCompare:@"Range"] == NSOrderedSame &&
                     [theValue hasPrefix:HTTP_RANGE_PREFIX])
                 {
                     curl_easy_setopt(mCURL, CURLOPT_RANGE, [[theValue substringFromIndex:[HTTP_RANGE_PREFIX length]] UTF8String]);
                 }
                 
                 // Accept-Encoding requests are also special
-                else if ([headerKey caseInsensitiveCompare:@"Accept-Encoding"] == NSOrderedSame)
+                else if ([aHeaderField caseInsensitiveCompare:@"Accept-Encoding"] == NSOrderedSame)
                 {
                     curl_easy_setopt(mCURL, CURLOPT_ENCODING, [theValue UTF8String]);
                 }
                 
                 else
                 {
-                    NSString *pair = [NSString stringWithFormat:@"%@: %@",headerKey,theValue];
+                    NSString *pair = [NSString stringWithFormat:@"%@: %@",aHeaderField,theValue];
                     httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
                 }
             }
