@@ -212,7 +212,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     return result;
 }
 
-- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data permissions:(NSNumber *)permissions withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
+- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 {
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO];
     [request setHTTPBody:data];
@@ -220,13 +220,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
     
     BOOL result = [_handle loadRequest:request error:error];
     [request release];
-    
-    if (result && permissions)
-    {
-        result = [self setAttributes:[NSDictionary dictionaryWithObject:permissions forKey:NSFilePosixPermissions]
-                        ofItemAtPath:path
-                               error:error];
-    }
     
     return result;
 }

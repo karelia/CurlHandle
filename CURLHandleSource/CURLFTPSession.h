@@ -43,7 +43,7 @@
 
 #pragma mark Creating and Deleting Items
 
-- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data permissions:(NSNumber *)permissions withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
+- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 
 - (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 
@@ -51,7 +51,7 @@
 
 
 #pragma mark Setting Attributes
-// Only NSFilePosixPermissions is recognised at present. Note that some servers don't support this so will return an error
+// Only NSFilePosixPermissions is recognised at present. Note that some servers don't support this so will return an error (code 500)
 // All other attributes are ignored
 - (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
 
