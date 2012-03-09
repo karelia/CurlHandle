@@ -51,7 +51,8 @@
 
 
 #pragma mark Setting Attributes
-// Only NSFilePosixPermissions is recognised at present. All other attributes are ignored
+// Only NSFilePosixPermissions is recognised at present. Note that some servers don't support this so will return an error
+// All other attributes are ignored
 - (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
 
 
