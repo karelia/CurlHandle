@@ -486,8 +486,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         mResult = curl_easy_perform(mCURL);
         [_uploadStream release]; _uploadStream = nil;
         
-        // Response
-        
+        // Cleanup
         if (nil != httpHeaders)
         {
             curl_slist_free_all(httpHeaders);
