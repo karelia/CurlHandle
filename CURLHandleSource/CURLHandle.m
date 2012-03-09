@@ -423,12 +423,12 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         NSData *uploadData = [request HTTPBody];
         if (uploadData)
         {
-            _uploadStream = [[NSInputStream alloc] initWithData:uploadData];
+            _uploadStream = [[[NSInputStream alloc] initWithData:uploadData] autorelease];
             LOAD_REQUEST_SET_OPTION(CURLOPT_INFILESIZE, [uploadData length]);
         }
         else
         {
-            _uploadStream = [[request HTTPBodyStream] retain];
+            _uploadStream = [request HTTPBodyStream];
         }
         
         if (_uploadStream)
@@ -463,12 +463,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         
         // Do the transfer
         code = curl_easy_perform(mCURL);
-        [_uploadStream release]; _uploadStream = nil;
-        
     }
     @finally
     {
         // Cleanup
+        [_uploadStream close];
         if (httpHeaders) curl_slist_free_all(httpHeaders);
         if (postQuoteCommands) curl_slist_free_all(postQuoteCommands);
         
