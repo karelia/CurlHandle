@@ -292,7 +292,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
          
          "*/
         
-        long timeout = [request timeoutInterval];
+        long timeout = (long)[request timeoutInterval];
         curl_easy_setopt([self curl], CURLOPT_NOSIGNAL, timeout != 0);
         curl_easy_setopt([self curl], CURLOPT_CONNECTTIMEOUT, timeout);
         curl_easy_setopt([self curl], CURLOPT_TIMEOUT, timeout);
@@ -402,27 +402,27 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         
         // Set the HTTP Headers.  (These will override options set with above)
         {
-            for (NSString *theKey in [request allHTTPHeaderFields])
+            for (NSString *headerKey in [request allHTTPHeaderFields])
             {
-                NSString *theValue = [request valueForHTTPHeaderField:theKey];
+                NSString *theValue = [request valueForHTTPHeaderField:headerKey];
                 
                 // Range requests are a special case that should inform Curl directly
 #define HTTP_RANGE_PREFIX @"bytes="
-                if ([theKey caseInsensitiveCompare:@"Range"] == NSOrderedSame &&
+                if ([headerKey caseInsensitiveCompare:@"Range"] == NSOrderedSame &&
                     [theValue hasPrefix:HTTP_RANGE_PREFIX])
                 {
                     curl_easy_setopt(mCURL, CURLOPT_RANGE, [[theValue substringFromIndex:[HTTP_RANGE_PREFIX length]] UTF8String]);
                 }
                 
                 // Accept-Encoding requests are also special
-                else if ([theKey caseInsensitiveCompare:@"Accept-Encoding"] == NSOrderedSame)
+                else if ([headerKey caseInsensitiveCompare:@"Accept-Encoding"] == NSOrderedSame)
                 {
                     curl_easy_setopt(mCURL, CURLOPT_ENCODING, [theValue UTF8String]);
                 }
                 
                 else
                 {
-                    NSString *pair = [NSString stringWithFormat:@"%@: %@",theKey,theValue];
+                    NSString *pair = [NSString stringWithFormat:@"%@: %@",headerKey,theValue];
                     httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
                 }
             }
@@ -487,7 +487,6 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         [_uploadStream release]; _uploadStream = nil;
         
         // Response
-#warning We can't really assume a header encoding, trying 7-bit ASCII only.  Maybe there is some way to know?
         
         if (nil != httpHeaders)
         {
@@ -669,8 +668,8 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                         }
                         
                     }
-                    [headerString release];
                 }
+				[headerString release];
             }
             
             
@@ -792,6 +791,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                 = (NSString *) CFURLCreateStringByAddingPercentEscapes(
                                                                        NULL, (CFStringRef) [aValue description], NULL, (CFStringRef) @";:@&=/+", cfStrEnc);
                 [s appendFormat:@"%@=%@&", escapedKey, escapedObject];
+				[escapedObject release];
             }
         }
         else
@@ -800,7 +800,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
             = (NSString *) CFURLCreateStringByAddingPercentEscapes(
                                                                    NULL, (CFStringRef) [keyObject description], NULL, (CFStringRef) @";:@&=/+", cfStrEnc);
             [s appendFormat:@"%@=%@&", escapedKey, escapedObject];
+			[escapedObject release];
         }
+		[escapedKey release];
 	}
 	// Delete final & from the string
 	if (![s isEqualToString:@""])
@@ -847,6 +849,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 	NSArray *components = [self componentsSeparatedByLineSeparators];
 	NSEnumerator *theEnum = [components objectEnumerator];
 	NSString *theLine = [theEnum nextObject];		// result code -- ignore
+	(void)theLine;
 	while (nil != (theLine = [theEnum nextObject]) )
 	{
 		if ([[theLine headerKey] isEqualToString:inKey])
@@ -882,6 +885,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 	
 	NSEnumerator *theEnum = [components objectEnumerator];
 	NSString *theLine = [theEnum nextObject];		// result code -- ignore
+	(void)theLine;
 	while (nil != (theLine = [theEnum nextObject]) )
 	{
 		NSString *key = [theLine headerKey];
@@ -928,8 +932,8 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 {
 	NSMutableArray *result	= [NSMutableArray array];
 	NSRange range = NSMakeRange(0,0);
-	unsigned start, end;
-	unsigned contentsEnd = 0;
+	NSUInteger start, end;
+	NSUInteger contentsEnd = 0;
 	
 	while (contentsEnd < [self length])
 	{

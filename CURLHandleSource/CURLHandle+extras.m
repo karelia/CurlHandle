@@ -198,13 +198,13 @@ headers = {body = "Content-Type: text/html; filename = \"hello.html\""}
 			
 		if (customHeader) {
 			// create the header structure 
-			struct curl_slist *headers = NULL;
-			headers = curl_slist_append(headers, [customHeader UTF8String]);
+			struct curl_slist *curlHeaders = NULL;
+			curlHeaders = curl_slist_append(curlHeaders, [customHeader UTF8String]);
 
 			// add the value to the form using the custom header
 			curl_formadd(&post, &last, CURLFORM_COPYNAME, [key UTF8String], 
 							 CURLFORM_COPYCONTENTS, valueCString, 
-							 CURLFORM_CONTENTHEADER, headers, CURLFORM_END);
+							 CURLFORM_CONTENTHEADER, curlHeaders, CURLFORM_END);
 		} else {
 			// add the value to the form using just the default header
 			curl_formadd(&post, &last, CURLFORM_COPYNAME, [key UTF8String],
