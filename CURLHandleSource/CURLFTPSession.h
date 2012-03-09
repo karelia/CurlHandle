@@ -40,6 +40,9 @@
 
 - (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 
+// Only NSFilePosixPermissions is recognised at present. All other attributes are ignored
+- (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
+
 - (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
 
 @property(nonatomic, assign) id <CURLFTPSessionDelegate> delegate;

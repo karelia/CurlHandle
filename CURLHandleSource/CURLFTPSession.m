@@ -193,6 +193,13 @@
     BOOL result = [_handle loadRequest:request error:error];
     [request release];
     
+    if (result && permissions)
+    {
+        result = [self setAttributes:[NSDictionary dictionaryWithObject:permissions forKey:NSFilePosixPermissions]
+                        ofItemAtPath:path
+                               error:error];
+    }
+    
     return result;
 }
 
@@ -212,6 +219,35 @@
     BOOL result = [_handle loadRequest:request error:error];
     [request release];
     return result;
+}
+
+- (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
+{
+    NSParameterAssert(attributes);
+    NSParameterAssert(path);
+    
+    NSNumber *permissions = [attributes objectForKey:NSFilePosixPermissions];
+    if (permissions)
+    {
+        // Navigate to the directory above the item to be modified
+        // CURLOPT_NOBODY stops libcurl from trying to list the directory's contents
+        NSMutableURLRequest *request = [self newMutableRequestWithPath:[path stringByDeletingLastPathComponent] isDirectory:YES];
+        [request setHTTPMethod:@"HEAD"];
+        
+        // Custom command to set the permissions once we're in the correct directory
+        // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the command twice in my testing
+        [request curl_setPostTransferCommands:[NSArray arrayWithObject:[NSString stringWithFormat:
+                                                                        @"SITE CHMOD %lo %@",
+                                                                        [permissions unsignedLongValue],
+                                                                        [path lastPathComponent]]]];
+        
+        BOOL result = [_handle loadRequest:request error:error];
+        [request release];
+        
+        if (!result) return NO;
+    }
+    
+    return YES;
 }
 
 - (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
