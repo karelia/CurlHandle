@@ -234,6 +234,19 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     return result;
 }
 
+- (BOOL)setOption:(CURLoption)option errorAndParameter:(NSError **)error, ...;
+{
+    va_list argList;
+	va_start(argList, error);
+    
+	CURLcode code = curl_easy_setopt(mCURL, option, va_arg(argList, void*));
+	va_end(argList);
+	
+    BOOL result = code == CURLE_OK;
+    if (!result && error) *error = [NSError errorWithDomain:CURLcodeErrorDomain code:code userInfo:nil];
+    return result;
+}
+
 /*" %{Loads the receiver's data in the synchronously.}
  
  	Actually set up for loading and do the perform.  This happens in either
@@ -250,38 +263,27 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         
         curl_easy_reset([self curl]);
         
-        
+#define LOAD_REQUEST_SET_OPTION(option, parameter, error) if (![self setOption:option errorAndParameter:error, parameter]) return NO;
+
 		// SET OPTIONS -- NOTE THAT WE DON'T SET ANY STRINGS DIRECTLY AT THIS STAGE.
 		// Put error messages here
-		mResult = curl_easy_setopt(mCURL, CURLOPT_ERRORBUFFER, &mErrorBuffer);
-            if(mResult) return NO;
-        
-		mResult = curl_easy_setopt(mCURL, CURLOPT_FOLLOWLOCATION, YES);
-            if(mResult) return NO;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_FAILONERROR, YES);
-            if(mResult) return NO;
+        LOAD_REQUEST_SET_OPTION(CURLOPT_ERRORBUFFER, &mErrorBuffer, error);
+                
+		LOAD_REQUEST_SET_OPTION(CURLOPT_FOLLOWLOCATION, YES, error);
+		LOAD_REQUEST_SET_OPTION(CURLOPT_FAILONERROR, YES, error);
         
 		// send all data to the C function
-		mResult = curl_easy_setopt(mCURL, CURLOPT_WRITEFUNCTION, curlBodyFunction);
-            if(mResult) return NO;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_HEADERFUNCTION, curlHeaderFunction);
-            if(mResult) return NO;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_READFUNCTION, curlReadFunction);
-            if(mResult) return NO;
+		LOAD_REQUEST_SET_OPTION(CURLOPT_WRITEFUNCTION, curlBodyFunction, error);
+		LOAD_REQUEST_SET_OPTION(CURLOPT_HEADERFUNCTION, curlHeaderFunction, error);
+		LOAD_REQUEST_SET_OPTION(CURLOPT_READFUNCTION, curlReadFunction, error);
 		// pass self to the callback
-		mResult = curl_easy_setopt(mCURL, CURLOPT_WRITEHEADER, self);
-            if(mResult) return NO;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_FILE, self);
-            if(mResult) return NO;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_READDATA, self);
-            if(mResult) return NO;
+		LOAD_REQUEST_SET_OPTION(CURLOPT_WRITEHEADER, self, error);
+		LOAD_REQUEST_SET_OPTION(CURLOPT_FILE, self, error);
+		LOAD_REQUEST_SET_OPTION(CURLOPT_READDATA, self, error);
         
-		mResult = curl_easy_setopt(mCURL, CURLOPT_VERBOSE, 1);
-            if(mResult) return NO;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGFUNCTION, curlDebugFunction);
-            if(mResult) return NO;
-		mResult = curl_easy_setopt(mCURL, CURLOPT_DEBUGDATA, self);
-            if(mResult) return NO;
+		LOAD_REQUEST_SET_OPTION(CURLOPT_VERBOSE, 1, error);
+		LOAD_REQUEST_SET_OPTION(CURLOPT_DEBUGFUNCTION, curlDebugFunction, error);
+		LOAD_REQUEST_SET_OPTION(CURLOPT_DEBUGDATA, self, error);
         
         
         /*"	Zero disables connection timeout (it
@@ -295,9 +297,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
          "*/
         
         long timeout = (long)[request timeoutInterval];
-        curl_easy_setopt([self curl], CURLOPT_NOSIGNAL, timeout != 0);
-        curl_easy_setopt([self curl], CURLOPT_CONNECTTIMEOUT, timeout);
-        curl_easy_setopt([self curl], CURLOPT_TIMEOUT, timeout);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_NOSIGNAL, timeout != 0, error);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_CONNECTTIMEOUT, timeout, error);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_TIMEOUT, timeout, error);
         
         
 
@@ -312,20 +314,16 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
             
             if ([theObject isKindOfClass:[NSNumber class]])
             {
-                mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject intValue]);
+                LOAD_REQUEST_SET_OPTION([theKey intValue], [theObject intValue], error);
             }
             else if ([theObject respondsToSelector:@selector(cString)])
             {
-                mResult = curl_easy_setopt(mCURL, [theKey intValue], [theObject cString]);
+                LOAD_REQUEST_SET_OPTION([theKey intValue], [theObject UTF8String], error);
             }
             else
             {
                 NSLog(@"Ignoring CURL option of type %@ for key %@", [theObject class], theKey);
                 mResult = 0;	// ignore the option, so don't have an error.
-            }
-            if (0 != mResult)
-            {
-                return NO;
             }
         }
         
@@ -368,13 +366,13 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
             
             if (proxyHost && proxyPort)
             {
-                mResult = curl_easy_setopt(mCURL, CURLOPT_PROXY, [proxyHost UTF8String]);
-                mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYPORT, [proxyPort longValue]);
+                LOAD_REQUEST_SET_OPTION(CURLOPT_PROXY, [proxyHost UTF8String], error);
+                LOAD_REQUEST_SET_OPTION(CURLOPT_PROXYPORT, [proxyPort longValue], error);
                 
                 // Now, provide a user/password if one is globally set.
                 if (nil != sProxyUserIDAndPassword)
                 {
-                    mResult = curl_easy_setopt(mCURL, CURLOPT_PROXYUSERPWD, [sProxyUserIDAndPassword UTF8String] );
+                    LOAD_REQUEST_SET_OPTION(CURLOPT_PROXYUSERPWD, [sProxyUserIDAndPassword UTF8String], error);
                 }
             }
         }
@@ -383,23 +381,23 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         NSString *method = [request HTTPMethod];
         if ([method isEqualToString:@"GET"])
         {
-            curl_easy_setopt(mCURL, CURLOPT_HTTPGET, 1);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_HTTPGET, 1, error);
         }
         else if ([method isEqualToString:@"HEAD"])
         {
-            curl_easy_setopt(mCURL, CURLOPT_NOBODY, 1);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_NOBODY, 1, error);
         }
         else if ([method isEqualToString:@"PUT"])
         {
-            mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 1L);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_UPLOAD, 1L, error);
         }
         else if ([method isEqualToString:@"POST"])
         {
-            curl_easy_setopt(mCURL, CURLOPT_POST, 1);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_POST, 1, error);
         }
         else
         {
-            curl_easy_setopt(mCURL, CURLOPT_CUSTOMREQUEST, [method UTF8String]);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_CUSTOMREQUEST, [method UTF8String], error);
         }
         
         // Set the HTTP Headers.  (These will override options set with above)
@@ -413,13 +411,15 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                 if ([aHeaderField caseInsensitiveCompare:@"Range"] == NSOrderedSame &&
                     [theValue hasPrefix:HTTP_RANGE_PREFIX])
                 {
-                    curl_easy_setopt(mCURL, CURLOPT_RANGE, [[theValue substringFromIndex:[HTTP_RANGE_PREFIX length]] UTF8String]);
+                    LOAD_REQUEST_SET_OPTION(CURLOPT_RANGE,
+                                            [[theValue substringFromIndex:[HTTP_RANGE_PREFIX length]] UTF8String],
+                                            error);
                 }
                 
                 // Accept-Encoding requests are also special
                 else if ([aHeaderField caseInsensitiveCompare:@"Accept-Encoding"] == NSOrderedSame)
                 {
-                    curl_easy_setopt(mCURL, CURLOPT_ENCODING, [theValue UTF8String]);
+                    LOAD_REQUEST_SET_OPTION(CURLOPT_ENCODING, [theValue UTF8String], error);
                 }
                 
                 else
@@ -428,7 +428,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                     httpHeaders = curl_slist_append( httpHeaders, [pair UTF8String] );
                 }
             }
-            curl_easy_setopt(mCURL, CURLOPT_HTTPHEADER, httpHeaders);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_HTTPHEADER, httpHeaders, error);
         }
         
         // Set the upload data
@@ -436,7 +436,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         if (uploadData)
         {
             _uploadStream = [[NSInputStream alloc] initWithData:uploadData];
-            mResult = curl_easy_setopt(mCURL, CURLOPT_INFILESIZE, [uploadData length]);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_INFILESIZE, [uploadData length], error);
         }
         else
         {
@@ -446,16 +446,19 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         if (_uploadStream)
         {
             [_uploadStream open];
-            mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 1L);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_UPLOAD, 1L, error);
         }
         else
         {
-            mResult = curl_easy_setopt(mCURL, CURLOPT_UPLOAD, 0);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_UPLOAD, 0, error);
         }
         
         // Intermediate directories
-        mResult = curl_easy_setopt(mCURL, CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories]);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories], error);
         
+        
+        // Set the URL
+        LOAD_REQUEST_SET_OPTION(CURLOPT_URL, [[[request URL] absoluteString] UTF8String], error);
         
         // Post-quote
         struct curl_slist *postQuoteCommands = NULL;
@@ -465,21 +468,15 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         }
         if (postQuoteCommands)
         {
-            mResult = curl_easy_setopt(mCURL, CURLOPT_POSTQUOTE, postQuoteCommands);
-            if (mResult)
+            if (![self setOption:CURLOPT_POSTQUOTE errorAndParameter:error, postQuoteCommands])
             {
                 curl_slist_free_all(postQuoteCommands);
                 return NO;
             }
         }
+        /* DON'T use LOAD_REQUEST_SET_OPTION after this point as it will leak postQuoteCommands
+         */
         
-        
-        // Set the URL
-        mResult = curl_easy_setopt(mCURL, CURLOPT_URL, [[[request URL] absoluteString] UTF8String]);
-        if (0 != mResult)
-        {
-            return NO;
-        }
         
         // clear the buffers
         [_headerBuffer setLength:0];	// empty out header buffer
