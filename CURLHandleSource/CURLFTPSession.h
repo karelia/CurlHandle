@@ -30,7 +30,8 @@
 
 - (void)useCredential:(NSURLCredential *)credential;
 
-- (NSString *)homeDirectoryPath;
+// Note that it's possible for this method to return nil with an error of nil, although I don't know what circumstances could cause this
+- (NSString *)homeDirectoryPath:(NSError **)error;
 
 
 #pragma mark Discovering Directory Contents

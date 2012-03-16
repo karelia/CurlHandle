@@ -130,17 +130,26 @@ createIntermediateDirectories:(BOOL)createIntermediates
     return result;
 }
 
-- (NSString *)homeDirectoryPath;
+- (NSString *)homeDirectoryPath:(NSError **)error;
 {
     // Deliberately want a request that should avoid doing any work
     NSMutableURLRequest *request = [_request mutableCopy];
     [request setURL:[NSURL URLWithString:@"/" relativeToURL:[request URL]]];
     [request setHTTPMethod:@"HEAD"];
     
-    [_handle loadRequest:request error:NULL];
+    BOOL success = [_handle loadRequest:request error:error];
     [request release];
     
-    return [_handle initialFTPPath];
+    if (success)
+    {
+        NSString *result = [_handle initialFTPPath];
+        if (!result && error) *error = nil; // I don't how the request would succeed, and this then fail, but it might
+        return result;
+    }
+    else
+    {
+        return nil;
+    }
 }
 
 - (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
