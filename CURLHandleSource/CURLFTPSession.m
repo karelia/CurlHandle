@@ -152,65 +152,57 @@ createIntermediateDirectories:(BOOL)createIntermediates
     }
 }
 
-- (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
-{
-    return [[self parsedResourceListingsOfDirectory:path error:error] valueForKey:(NSString *)kCFFTPResourceName];
-}
+#pragma mark Discovering Directory Contents
 
-- (NSArray *)parsedResourceListingsOfDirectory:(NSString *)path error:(NSError **)error;
+- (BOOL)enumerateContentsOfDirectoryAtPath:(NSString *)path
+                                     error:(NSError **)error
+                                usingBlock:(void (^)(NSDictionary *parsedResourceListing))block;
 {
     if (!path) path = @".";
     
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
     
     _data = [[NSMutableData alloc] init];
-    BOOL success = [_handle loadRequest:request error:error];
+    BOOL result = [_handle loadRequest:request error:error];
     
-    NSMutableArray *result = nil;
-    if (success)
+    // Process the data to make a directory listing
+    while (result)
     {
-        result = [NSMutableArray array];
+        CFDictionaryRef parsedDict = NULL;
+        CFIndex bytesConsumed = CFFTPCreateParsedResourceListing(NULL,
+                                                                 [_data bytes], [_data length],
+                                                                 &parsedDict);
         
-        // Process the data to make a directory listing
-        while (YES)
+        if (bytesConsumed > 0)
         {
-            CFDictionaryRef parsedDict = NULL;
-            CFIndex bytesConsumed = CFFTPCreateParsedResourceListing(NULL,
-                                                                     [_data bytes], [_data length],
-                                                                     &parsedDict);
+            // Make sure CFFTPCreateParsedResourceListing was able to properly
+            // parse the incoming data
+            if (parsedDict)
+            {
+                block((NSDictionary *)parsedDict);
+                CFRelease(parsedDict);
+            }
             
-            if (bytesConsumed > 0)
+            [_data replaceBytesInRange:NSMakeRange(0, bytesConsumed) withBytes:NULL length:0];
+        }
+        else if (bytesConsumed < 0)
+        {
+            // error!
+            if (error)
             {
-                // Make sure CFFTPCreateParsedResourceListing was able to properly
-                // parse the incoming data
-                if (parsedDict != NULL)
-                {
-                    [result addObject:(NSDictionary *)parsedDict];
-                    CFRelease(parsedDict);
-                }
+                NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                          [request URL], NSURLErrorFailingURLErrorKey,
+                                          [[request URL] absoluteString], NSURLErrorFailingURLStringErrorKey,
+                                          nil];
                 
-                [_data replaceBytesInRange:NSMakeRange(0, bytesConsumed) withBytes:NULL length:0];
+                *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
+                [userInfo release];
             }
-            else if (bytesConsumed < 0)
-            {
-                // error!
-                if (error)
-                {
-                    NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                              [request URL], NSURLErrorFailingURLErrorKey,
-                                              [[request URL] absoluteString], NSURLErrorFailingURLStringErrorKey,
-                                              nil];
-                    
-                    *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
-                    [userInfo release];
-                }
-                result = nil;
-                break;
-            }
-            else
-            {
-                break;
-            }
+            result = NO;
+        }
+        else
+        {
+            break;
         }
     }
     
@@ -220,6 +212,8 @@ createIntermediateDirectories:(BOOL)createIntermediates
     
     return result;
 }
+
+#pragma mark Creating and Deleting Items
 
 - (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 {

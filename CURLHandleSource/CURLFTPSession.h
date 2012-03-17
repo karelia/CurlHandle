@@ -37,10 +37,10 @@
 
 #pragma mark Discovering Directory Contents
 
-- (NSArray *)contentsOfDirectory:(NSString *)path error:(NSError **)error;
-
-// like -contentsOfDirectory:error: but returns an array of dictionaries, with keys like kCFFTPResourceName
-- (NSArray *)parsedResourceListingsOfDirectory:(NSString *)path error:(NSError **)error;
+// Potentially, directory listings arrive in pieces. As the listing is parsed, each resource is passed to the block as dictionary with keys such as kCFFTPResourceName
+- (BOOL)enumerateContentsOfDirectoryAtPath:(NSString *)path
+                                     error:(NSError **)error
+                                usingBlock:(void (^)(NSDictionary *parsedResourceListing))block;
 
 
 #pragma mark Creating and Deleting Items
