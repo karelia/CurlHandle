@@ -39,6 +39,8 @@
 
 - (void)dealloc
 {
+    [_handle cancel];   // for good measure
+    [_handle setDelegate:nil];
     [_handle release];
     [_request release];
     [_credential release];
