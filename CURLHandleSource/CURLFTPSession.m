@@ -233,6 +233,43 @@ createIntermediateDirectories:(BOOL)createIntermediates
     return result;
 }
 
+- (BOOL)createFileAtPath:(NSString *)path withContentsOfURL:(NSURL *)url withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock;
+{
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO];
+    
+    // Read the data using an input stream if possible
+    NSInputStream *stream = [[NSInputStream alloc] initWithURL:url];
+    if (stream)
+    {
+        [request setHTTPBodyStream:stream];
+        [stream release];
+    }
+    else
+    {
+        NSData *data = [[NSData alloc] initWithContentsOfURL:url options:0 error:error];
+        if (data)
+        {
+            [request setHTTPBody:data];
+            [data release];
+        }
+        else
+        {
+            [request release];
+            return NO;
+        }
+    }
+    
+    [request curl_setCreateIntermediateDirectories:createIntermediates];
+    
+    _progressBlock = progressBlock;
+    BOOL result = [_handle loadRequest:request error:error];
+    _progressBlock = NULL;
+    
+    [request release];
+    
+    return result;
+}
+
 - (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 {
     return [self executeCustomCommands:[NSArray arrayWithObject:[@"MKD " stringByAppendingString:[path lastPathComponent]]]
@@ -280,6 +317,14 @@ createIntermediateDirectories:(BOOL)createIntermediates
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
 {
     [_data appendData:data];
+}
+
+- (void)handle:(CURLHandle *)handle didSendBodyDataOfLength:(NSUInteger)bytesWritten;
+{
+    if (_progressBlock)
+    {
+        _progressBlock(bytesWritten);
+    }
 }
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
