@@ -282,14 +282,14 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
          
             According to man 3 curl_easy_setopt, CURLOPT_CONNECTTIMEOUT uses signals and thus isn't thread-safe. However, in the same man page it's stated that if you TURN OFF SIGNALLING, you can still use CURLOPT_CONNECTTIMEOUT! This will DISABLE any features that use signals, so beware! (But turning off the connection timeout by setting to zero will turn it back on.)
          
-            According to man 3 curl_easy_setopt, CURLOPT_TIMEOUT uses signals and thus isn't thread-safe. However, in the same man page it's stated that if you TURN OFF SIGNALLING, you can still use CURLOPT_TIMEOUT! This will DISABLE any features that use signals, so beware! (But turning off the connection timeout by setting to zero will turn it back on.)
+            CURLOPT_TIMEOUT is for how long the entire transfer takes, which doesn't match up to -timeoutInterval's definition. I'm leaving it out for now. Perhaps a progress callback, or minimum transfer speed requirement could manage the eventuality of a transfer hanging mid-way.
          
          "*/
         
         long timeout = (long)[request timeoutInterval];
         LOAD_REQUEST_SET_OPTION(CURLOPT_NOSIGNAL, timeout != 0);
         LOAD_REQUEST_SET_OPTION(CURLOPT_CONNECTTIMEOUT, timeout);
-        LOAD_REQUEST_SET_OPTION(CURLOPT_TIMEOUT, timeout);
+        //LOAD_REQUEST_SET_OPTION(CURLOPT_TIMEOUT, timeout);
         
         
 
