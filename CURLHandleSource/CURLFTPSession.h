@@ -71,6 +71,11 @@
 @property(nonatomic, assign) id <CURLFTPSessionDelegate> delegate;
 
 
+#pragma mark FTP URLs
++ (NSURL *)URLWithPath:(NSString *)path relativeToURL:(NSURL *)baseURL;
++ (NSString *)pathOfURLRelativeToHomeDirectory:(NSURL *)URL;
+
+
 @end
 
 

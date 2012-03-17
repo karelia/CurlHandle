@@ -73,38 +73,24 @@
         {
             // It turns out that to list root, you need a URL like ftp://example.com//./
             if ([path length] == 1) path = @"/.";
-            
-            // Get back to the root directory
-            NSURL *homeDirectory = [NSURL URLWithString:@"/" relativeToURL:[request URL]];
-            
-            // Have to use -absoluteURL otherwise we end up with a relative string beginning @"//", and that resolves to be the wrong thing
-            CFURLRef url = CFURLCreateCopyAppendingPathComponent(NULL,
-                                                                 (CFURLRef)[homeDirectory absoluteURL],
-                                                                 (CFStringRef)path,
-                                                                 isDirectory);
-            
-            [request setURL:(NSURL *)url];
-            CFRelease(url);
+        }
+        
+        if (isDirectory)
+        {
+            if (![path hasSuffix:@"/"] || [path isEqualToString:@"/"])
+            {
+                path = [path stringByAppendingString:@"/"];
+            }
         }
         else
         {
-            if (isDirectory)
+            while ([path hasSuffix:@"/"])
             {
-                if (![path hasSuffix:@"/"] || [path isEqualToString:@"/"])
-                {
-                    path = [path stringByAppendingString:@"/"];
-                }
+                path = [path substringToIndex:[path length] - 1];
             }
-            else
-            {
-                while ([path hasSuffix:@"/"])
-                {
-                    path = [path substringToIndex:[path length] - 1];
-                }
-            }
-            
-            [request setURL:[NSURL URLWithString:path relativeToURL:[request URL]]];
         }
+        
+        [request setURL:[[self class] URLWithPath:path relativeToURL:[request URL]]];
     }
     
     return request;
@@ -336,6 +322,40 @@ createIntermediateDirectories:(BOOL)createIntermediates
     }
     
     [[self delegate] FTPSession:self didReceiveDebugInfo:string ofType:type];
+}
+
+#pragma mark FTP URL helpers
+
++ (NSURL *)URLWithPath:(NSString *)path relativeToURL:(NSURL *)baseURL;
+{
+    // FTP is special. Absolute paths need to specified with an extra prepended slash <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTURL>
+    if ([[baseURL scheme] isEqualToString:@"ftp"] && [path isAbsolutePath])
+    {
+        // Get to host's URL, including single trailing slash
+        // -absoluteURL has to be called so that the real path can be properly appended
+        baseURL = [[NSURL URLWithString:@"/" relativeToURL:baseURL] absoluteURL];
+        return [baseURL URLByAppendingPathComponent:path];
+    }
+    else
+    {
+        return [NSURL URLWithString:path relativeToURL:baseURL];
+    }
+}
+
++ (NSString *)pathOfURLRelativeToHomeDirectory:(NSURL *)URL;
+{
+    // FTP is special. The first slash of the path is to be ignored <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTURL>
+    if ([[URL scheme] isEqualToString:@"ftp"])
+    {
+        CFStringRef strictPath = CFURLCopyStrictPath((CFURLRef)[URL absoluteURL], NULL);
+        NSString *result = [(NSString *)strictPath stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        if (strictPath) CFRelease(strictPath);
+        return result;
+    }
+    else
+    {
+        return [URL path];
+    }
 }
 
 @end
