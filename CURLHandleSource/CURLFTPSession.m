@@ -306,6 +306,10 @@ createIntermediateDirectories:(BOOL)createIntermediates
                                  error:error];
 }
 
+#pragma mark Cancellation
+
+- (void)cancel; { [_handle cancel]; }
+
 #pragma mark Delegate
 
 @synthesize delegate = _delegate;

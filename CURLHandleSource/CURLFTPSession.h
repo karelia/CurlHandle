@@ -62,6 +62,11 @@
 - (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
 
 
+#pragma mark Cancellation
+// Can call on any thread to cancel the current operation as soon as reasonable
+- (void)cancel;
+
+
 #pragma mark Delegate
 @property(nonatomic, assign) id <CURLFTPSessionDelegate> delegate;
 
