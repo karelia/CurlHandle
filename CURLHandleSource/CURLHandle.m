@@ -243,6 +243,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 - (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 {
+    [self retain];  // so can't be accidentally deallocated mid-operation
 	_cancelled = NO;
     
     CURLcode code = CURLE_OK;
@@ -578,10 +579,12 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                 }
             }
             
+            [self release]; // was retained at start
             return NO;
         }
     }
     
+    [self release]; // was retained at start
     return YES;
 }
 
