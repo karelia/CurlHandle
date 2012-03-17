@@ -664,6 +664,12 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 - (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 {
     NSInteger result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
+    
+    if (result > 0 && [[self delegate] respondsToSelector:@selector(handle:didSendBodyDataOfLength:)])
+    {
+        [[self delegate] handle:self didSendBodyDataOfLength:result];
+    }
+    
     return result;
 }
 

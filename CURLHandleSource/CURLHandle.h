@@ -96,6 +96,8 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 @optional
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 
+- (void)handle:(CURLHandle *)handle didSendBodyDataOfLength:(NSUInteger)bytesWritten;
+
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
 
 @end
