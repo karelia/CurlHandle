@@ -13,10 +13,6 @@
 		2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 275707681503E21C00363512 /* CURLFTPSession.m */; };
 		27F9E057151BA7930006F903 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 27F9E056151BA7930006F903 /* libcurl.4.dylib */; };
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
-		79B96CAD0A6360E00060AC12 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA80A6360E00060AC12 /* libcrypto.dylib */; };
-		79B96CAE0A6360E00060AC12 /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA90A6360E00060AC12 /* libssl.dylib */; };
-		79B96CAF0A6360E00060AC12 /* libc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CAA0A6360E00060AC12 /* libc.dylib */; };
-		79B96CB00A6360E00060AC12 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CAB0A6360E00060AC12 /* libz.dylib */; };
 		79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 79B96CBB0A6360F90060AC12 /* CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
@@ -35,10 +31,6 @@
 		795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResumableHTTPUploader.h; sourceTree = "<group>"; };
 		7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResumableHTTPUploader.m; sourceTree = "<group>"; };
 		79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
-		79B96CA80A6360E00060AC12 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
-		79B96CA90A6360E00060AC12 /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = /usr/lib/libssl.dylib; sourceTree = "<absolute>"; };
-		79B96CAA0A6360E00060AC12 /* libc.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libc.dylib; path = /usr/lib/libc.dylib; sourceTree = "<absolute>"; };
-		79B96CAB0A6360E00060AC12 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
 		79B96CBB0A6360F90060AC12 /* CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CURLHandle.h; sourceTree = "<group>"; };
 		79B96CBC0A6360F90060AC12 /* CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CURLHandle.m; sourceTree = "<group>"; };
 		79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+extras.h"; sourceTree = "<group>"; };
@@ -56,10 +48,6 @@
 				27F9E057151BA7930006F903 /* libcurl.4.dylib in Frameworks */,
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
 				79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */,
-				79B96CAD0A6360E00060AC12 /* libcrypto.dylib in Frameworks */,
-				79B96CAE0A6360E00060AC12 /* libssl.dylib in Frameworks */,
-				79B96CAF0A6360E00060AC12 /* libc.dylib in Frameworks */,
-				79B96CB00A6360E00060AC12 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,10 +113,6 @@
 			children = (
 				79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */,
 				27F9E056151BA7930006F903 /* libcurl.4.dylib */,
-				79B96CA80A6360E00060AC12 /* libcrypto.dylib */,
-				79B96CA90A6360E00060AC12 /* libssl.dylib */,
-				79B96CAA0A6360E00060AC12 /* libc.dylib */,
-				79B96CAB0A6360E00060AC12 /* libz.dylib */,
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
