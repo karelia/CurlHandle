@@ -544,17 +544,21 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                         *error = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError underlyingError:*error];
                         break;
                         
-    #if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_2_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_2_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
                     case CURLE_FILESIZE_EXCEEDED:
                         *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorDataLengthExceedsMaximum underlyingError:*error];
                         break;
-    #endif
+#endif
                         
-    #if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED
+#if !defined (MAC_OS_X_VERSION_10_7)
+#define MAC_OS_X_VERSION_10_7 (MAC_OS_X_VERSION_MAX_ALLOWED + 1)
+#endif
+                        
+#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED
                     case CURLE_SEND_FAIL_REWIND:
                         *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorRequestBodyStreamExhausted underlyingError:*error];
                         break;
-    #endif
+#endif
                         
                     case CURLE_LOGIN_DENIED:
                         *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorUserAuthenticationRequired underlyingError:*error];
@@ -564,11 +568,15 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                         *error = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteOutOfSpaceError underlyingError:*error];
                         break;
                         
-    #if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_5_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
+#if !defined (__IPHONE_5_0)
+#define __IPHONE_5_0 (__IPHONE_OS_VERSION_MAX_ALLOWED + 1)
+#endif
+                        
+#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_5_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
                     case CURLE_REMOTE_FILE_EXISTS:
                         *error = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError underlyingError:*error];
                         break;
-    #endif
+#endif
                         
                     case CURLE_REMOTE_FILE_NOT_FOUND:
                         *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorResourceUnavailable underlyingError:*error];
