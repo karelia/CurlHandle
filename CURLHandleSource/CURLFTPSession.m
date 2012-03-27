@@ -55,8 +55,14 @@
 {
     [_credential release]; _credential = [credential retain];
     
-    [_handle setString:[credential user] forKey:CURLOPT_USERNAME];
-    [_handle setString:[credential password] forKey:CURLOPT_PASSWORD];
+    NSString *user = [credential user];
+    if (user)
+    {
+        [_handle setString:user forKey:CURLOPT_USERNAME];
+        
+        NSString *password = [credential password];
+        if (password) [_handle setString:password forKey:CURLOPT_PASSWORD];
+    }
 }
 
 #pragma mark Operations
