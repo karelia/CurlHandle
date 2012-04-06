@@ -344,7 +344,8 @@ createIntermediateDirectories:(BOOL)createIntermediates
     }
     else
     {
-        return [NSURL URLWithString:path relativeToURL:baseURL];
+        return [NSURL URLWithString:[path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+                      relativeToURL:baseURL];
     }
 }
 
