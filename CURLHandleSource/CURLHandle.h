@@ -28,6 +28,7 @@ extern NSString				*sProxyUserIDAndPassword;
 "*/
 
 @class CURLHandle;
+int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose);
 extern size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
 extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
 extern size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
