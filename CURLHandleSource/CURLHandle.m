@@ -721,9 +721,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     
     NSInteger result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
     
-    if (result > 0 && [[self delegate] respondsToSelector:@selector(handle:didSendBodyDataOfLength:)])
+    if (result >= 0 && [[self delegate] respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
     {
-        [[self delegate] handle:self didSendBodyDataOfLength:result];
+        [[self delegate] handle:self willSendBodyDataOfLength:result];
     }
     
     return result;

@@ -100,7 +100,8 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 @optional
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 
-- (void)handle:(CURLHandle *)handle didSendBodyDataOfLength:(NSUInteger)bytesWritten;
+// When sending data to the server, this reports just before it goes out on the wire. Reports a length of 0 when the end of the data is written so you can get a nice heads up that an upload is about to complete
+- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten;
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
 

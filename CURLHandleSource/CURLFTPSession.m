@@ -311,7 +311,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     [_data appendData:data];
 }
 
-- (void)handle:(CURLHandle *)handle didSendBodyDataOfLength:(NSUInteger)bytesWritten;
+- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten;
 {
     if (_progressBlock)
     {
