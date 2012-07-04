@@ -110,6 +110,12 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
     if (!string)
     {
+        // FTP servers are fairly free to use whatever encoding they like. We've run into one that appears to be Hungarian; as far as I can tell ISO Latin 2 is the best compromise for that
+        string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSISOLatin2StringEncoding];
+    }
+    
+    if (!string)
+    {
         // I don't yet know what causes this, but it does happen from time to time. If so, insist that something useful go in the log
         if (infoLength == 0)
         {
