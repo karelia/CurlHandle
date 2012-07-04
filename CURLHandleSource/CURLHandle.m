@@ -110,7 +110,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
     if (!string)
     {
-        // I don't yet know what causes this, but it doe happen from time to time. If so, insist that something useful go in the log
+        // I don't yet know what causes this, but it does happen from time to time. If so, insist that something useful go in the log
         if (infoLength == 0)
         {
             string = [@"<NULL> debug info" retain];
