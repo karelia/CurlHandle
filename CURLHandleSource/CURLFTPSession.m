@@ -215,7 +215,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     [request setHTTPBody:data];
     [request curl_setCreateIntermediateDirectories:createIntermediates];
     
-    BOOL result = [_handle loadRequest:request error:error];
+    BOOL result = [self createFileWithRequest:request error:error progressBlock:nil];
     [request release];
     
     return result;
@@ -249,11 +249,36 @@ createIntermediateDirectories:(BOOL)createIntermediates
     
     [request curl_setCreateIntermediateDirectories:createIntermediates];
     
-    _progressBlock = progressBlock;
-    BOOL result = [_handle loadRequest:request error:error];
+    BOOL result = [self createFileWithRequest:request error:error progressBlock:progressBlock];
+    [request release];
+    
+    return result;
+}
+
+- (BOOL)createFileWithRequest:(NSURLRequest *)request error:(NSError **)outError progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock;
+{
+    // Use our own progress block to watch for the file end being reached before passing onto the original requester
+    __block BOOL atEnd = NO;
+    _progressBlock = ^(NSUInteger bytesWritten){
+        if (bytesWritten == 0) atEnd = YES;
+        if (progressBlock) progressBlock(bytesWritten);
+    };
+    
+    NSError *error;
+    BOOL result = [_handle loadRequest:request error:&error];
     _progressBlock = NULL;
     
-    [request release];
+    
+    // Long FTP uploads have a tendency to have the control connection cutoff for idling. As a hack, assume that if we reached the end of the body stream, a timeout is likely because of that
+    if (!result)
+    {
+        if (atEnd && [error code] == NSURLErrorTimedOut && [[error domain] isEqualToString:NSURLErrorDomain])
+        {
+            return YES;
+        }
+        
+        if (outError) *outError = error;
+    }
     
     return result;
 }
@@ -311,7 +336,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     [_data appendData:data];
 }
 
-- (void)handle:(CURLHandle *)handle didSendBodyDataOfLength:(NSUInteger)bytesWritten;
+- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten;
 {
     if (_progressBlock)
     {

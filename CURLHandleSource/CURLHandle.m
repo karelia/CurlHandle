@@ -52,6 +52,28 @@ NSString			*sProxyUserIDAndPassword = nil;
 @end
 
 
+int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose)
+{
+    if (purpose == CURLSOCKTYPE_IPCXN)
+    {
+        // FTP control connections should be kept alive. However, I'm fairly sure this is unlikely to have a real effect in practice since OS X's default time before it starts sending keep alive packets is 2 hours :(
+        if ([[URL scheme] isEqualToString:@"ftp"])
+        {
+            int keepAlive = 1;
+            socklen_t keepAliveLen = sizeof(keepAlive);
+            int result = setsockopt(curlfd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, keepAliveLen);
+            
+            if (result)
+            {
+                NSLog(@"Unable to set FTP control connection keepalive with error:%i", result);
+                return 1;
+            }
+        }
+    }
+    
+    return 0;
+}
+
 /*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
 	we can use that to get back into Objective C and do the work with the class.
 "*/
@@ -88,7 +110,13 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
     if (!string)
     {
-        // I don't yet know what causes this, but it doe happen from time to time. If so, insist that something useful go in the log
+        // FTP servers are fairly free to use whatever encoding they like. We've run into one that appears to be Hungarian; as far as I can tell ISO Latin 2 is the best compromise for that
+        string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSISOLatin2StringEncoding];
+    }
+    
+    if (!string)
+    {
+        // I don't yet know what causes this, but it does happen from time to time. If so, insist that something useful go in the log
         if (infoLength == 0)
         {
             string = [@"<NULL> debug info" retain];
@@ -277,6 +305,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 		LOAD_REQUEST_SET_OPTION(CURLOPT_FAILONERROR, YES);
         
 		// send all data to the C function
+        LOAD_REQUEST_SET_OPTION(CURLOPT_SOCKOPTFUNCTION, curlSocketOptFunction);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_SOCKOPTDATA, [request URL]);
+        
 		LOAD_REQUEST_SET_OPTION(CURLOPT_WRITEFUNCTION, curlBodyFunction);
 		LOAD_REQUEST_SET_OPTION(CURLOPT_HEADERFUNCTION, curlHeaderFunction);
 		LOAD_REQUEST_SET_OPTION(CURLOPT_READFUNCTION, curlReadFunction);
@@ -696,9 +727,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     
     NSInteger result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
     
-    if (result > 0 && [[self delegate] respondsToSelector:@selector(handle:didSendBodyDataOfLength:)])
+    if (result >= 0 && [[self delegate] respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
     {
-        [[self delegate] handle:self didSendBodyDataOfLength:result];
+        [[self delegate] handle:self willSendBodyDataOfLength:result];
     }
     
     return result;
