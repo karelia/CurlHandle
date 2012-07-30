@@ -46,6 +46,7 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 	NSDictionary	*mProxies;	/*" Dictionary of proxy information; it's released when the handle is deallocated since it's needed for the transfer."*/
 
 	// Backgrounding support
+    BOOL    _executing;     // debugging
 	BOOL    _cancelled;		/*" A flag that is set by the foreground thread and read by the background thread; it's an indicator that the user has cancelled. "*/
     
     NSInputStream   *_uploadStream;

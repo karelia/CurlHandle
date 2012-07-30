@@ -284,6 +284,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 - (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 {
+    NSAssert(_executing == NO, @"CURLHandle instances may not be accessed on multiple threads at once, or re-entrantly");
+    _executing = YES;
+    
     [self retain];  // so can't be accidentally deallocated mid-operation
 	_cancelled = NO;
     
@@ -517,6 +520,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         if (httpHeaders) curl_slist_free_all(httpHeaders);
         if (postQuoteCommands) curl_slist_free_all(postQuoteCommands);
         
+        _executing = NO;
         
         if (code != CURLE_OK)
         {
