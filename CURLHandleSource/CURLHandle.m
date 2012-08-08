@@ -339,6 +339,8 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         LOAD_REQUEST_SET_OPTION(CURLOPT_CONNECTTIMEOUT, timeout);
         //LOAD_REQUEST_SET_OPTION(CURLOPT_TIMEOUT, timeout);
         
+        // Make FTP response time shorter so that when faced with a server which turns out not to receive EPSV connections, can fall back to PASV in time
+        LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_RESPONSE_TIMEOUT, 0.5 * timeout);
         
 
         
