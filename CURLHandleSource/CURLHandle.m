@@ -503,6 +503,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
             LOAD_REQUEST_SET_OPTION(CURLOPT_POSTQUOTE, postQuoteCommands);
         }
         
+        // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
+        LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_USE_EPSV, 0);
+        
         // Set the URL
         LOAD_REQUEST_SET_OPTION(CURLOPT_URL, [[[request URL] absoluteString] UTF8String]);
         
