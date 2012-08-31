@@ -19,7 +19,8 @@
     
     if (self = [self init])
     {
-        if ([@"ftp" caseInsensitiveCompare:[[request URL] scheme]] != NSOrderedSame)
+        NSString *scheme = [[request URL] scheme];
+        if ([@"ftp" caseInsensitiveCompare:scheme] != NSOrderedSame && [@"ftps" caseInsensitiveCompare:scheme] != NSOrderedSame)
         {
             [self release]; return nil;
         }
@@ -362,7 +363,10 @@ createIntermediateDirectories:(BOOL)createIntermediates
 + (NSURL *)URLWithPath:(NSString *)path relativeToURL:(NSURL *)baseURL;
 {
     // FTP is special. Absolute paths need to specified with an extra prepended slash <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTURL>
-    if ([@"ftp" caseInsensitiveCompare:[baseURL scheme]] == NSOrderedSame && [path isAbsolutePath])
+    NSString *scheme = [baseURL scheme];
+    
+    if (([@"ftp" caseInsensitiveCompare:scheme] == NSOrderedSame || [@"ftps" caseInsensitiveCompare:scheme] == NSOrderedSame) &&
+        [path isAbsolutePath])
     {
         // Get to host's URL, including single trailing slash
         // -absoluteURL has to be called so that the real path can be properly appended
@@ -379,7 +383,8 @@ createIntermediateDirectories:(BOOL)createIntermediates
 + (NSString *)pathOfURLRelativeToHomeDirectory:(NSURL *)URL;
 {
     // FTP is special. The first slash of the path is to be ignored <http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTURL>
-    if ([@"ftp" caseInsensitiveCompare:[URL scheme]] == NSOrderedSame)
+    NSString *scheme = [URL scheme];
+    if ([@"ftp" caseInsensitiveCompare:scheme] == NSOrderedSame || [@"ftps" caseInsensitiveCompare:scheme] == NSOrderedSame)
     {
         CFStringRef strictPath = CFURLCopyStrictPath((CFURLRef)[URL absoluteURL], NULL);
         NSString *result = [(NSString *)strictPath stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
