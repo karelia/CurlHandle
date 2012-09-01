@@ -549,7 +549,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                 long osErrorNumber = 0;
                 if (curl_easy_getinfo(mCURL, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
                 {
-                    [userInfo setObject:[NSError errorWithDomain:NSOSStatusErrorDomain code:osErrorNumber userInfo:nil]
+                    [userInfo setObject:[NSError errorWithDomain:NSPOSIXErrorDomain code:osErrorNumber userInfo:nil]
                                  forKey:NSUnderlyingErrorKey];
                 }
                 
