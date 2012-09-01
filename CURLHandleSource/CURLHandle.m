@@ -489,6 +489,9 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
             LOAD_REQUEST_SET_OPTION(CURLOPT_UPLOAD, 0);
         }
         
+        // SSL
+        LOAD_REQUEST_SET_OPTION(CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]);
+        
         // Intermediate directories
         LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories]);
         
@@ -757,6 +760,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 @implementation NSURLRequest (CURLOptionsFTP)
 
+- (curl_usessl)curl_desiredSSLLevel;
+{
+    return [[NSURLProtocol propertyForKey:@"curl_desiredSSLLevel" inRequest:self] longValue];
+}
+
 - (NSArray *)curl_postTransferCommands;
 {
     return [NSURLProtocol propertyForKey:@"curl_postTransferCommands" inRequest:self];
@@ -770,6 +778,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 @end
 
 @implementation NSMutableURLRequest (CURLOptionsFTP)
+
+- (void)curl_setDesiredSSLLevel:(curl_usessl)level;
+{
+    [NSURLProtocol setProperty:[NSNumber numberWithLong:level] forKey:@"curl_desiredSSLLevel" inRequest:self];
+}
 
 - (void)curl_setPostTransferCommands:(NSArray *)commands;
 {

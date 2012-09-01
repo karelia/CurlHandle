@@ -114,6 +114,9 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 @interface NSURLRequest (CURLOptionsFTP)
 
+// CURLUSESSL_NONE, CURLUSESSL_TRY, CURLUSESSL_CONTROL, or CURLUSESSL_ALL
+@property(nonatomic, readonly) curl_usessl curl_desiredSSLLevel;
+
 // An array of strings. Executed in turn once the main request is done
 @property(nonatomic, copy, readonly) NSArray *curl_postTransferCommands;
 
@@ -126,6 +129,7 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 @interface NSMutableURLRequest (CURLOptionsFTP)
 
+- (void)curl_setDesiredSSLLevel:(curl_usessl)level;
 - (void)curl_setPostTransferCommands:(NSArray *)postTransferCommands;
 - (void)curl_setCreateIntermediateDirectories:(NSUInteger)createIntermediateDirectories;
 
