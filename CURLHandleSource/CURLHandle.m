@@ -739,6 +739,19 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     if (_cancelled) return CURL_READFUNC_ABORT;
     
     NSInteger result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
+    if (result < 0)
+    {
+        if ([[self delegate] respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)])
+        {
+            NSError *error = [_uploadStream streamError];
+            
+            [[self delegate] handle:self
+         didReceiveDebugInformation:[NSString stringWithFormat:@"Read failed: %@", [error debugDescription]]
+                             ofType:CURLINFO_HEADER_IN];
+        }
+        
+        return CURL_READFUNC_ABORT;
+    }
     
     if (result >= 0 && [[self delegate] respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
     {
