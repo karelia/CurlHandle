@@ -492,6 +492,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         
         // SSL
         LOAD_REQUEST_SET_OPTION(CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_CERTINFO, 1L);
         
         // Intermediate directories
         LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories]);
@@ -639,6 +640,16 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                         *error = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorResourceUnavailable underlyingError:*error];
                         break;
                         
+                    case CURLE_SSL_CACERT:
+                    {
+                        struct curl_certinfo *certInfo = NULL;
+                        if (curl_easy_getinfo(mCURL, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
+                        {
+                            // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
+                        }
+                        
+                        break;
+                    }
                     default:
                         break;
                 }
