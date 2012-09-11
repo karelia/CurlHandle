@@ -493,6 +493,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         // SSL
         LOAD_REQUEST_SET_OPTION(CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]);
         LOAD_REQUEST_SET_OPTION(CURLOPT_CERTINFO, 1L);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]);
         
         // Intermediate directories
         LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories]);
@@ -790,6 +791,12 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     return [[NSURLProtocol propertyForKey:@"curl_desiredSSLLevel" inRequest:self] longValue];
 }
 
+- (BOOL)curl_shouldVerifySSLCertificate;
+{
+    NSNumber *result = [NSURLProtocol propertyForKey:@"curl_shouldVerifySSLCertificate" inRequest:self];
+    return (result ? [result boolValue] : YES);
+}
+
 - (NSArray *)curl_postTransferCommands;
 {
     return [NSURLProtocol propertyForKey:@"curl_postTransferCommands" inRequest:self];
@@ -807,6 +814,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 - (void)curl_setDesiredSSLLevel:(curl_usessl)level;
 {
     [NSURLProtocol setProperty:[NSNumber numberWithLong:level] forKey:@"curl_desiredSSLLevel" inRequest:self];
+}
+
+- (void)curl_setShouldVerifySSLCertificate:(BOOL)verify;
+{
+    [NSURLProtocol setProperty:[NSNumber numberWithBool:verify] forKey:@"curl_shouldVerifySSLCertificate" inRequest:self];
 }
 
 - (void)curl_setPostTransferCommands:(NSArray *)commands;
