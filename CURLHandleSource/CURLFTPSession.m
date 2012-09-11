@@ -19,8 +19,7 @@
     
     if (self = [self init])
     {
-        NSString *scheme = [[request URL] scheme];
-        if ([@"ftp" caseInsensitiveCompare:scheme] != NSOrderedSame && [@"ftps" caseInsensitiveCompare:scheme] != NSOrderedSame)
+        if (![self validateRequest:request])
         {
             [self release]; return nil;
         }
@@ -66,7 +65,22 @@
     }
 }
 
-#pragma mark Operations
+#pragma mark Requests
+
+@synthesize baseRequest = _request;
+- (void)setBaseRequest:(NSURLRequest *)request;
+{
+    NSParameterAssert([self validateRequest:request]);
+    
+    request = [request copy];
+    [_request release]; _request = request;
+}
+
+- (BOOL)validateRequest:(NSURLRequest *)request;
+{
+    NSString *scheme = [[request URL] scheme];
+    return ([@"ftp" caseInsensitiveCompare:scheme] == NSOrderedSame || [@"ftps" caseInsensitiveCompare:scheme] == NSOrderedSame);
+}
 
 - (NSMutableURLRequest *)newMutableRequestWithPath:(NSString *)path isDirectory:(BOOL)isDirectory;
 {
@@ -102,6 +116,8 @@
     
     return request;
 }
+
+#pragma mark Operations
 
 - (BOOL)executeCustomCommands:(NSArray *)commands
                   inDirectory:(NSString *)directory
