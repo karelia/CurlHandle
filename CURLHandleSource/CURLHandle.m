@@ -12,7 +12,6 @@
 #include <SystemConfiguration/SystemConfiguration.h>
 
 
-
 // Un-comment these to do some debugging things
 //#define DEBUGCURL 1
 //#define DEBUGCURL_SLOW

@@ -10,8 +10,12 @@
 #import <Foundation/Foundation.h>
 #import <curl/curl.h>
 
-@protocol CURLHandleDelegate;
 
+#ifndef CURLHandleLog
+#define CURLHandleLog NSLog
+#endif
+
+@protocol CURLHandleDelegate;
 
 extern NSString * const CURLcodeErrorDomain;
 extern NSString * const CURLMcodeErrorDomain;

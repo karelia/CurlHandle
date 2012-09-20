@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		221EAD11160B167900E4F270 /* CURLRunLoopSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */; };
+		221EAD12160B167900E4F270 /* CURLRunLoopSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLRunLoopSource.m */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		275707691503E21D00363512 /* CURLFTPSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 275707671503E21C00363512 /* CURLFTPSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -22,6 +24,8 @@
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLRunLoopSource.h; sourceTree = "<group>"; };
+		221EAD10160B167900E4F270 /* CURLRunLoopSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLRunLoopSource.m; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
 		275707671503E21C00363512 /* CURLFTPSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLFTPSession.h; sourceTree = "<group>"; };
@@ -97,6 +101,8 @@
 			children = (
 				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
 				79B96CBC0A6360F90060AC12 /* CURLHandle.m */,
+				221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */,
+				221EAD10160B167900E4F270 /* CURLRunLoopSource.m */,
 				79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */,
 				79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */,
 				27229B3814C83905007D0FF1 /* CURLProtocol.h */,
@@ -146,6 +152,7 @@
 				79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */,
 				27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */,
 				275707691503E21D00363512 /* CURLFTPSession.h in Headers */,
+				221EAD11160B167900E4F270 /* CURLRunLoopSource.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,6 +221,7 @@
 				79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */,
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
 				2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */,
+				221EAD12160B167900E4F270 /* CURLRunLoopSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
