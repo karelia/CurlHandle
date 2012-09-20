@@ -101,6 +101,15 @@ static void perform(void *info)
             if (ready > 0)
             {
                 curl_multi_perform(multi, &count);
+
+                CURLMsg* message;
+                while ((message = curl_multi_info_read(multi, &count)) != nil)
+                {
+                    if (message->msg == CURLMSG_DONE)
+                    {
+                        curl_multi_remove_handle(multi, message->easy_handle);
+                    }
+                }
             }
         }
     }
