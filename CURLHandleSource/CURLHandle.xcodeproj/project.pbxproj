@@ -15,6 +15,9 @@
 		223FD0A4160B523700BE1C80 /* CURLRunLoopSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLRunLoopSourceTests.m */; };
 		223FD0A9160B55C200BE1C80 /* CURLRunLoopSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLRunLoopSource.m */; };
 		223FD0AA160B564800BE1C80 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C5DA93115AFD699006F518F /* libcurl.4.dylib */; };
+		223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */; };
+		223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
+		223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		275707691503E21D00363512 /* CURLFTPSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 275707671503E21C00363512 /* CURLFTPSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -42,6 +45,7 @@
 		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		223FD0A3160B523700BE1C80 /* CURLRunLoopSourceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLRunLoopSourceTests.m; sourceTree = "<group>"; };
 		223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CURLHandleTests-Prefix.pch"; sourceTree = "<group>"; };
+		223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleTests.m; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
 		275707671503E21C00363512 /* CURLFTPSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLFTPSession.h; sourceTree = "<group>"; };
@@ -68,6 +72,7 @@
 				223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */,
 				223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */,
 				223FD0AA160B564800BE1C80 /* libcurl.4.dylib in Frameworks */,
+				223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,7 +101,6 @@
 		0867D691FE84028FC02AAC07 /* CURLHandle */ = {
 			isa = PBXGroup;
 			children = (
-				3C5DA93115AFD699006F518F /* libcurl.4.dylib */,
 				08FB77AEFE84172EC02AAC07 /* Classes */,
 				32C88DFF0371C24200C91783 /* Other Sources */,
 				089C1665FE841158C02AAC07 /* Resources */,
@@ -147,6 +151,7 @@
 		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3C5DA93115AFD699006F518F /* libcurl.4.dylib */,
 				79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */,
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 			);
@@ -186,6 +191,7 @@
 		223FD09C160B523700BE1C80 /* CURLHandleTests */ = {
 			isa = PBXGroup;
 			children = (
+				223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */,
 				223FD0A3160B523700BE1C80 /* CURLRunLoopSourceTests.m */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
@@ -332,6 +338,8 @@
 			files = (
 				223FD0A4160B523700BE1C80 /* CURLRunLoopSourceTests.m in Sources */,
 				223FD0A9160B55C200BE1C80 /* CURLRunLoopSource.m in Sources */,
+				223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */,
+				223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
