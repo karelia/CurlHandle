@@ -6,7 +6,11 @@
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
-#import "CURLHandleTests.h"
+#import <SenTestingKit/SenTestingKit.h>
+
+@interface CURLHandleTests : SenTestCase
+
+@end
 
 @implementation CURLHandleTests
 

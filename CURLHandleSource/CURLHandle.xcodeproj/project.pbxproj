@@ -38,7 +38,6 @@
 		223FD09B160B523700BE1C80 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
 		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		223FD0A2160B523700BE1C80 /* CURLHandleTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CURLHandleTests.h; sourceTree = "<group>"; };
 		223FD0A3160B523700BE1C80 /* CURLHandleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLHandleTests.m; sourceTree = "<group>"; };
 		223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CURLHandleTests-Prefix.pch"; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
@@ -184,7 +183,6 @@
 		223FD09C160B523700BE1C80 /* CURLHandleTests */ = {
 			isa = PBXGroup;
 			children = (
-				223FD0A2160B523700BE1C80 /* CURLHandleTests.h */,
 				223FD0A3160B523700BE1C80 /* CURLHandleTests.m */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
