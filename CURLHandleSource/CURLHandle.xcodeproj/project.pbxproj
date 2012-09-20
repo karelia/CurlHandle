@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		221EAD11160B167900E4F270 /* CURLRunLoopSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */; };
 		221EAD12160B167900E4F270 /* CURLRunLoopSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLRunLoopSource.m */; };
+		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
+		223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD096160B523700BE1C80 /* Cocoa.framework */; };
+		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
+		223FD0A4160B523700BE1C80 /* CURLHandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLHandleTests.m */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		275707691503E21D00363512 /* CURLFTPSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 275707671503E21C00363512 /* CURLFTPSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -26,6 +30,17 @@
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLRunLoopSource.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLRunLoopSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLRunLoopSource.m; sourceTree = "<group>"; };
+		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		223FD094160B523700BE1C80 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		223FD096160B523700BE1C80 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		223FD099160B523700BE1C80 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		223FD09A160B523700BE1C80 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		223FD09B160B523700BE1C80 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
+		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		223FD0A2160B523700BE1C80 /* CURLHandleTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CURLHandleTests.h; sourceTree = "<group>"; };
+		223FD0A3160B523700BE1C80 /* CURLHandleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLHandleTests.m; sourceTree = "<group>"; };
+		223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CURLHandleTests-Prefix.pch"; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
 		275707671503E21C00363512 /* CURLFTPSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLFTPSession.h; sourceTree = "<group>"; };
@@ -45,6 +60,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		223FD08E160B523700BE1C80 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */,
+				223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -62,6 +86,7 @@
 			isa = PBXGroup;
 			children = (
 				8DC2EF5B0486A6940098B216 /* CURLHandle.framework */,
+				223FD092160B523700BE1C80 /* CURLHandleTests.octest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -74,6 +99,8 @@
 				32C88DFF0371C24200C91783 /* Other Sources */,
 				089C1665FE841158C02AAC07 /* Resources */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
+				223FD09C160B523700BE1C80 /* CURLHandleTests */,
+				223FD093160B523700BE1C80 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
 			name = CURLHandle;
@@ -134,6 +161,46 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
+		223FD093160B523700BE1C80 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				223FD094160B523700BE1C80 /* SenTestingKit.framework */,
+				223FD096160B523700BE1C80 /* Cocoa.framework */,
+				223FD098160B523700BE1C80 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		223FD098160B523700BE1C80 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				223FD099160B523700BE1C80 /* AppKit.framework */,
+				223FD09A160B523700BE1C80 /* CoreData.framework */,
+				223FD09B160B523700BE1C80 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		223FD09C160B523700BE1C80 /* CURLHandleTests */ = {
+			isa = PBXGroup;
+			children = (
+				223FD0A2160B523700BE1C80 /* CURLHandleTests.h */,
+				223FD0A3160B523700BE1C80 /* CURLHandleTests.m */,
+				223FD09D160B523700BE1C80 /* Supporting Files */,
+			);
+			path = CURLHandleTests;
+			sourceTree = "<group>";
+		};
+		223FD09D160B523700BE1C80 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */,
+				223FD09F160B523700BE1C80 /* InfoPlist.strings */,
+				223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		32C88DFF0371C24200C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,6 +226,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		223FD091160B523700BE1C80 /* CURLHandleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 223FD0A6160B523700BE1C80 /* Build configuration list for PBXNativeTarget "CURLHandleTests" */;
+			buildPhases = (
+				223FD08D160B523700BE1C80 /* Sources */,
+				223FD08E160B523700BE1C80 /* Frameworks */,
+				223FD08F160B523700BE1C80 /* Resources */,
+				223FD090160B523700BE1C80 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CURLHandleTests;
+			productName = CURLHandleTests;
+			productReference = 223FD092160B523700BE1C80 /* CURLHandleTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
 		8DC2EF4F0486A6940098B216 /* CURLHandle */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "CURLHandle" */;
@@ -185,6 +270,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = "Karelia Software";
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "CURLHandle" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -199,11 +285,20 @@
 			projectRoot = "";
 			targets = (
 				8DC2EF4F0486A6940098B216 /* CURLHandle */,
+				223FD091160B523700BE1C80 /* CURLHandleTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		223FD08F160B523700BE1C80 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF520486A6940098B216 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -213,7 +308,31 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		223FD090160B523700BE1C80 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		223FD08D160B523700BE1C80 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				223FD0A4160B523700BE1C80 /* CURLHandleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF540486A6940098B216 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -226,6 +345,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		223FD09F160B523700BE1C80 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				223FD0A0160B523700BE1C80 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
@@ -301,6 +431,64 @@
 			};
 			name = Release;
 		};
+		223FD0A7160B523700BE1C80 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CURLHandleTests/CURLHandleTests-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		223FD0A8160B523700BE1C80 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "CURLHandleTests/CURLHandleTests-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -321,6 +509,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		223FD0A6160B523700BE1C80 /* Build configuration list for PBXNativeTarget "CURLHandleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				223FD0A7160B523700BE1C80 /* Debug */,
+				223FD0A8160B523700BE1C80 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

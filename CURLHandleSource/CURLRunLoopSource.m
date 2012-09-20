@@ -84,9 +84,9 @@ static void perform(void *info)
 
     while (self.running)
     {
-        FD_ZERO(read_fds);
-        FD_ZERO(write_fds);
-        FD_ZERO(exc_fds);
+        FD_ZERO(&read_fds);
+        FD_ZERO(&write_fds);
+        FD_ZERO(&exc_fds);
         count = FD_SETSIZE;
         CURLMcode result = curl_multi_fdset(multi, &read_fds, &write_fds, &exc_fds, &count);
         if (result == CURLM_OK)
