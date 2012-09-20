@@ -12,9 +12,8 @@
 
 @interface CURLRunLoopSource()
 
-@property (assign, nonatomic) CFRunLoopSourceRef source;
+@property (strong, nonatomic) __attribute__((NSObject)) CFRunLoopSourceRef source;
 @property (strong, nonatomic) NSThread* thread;
-@property (assign, atomic) BOOL running;
 @property (assign, nonatomic) CURLM* multi;
 
 @end
@@ -27,12 +26,12 @@ static void perform(void *info);
 
 static void schedule(void *info, CFRunLoopRef rl, CFStringRef mode)
 {
-    CURLHandleLog(@"runloop scheduled");
+    CURLHandleLog(@"runloop scheduled for mode %@", mode);
 }
 
 static void cancel(void *info, CFRunLoopRef rl, CFStringRef mode)
 {
-    CURLHandleLog(@"runloop cancelled");
+    CURLHandleLog(@"runloop cancelled for mode %@", mode);
 }
 
 static void perform(void *info)
@@ -44,15 +43,73 @@ static void perform(void *info)
 
 @synthesize source;
 
+- (id)init
+{
+    if ((self = [super init]) != nil)
+    {
+
+    }
+
+    return self;
+}
+
+- (void)dealloc
+{
+    [self shutdown];
+    
+    [_thread release];
+
+    [super dealloc];
+}
+
+- (void)addToRunLoop:(NSRunLoop*)runLoop
+{
+    [self addToRunLoop:runLoop mode:(NSString*)kCFRunLoopCommonModes];
+}
+
+- (void)removeFromRunLoop:(NSRunLoop*)runLoop
+{
+    [self removeFromRunLoop:runLoop mode:(NSString*)kCFRunLoopCommonModes];
+}
+
+- (void)addToRunLoop:(NSRunLoop*)runLoop mode:(NSString*)mode;
+
+{
+    if ([self createSource])
+    {
+        CFRunLoopRef cf = [runLoop getCFRunLoop];
+        CFRunLoopAddSource(cf, self.source, (CFStringRef)mode);
+        [self createThread];
+    }
+}
+
+- (void)removeFromRunLoop:(NSRunLoop*)runLoop mode:(NSString*)mode;
+{
+    CFRunLoopRef cf = [runLoop getCFRunLoop];
+    CFRunLoopRemoveSource(cf, self.source, (CFStringRef)mode);
+}
+
+- (void)shutdown
+{
+    [self releaseThread];
+    [self releaseSource];
+    CURLHandleLog(@"shutdown");
+}
+
 - (BOOL)createSource
 {
-    CFRunLoopSourceContext context;
-    memset(&context, 0, sizeof(context));
-    context.info = self;
-    context.schedule = schedule;
-    context.perform = perform;
-    context.cancel = cancel;
-    self.source = CFRunLoopSourceCreate(nil, 0, &context);
+    if (self.source == nil)
+    {
+        CFRunLoopSourceContext context;
+        memset(&context, 0, sizeof(context));
+        context.info = self;
+        context.schedule = schedule;
+        context.perform = perform;
+        context.cancel = cancel;
+        self.source = CFRunLoopSourceCreate(nil, 0, &context);
+        CURLHandleLog(self.source ? @"created source" : @"failed to create source");
+
+    }
 
     return (self.source != nil);
 }
@@ -61,18 +118,45 @@ static void perform(void *info)
 {
     if (self.source)
     {
-        CFRelease(self.source);
+        CFRunLoopSourceInvalidate(self.source);
         self.source = nil;
+        CURLHandleLog(@"released source");
     }
 }
 
-- (void)createThread
+- (BOOL)createThread
 {
-    self.thread = [[NSThread alloc] initWithTarget:self selector:@selector(monitor) object:nil];
+    if (!self.thread)
+    {
+        NSThread* thread = [[NSThread alloc] initWithTarget:self selector:@selector(monitor) object:nil];
+        self.thread = thread;
+        [thread start];
+        [thread release];
+        CURLHandleLog(thread ? @"created thread" : @"failed to create thread");
+    }
+
+    return (self.thread != nil);
+}
+
+- (void)releaseThread
+{
+    if (self.thread)
+    {
+        [self.thread cancel];
+        while (![self.thread isFinished])
+        {
+            // TODO: spin runloop here?
+        }
+
+        self.thread = nil;
+        CURLHandleLog(@"released thread");
+    }
 }
 
 - (void)monitor
 {
+    CURLHandleLog(@"started monitor thread");
+
     CURLM* multi = curl_multi_init();
     self.multi = multi;
 
@@ -82,7 +166,7 @@ static void perform(void *info)
     fd_set exc_fds;
     int count = MAX_FDS;
 
-    while (self.running)
+    while (![self.thread isCancelled])
     {
         FD_ZERO(&read_fds);
         FD_ZERO(&write_fds);
@@ -116,6 +200,8 @@ static void perform(void *info)
 
     self.multi = nil;
     curl_multi_cleanup(multi);
+
+    CURLHandleLog(@"finished monitor thread");
 }
 
 @end

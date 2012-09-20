@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
+#import "CURLRunLoopSource.h"
+
 #import <SenTestingKit/SenTestingKit.h>
 
 @interface CURLHandleTests : SenTestCase
@@ -28,9 +30,19 @@
     [super tearDown];
 }
 
-- (void)testExample
+- (void)testAddingLoop
 {
-    STFail(@"Unit tests are not implemented yet in CURLHandleTests");
+    CURLRunLoopSource* source = [[CURLRunLoopSource alloc] init];
+
+    NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
+
+    [source addToRunLoop:runLoop];
+
+    [source removeFromRunLoop:runLoop];
+
+    [source shutdown];
+    
+    [source release];
 }
 
 @end
