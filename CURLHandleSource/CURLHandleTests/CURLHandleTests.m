@@ -61,13 +61,18 @@
     handle.delegate = self;
 
     NSError* error = nil;
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.karelia.com"]];
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
 
     BOOL ok = [handle loadRequest:request error:&error];
     STAssertTrue(ok, @"failed to load request, with error %@", error);
 
     STAssertNotNil(self.response, @"got no response");
     STAssertTrue([self.data length] > 0, @"got no data");
+
+    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+    NSString* receivedNotes = [[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding];
+    STAssertTrue([receivedNotes isEqualToString:devNotes], @"received notes didn't match: was:\n%@\n\nshould have been:\n%@", receivedNotes, devNotes);
 
     [handle release];
 }
