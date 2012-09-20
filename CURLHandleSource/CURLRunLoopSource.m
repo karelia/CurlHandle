@@ -15,6 +15,7 @@
 @property (strong, nonatomic) __attribute__((NSObject)) CFRunLoopSourceRef source;
 @property (strong, nonatomic) NSThread* thread;
 @property (assign, nonatomic) CURLM* multi;
+@property (strong, nonatomic) NSMutableArray* handles;
 
 @end
 
@@ -47,7 +48,7 @@ static void perform(void *info)
 {
     if ((self = [super init]) != nil)
     {
-
+        self.handles = [NSMutableArray array];
     }
 
     return self;
@@ -56,7 +57,8 @@ static void perform(void *info)
 - (void)dealloc
 {
     [self shutdown];
-    
+
+    [_handles release];
     [_thread release];
 
     [super dealloc];
@@ -87,6 +89,22 @@ static void perform(void *info)
 {
     CFRunLoopRef cf = [runLoop getCFRunLoop];
     CFRunLoopRemoveSource(cf, self.source, (CFStringRef)mode);
+}
+
+- (BOOL)addHandle:(CURLHandle*)handle
+{
+    [self.handles addObject:handle];
+    CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
+
+    return result == CURLM_OK;
+}
+
+- (BOOL)removeHandle:(CURLHandle*)handle
+{
+    [self.handles removeObject:handle];
+    CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
+
+    return result == CURLM_OK;
 }
 
 - (void)shutdown

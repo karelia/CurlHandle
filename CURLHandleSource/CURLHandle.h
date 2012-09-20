@@ -15,6 +15,8 @@
 #define CURLHandleLog NSLog
 #endif
 
+@class CURLRunLoopSource;
+
 @protocol CURLHandleDelegate;
 
 extern NSString * const CURLcodeErrorDomain;
@@ -74,6 +76,9 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 // The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate
 // At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
 - (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
+
+- (BOOL)loadRequest:(NSURLRequest *)request forRunLoopSource:(CURLRunLoopSource*)source;
+
 
 // Can be called from any thread. Causes -loadRequest:error: as soon as it can
 - (void)cancel;

@@ -8,6 +8,8 @@
 //
 
 #import "CURLHandle.h"
+#import "CURLRunLoopSource.h"
+
 #define NSS(s) (NSString *)(s)
 #include <SystemConfiguration/SystemConfiguration.h>
 
@@ -284,6 +286,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 - (CURLcode)setupRequest:(NSURLRequest *)request error:(NSError **)error
 {
+    NSAssert(_executing == NO, @"CURLHandle instances may not be accessed on multiple threads at once, or re-entrantly");
+    _executing = YES;
+
+    _cancelled = NO;
+
     self.httpHeaders = NULL;
     self.postQuoteCommands = NULL;
 
@@ -635,29 +642,14 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     return result;
 }
 
-- (BOOL)cleanupRequest:(NSURLRequest*)request error:(NSError **)error
+- (void)cleanup
 {
-    CURLcode code = CURLE_OK;
-
     // Cleanup
     [_uploadStream close];
     if (self.httpHeaders) curl_slist_free_all(self.httpHeaders);
     if (self.postQuoteCommands) curl_slist_free_all(self.postQuoteCommands);
 
     _executing = NO;
-
-    if (code != CURLE_OK)
-    {
-        if (error)
-        {
-            *error = [self errorForURL:[request URL] code:code];
-        }
-
-        [self release]; // was retained at start
-        return NO;
-    }
-
-    return YES;
 }
 
 /*" %{Loads the receiver's data in the synchronously.}
@@ -670,35 +662,55 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 - (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 {
-    NSAssert(_executing == NO, @"CURLHandle instances may not be accessed on multiple threads at once, or re-entrantly");
-    _executing = YES;
-
     [self retain];  // so can't be accidentally deallocated mid-operation
-	_cancelled = NO;
 
     CURLcode code = CURLE_OK;
 
     @try
     {
         code = [self setupRequest:request error:error];
-        if (code != CURLE_OK)
+        if (code == CURLE_OK)
         {
-            return NO;
+            code = curl_easy_perform(mCURL);
         }
-        
-        // Do the transfer
-        code = curl_easy_perform(mCURL);
     }
+    
     @finally
     {
-        if (![self cleanupRequest:request error:error])
+        [self cleanup];
+
+        if (code != CURLE_OK)
         {
-            return NO;
+            if (error)
+            {
+                *error = [self errorForURL:[request URL] code:code];
+            }
         }
     }
     
     [self release]; // was retained at start
-    return YES;
+
+    return code == CURLE_OK;
+}
+
+- (BOOL)loadRequest:(NSURLRequest *)request forRunLoopSource:(CURLRunLoopSource *)source error:(NSError **)error
+{
+    CURLcode code = CURLE_OK;
+
+    @try
+    {
+        code = [self setupRequest:request error:error];
+        if (code == CURLE_OK)
+        {
+            [source addHandle:self];
+        }
+    }
+
+    @catch (NSException* exception)
+    {
+    }
+
+    return code == CURLE_OK;
 }
 
 - (void)cancel;
