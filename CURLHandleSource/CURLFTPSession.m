@@ -323,6 +323,14 @@ createIntermediateDirectories:(BOOL)createIntermediates
                                  error:error];
 }
 
+- (BOOL)removeDirectoryAtPath:(NSString *)path error:(NSError **)error;
+{
+    return [self executeCustomCommands:[NSArray arrayWithObject:[@"RMD " stringByAppendingString:[path lastPathComponent]]]
+                           inDirectory:[path stringByDeletingLastPathComponent]
+         createIntermediateDirectories:NO
+                                 error:error];
+}
+
 #pragma mark Cancellation
 
 - (void)cancel; { [_handle cancel]; }
