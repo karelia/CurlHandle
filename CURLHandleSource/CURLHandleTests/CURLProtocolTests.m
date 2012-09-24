@@ -7,47 +7,17 @@
 //
 
 #import "CURLProtocol.h"
+#import "CURLHandleBasedTest.h"
 
-#import <SenTestingKit/SenTestingKit.h>
+@interface CURLHandleTests : CURLHandleBasedTest
 
-@interface CURLProtocolTests : SenTestCase<NSURLConnectionDelegate>
+@end
 
-@property (strong, nonatomic) NSMutableData* data;
-@property (assign, atomic) BOOL exitRunLoop;
-@property (strong, nonatomic) NSURLResponse* response;
-@property (assign, nonatomic) BOOL sending;
+@interface CURLProtocolTests : CURLHandleBasedTest
 
 @end
 
 @implementation CURLProtocolTests
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    self.exitRunLoop = YES;
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
-    self.response = response;
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)dataIn
-{
-    NSMutableData* data = self.data;
-    if (!data)
-    {
-        data = [NSMutableData dataWithCapacity:self.response.expectedContentLength];
-        self.data = data;
-    }
-
-    [data appendData:dataIn];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    self.exitRunLoop = YES;
-}
-
 
 - (void)testSimpleDownload
 {
@@ -55,7 +25,6 @@
     request.shouldUseCurlHandle = YES;
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    [connection start];
     
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
@@ -65,14 +34,7 @@
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
     }
 
-    STAssertNotNil(self.response, @"got no response");
-    STAssertTrue([self.data length] > 0, @"got no data");
-
-    NSError* error = nil;
-    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
-    NSString* receivedNotes = [[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding];
-    STAssertTrue([receivedNotes isEqualToString:devNotes], @"received notes didn't match: was:\n%@\n\nshould have been:\n%@", receivedNotes, devNotes);
+    [self checkDownloadedBufferWasCorrect];
 }
 
 @end

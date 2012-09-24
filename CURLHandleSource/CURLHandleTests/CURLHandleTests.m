@@ -6,54 +6,13 @@
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
-#import "CURLHandle.h"
+#import "CURLHandleBasedTest.h"
 
-#import <SenTestingKit/SenTestingKit.h>
-
-@interface CURLHandleTests : SenTestCase<CURLHandleDelegate>
-
-@property (strong, nonatomic) NSData* data;
-@property (strong, nonatomic) NSURLResponse* response;
-@property (assign, nonatomic) BOOL sending;
+@interface CURLHandleTests : CURLHandleBasedTest
 
 @end
 
 @implementation CURLHandleTests
-
-- (void)setUp
-{
-    [super setUp];
-    
-    // Set-up code here.
-}
-
-- (void)tearDown
-{
-    // Tear-down code here.
-    
-    [super tearDown];
-}
-
-- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data
-{
-    self.data = data;
-}
-
-- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response
-{
-    self.response = response;
-}
-
-- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
-{
-    self.sending = YES;
-}
-
-- (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type
-{
-    CURLHandleLog(@"got debug info: %@ type:%d", string, type);
-}
-
 
 - (void)testSimpleDownload
 {
@@ -66,13 +25,7 @@
     BOOL ok = [handle loadRequest:request error:&error];
     STAssertTrue(ok, @"failed to load request, with error %@", error);
 
-    STAssertNotNil(self.response, @"got no response");
-    STAssertTrue([self.data length] > 0, @"got no data");
-
-    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
-    NSString* receivedNotes = [[NSString alloc] initWithData:self.data encoding:NSUTF8StringEncoding];
-    STAssertTrue([receivedNotes isEqualToString:devNotes], @"received notes didn't match: was:\n%@\n\nshould have been:\n%@", receivedNotes, devNotes);
+    [self checkDownloadedBufferWasCorrect];
 
     [handle release];
 }
