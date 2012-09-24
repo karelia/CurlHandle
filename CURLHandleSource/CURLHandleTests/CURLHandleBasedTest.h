@@ -12,12 +12,14 @@
 @interface CURLHandleBasedTest : SenTestCase<CURLHandleDelegate>
 
 @property (strong, nonatomic) NSMutableData* buffer;
+@property (strong, nonatomic) NSError* error;
 @property (assign, nonatomic) NSUInteger expected;
 @property (assign, atomic) BOOL exitRunLoop;
 @property (strong, nonatomic) NSURLResponse* response;
 @property (assign, nonatomic) BOOL sending;
 
 - (void)checkDownloadedBufferWasCorrect;
+- (void)runUntilDone;
 
 @end
 

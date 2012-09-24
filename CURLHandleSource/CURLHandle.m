@@ -598,7 +598,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
         if (code == CURLE_OK)
         {
-            if ([[self delegate] respondsToSelector:@selector(handleFinished:)])
+            if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
             {
                 [self.delegate handleDidFinish:self];
             }
@@ -653,7 +653,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (void)completeForRunLoopSource:(CURLRunLoopSource*)source
 {
-    if ([[self delegate] respondsToSelector:@selector(handleFinished:)])
+    if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
     {
         [self.delegate handleDidFinish:self];
     }

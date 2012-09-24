@@ -58,11 +58,7 @@
     BOOL ok = [handle loadRequest:request forRunLoopSource:source];
     STAssertTrue(ok, @"failed to load request");
 
-    self.exitRunLoop = NO;
-    while (!self.exitRunLoop)
-    {
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
-    }
+    [self runUntilDone];
 
     [self checkDownloadedBufferWasCorrect];
 

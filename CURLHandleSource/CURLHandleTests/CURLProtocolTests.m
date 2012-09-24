@@ -9,10 +9,6 @@
 #import "CURLProtocol.h"
 #import "CURLHandleBasedTest.h"
 
-@interface CURLHandleTests : CURLHandleBasedTest
-
-@end
-
 @interface CURLProtocolTests : CURLHandleBasedTest
 
 @end
@@ -28,11 +24,7 @@
     
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
-    self.exitRunLoop = NO;
-    while (!self.exitRunLoop)
-    {
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
-    }
+    [self runUntilDone];
 
     [self checkDownloadedBufferWasCorrect];
 }

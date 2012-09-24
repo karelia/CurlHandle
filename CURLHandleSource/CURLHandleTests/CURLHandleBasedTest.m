@@ -20,8 +20,6 @@
     }
 
     [buffer appendData:data];
-
-    self.exitRunLoop = [buffer length] == self.expected;
 }
 
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response
@@ -40,6 +38,19 @@
     CURLHandleLog(@"got debug info: %@ type:%d", string, type);
 }
 
+- (void)handleDidFinish:(CURLHandle *)handle
+{
+    CURLHandleLog(@"handle finished");
+    self.exitRunLoop = YES;
+}
+
+- (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
+{
+    CURLHandleLog(@"handle failed with error %@", error);
+    self.error = error;
+    self.exitRunLoop = YES;
+}
+
 - (void)runUntilDone
 {
     self.exitRunLoop = NO;
@@ -52,7 +63,8 @@
 - (void)checkDownloadedBufferWasCorrect
 {
     STAssertNotNil(self.response, @"got no response");
-    STAssertTrue([self.buffer length] > 0, @"got no data");
+    STAssertTrue([self.buffer length] > 0, @"got no data, expected %ld", self.expected);
+    STAssertNil(self.error, @"got error %@", self.error);
 
     NSError* error = nil;
     NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];

@@ -123,8 +123,8 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 - (BOOL)removeHandle:(CURLHandle*)handle
 {
-    [self.handles removeObject:handle];
     CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
+    [self.handles removeObject:handle];
 
     return result == CURLM_OK;
 }
