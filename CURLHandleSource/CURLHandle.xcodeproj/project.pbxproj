@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22002EDC161097EC00464D33 /* CURLProtocolTests.m */; };
+		22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		221EAD11160B167900E4F270 /* CURLRunLoopSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */; };
 		221EAD12160B167900E4F270 /* CURLRunLoopSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLRunLoopSource.m */; };
 		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
@@ -49,6 +51,7 @@
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		22002EDC161097EC00464D33 /* CURLProtocolTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocolTests.m; sourceTree = "<group>"; };
 		221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLRunLoopSource.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLRunLoopSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLRunLoopSource.m; sourceTree = "<group>"; };
 		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -229,6 +232,7 @@
 			isa = PBXGroup;
 			children = (
 				223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */,
+				22002EDC161097EC00464D33 /* CURLProtocolTests.m */,
 				223FD0A3160B523700BE1C80 /* CURLRunLoopSourceTests.m */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
@@ -389,6 +393,8 @@
 				2270F4A316108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
 				2270F4A9161090AB009B6F98 /* CURLResponse.m in Sources */,
 				2270F4AE16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
+				22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */,
+				22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
