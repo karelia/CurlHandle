@@ -9,11 +9,33 @@
 #import "CURLProtocol.h"
 #import "CURLHandleBasedTest.h"
 
-@interface CURLProtocolTests : CURLHandleBasedTest
+@interface CURLProtocolTests : CURLHandleBasedTest<NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
 @end
 
 @implementation CURLProtocolTests
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+{
+    self.error = error;
+    self.exitRunLoop = YES;
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    self.response = response;
+    self.buffer = [NSMutableData data];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)dataIn
+{
+    [self.buffer appendData:dataIn];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    self.exitRunLoop = YES;
+}
 
 - (void)testSimpleDownload
 {
