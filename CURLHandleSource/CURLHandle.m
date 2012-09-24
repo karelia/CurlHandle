@@ -201,7 +201,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 #define LOAD_REQUEST_SET_OPTION(option, parameter) if ((code = curl_easy_setopt(_curl, option, parameter)) != CURLE_OK) return code;
 
-- (CURLcode)setupRequest:(NSURLRequest *)request error:(NSError **)error
+- (CURLcode)setupRequest:(NSURLRequest *)request
 {
     NSAssert(_executing == NO, @"CURLHandle instances may not be accessed on multiple threads at once, or re-entrantly");
     _executing = YES;
@@ -585,7 +585,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
     @try
     {
-        code = [self setupRequest:request error:error];
+        code = [self setupRequest:request];
         if (code == CURLE_OK)
         {
             code = curl_easy_perform(_curl);
@@ -596,11 +596,24 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     {
         [self cleanup];
 
-        if (code != CURLE_OK)
+        if (code == CURLE_OK)
         {
+            if ([[self delegate] respondsToSelector:@selector(handleFinished:)])
+            {
+                [self.delegate handleDidFinish:self];
+            }
+
+        }
+        else
+        {
+            NSError* result = [self errorForURL:[request URL] code:code];
+            if ([[self delegate] respondsToSelector:@selector(handle:didFailWithError:)])
+            {
+                [self.delegate handle:self didFailWithError:result];
+            }
             if (error)
             {
-                *error = [self errorForURL:[request URL] code:code];
+                *error = result;
             }
         }
     }
@@ -610,24 +623,43 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return code == CURLE_OK;
 }
 
-- (BOOL)loadRequest:(NSURLRequest *)request forRunLoopSource:(CURLRunLoopSource *)source error:(NSError **)error
+- (BOOL)loadRequest:(NSURLRequest *)request forRunLoopSource:(CURLRunLoopSource *)source
 {
-    CURLcode code = CURLE_OK;
+    CURLcode code = CURLE_FAILED_INIT;
+    NSError* error = nil;
 
     @try
     {
-        code = [self setupRequest:request error:error];
+        code = [self setupRequest:request];
+    }
+
+    @finally
+    {
         if (code == CURLE_OK)
         {
             [source addHandle:self];
         }
-    }
-
-    @catch (NSException* exception)
-    {
+        else
+        {
+            if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
+            {
+                [self.delegate handle:self didFailWithError:error];
+            }
+        }
     }
 
     return code == CURLE_OK;
+}
+
+- (void)completeForRunLoopSource:(CURLRunLoopSource*)source
+{
+    if ([[self delegate] respondsToSelector:@selector(handleFinished:)])
+    {
+        [self.delegate handleDidFinish:self];
+    }
+
+    [self cleanup];
+    [source removeHandle:self];
 }
 
 - (void)cancel;

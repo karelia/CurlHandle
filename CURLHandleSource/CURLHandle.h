@@ -66,8 +66,8 @@ extern NSString				*sProxyUserIDAndPassword;
 // At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
 - (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
 
-- (BOOL)loadRequest:(NSURLRequest *)request forRunLoopSource:(CURLRunLoopSource *)source error:(NSError **)error;
-
+- (BOOL)loadRequest:(NSURLRequest *)request forRunLoopSource:(CURLRunLoopSource *)source;
+- (void)completeForRunLoopSource:(CURLRunLoopSource*)source;
 
 // Can be called from any thread. Causes -loadRequest:error: as soon as it can
 - (void)cancel;
@@ -94,6 +94,8 @@ extern NSString				*sProxyUserIDAndPassword;
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
 @optional
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
+- (void)handleDidFinish:(CURLHandle *)handle;
+- (void)handle:(CURLHandle*)handle didFailWithError:(NSError*)error;
 
 // When sending data to the server, this reports just before it goes out on the wire. Reports a length of 0 when the end of the data is written so you can get a nice heads up that an upload is about to complete
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten;
