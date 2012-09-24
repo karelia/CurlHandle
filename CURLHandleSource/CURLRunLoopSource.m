@@ -264,7 +264,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
                     CURLHandle* handle = [self handleWithEasyHandle:message->easy_handle];
                     if (handle)
                     {
-                        [handle completeForRunLoopSource:self];
+                        [handle completeUsingSource:self];
                     }
                     else
                     {

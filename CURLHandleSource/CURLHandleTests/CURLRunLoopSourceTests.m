@@ -55,7 +55,7 @@
 
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
 
-    BOOL ok = [handle loadRequest:request forRunLoopSource:source];
+    BOOL ok = [handle loadRequest:request usingSource:source];
     STAssertTrue(ok, @"failed to load request");
 
     [self runUntilDone];

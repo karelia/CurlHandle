@@ -623,7 +623,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return code == CURLE_OK;
 }
 
-- (BOOL)loadRequest:(NSURLRequest *)request forRunLoopSource:(CURLRunLoopSource *)source
+- (BOOL)loadRequest:(NSURLRequest *)request usingSource:(CURLRunLoopSource *)source
 {
     CURLcode code = CURLE_FAILED_INIT;
     NSError* error = nil;
@@ -651,7 +651,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return code == CURLE_OK;
 }
 
-- (void)completeForRunLoopSource:(CURLRunLoopSource*)source
+- (void)completeUsingSource:(CURLRunLoopSource*)source
 {
     if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
     {

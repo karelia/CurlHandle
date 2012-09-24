@@ -55,7 +55,7 @@
     // Turn automatic redirects off by default, so can properly report them to delegate
     curl_easy_setopt([handle curl], CURLOPT_FOLLOWLOCATION, NO);
     
-    [handle loadRequest:[self request] forRunLoopSource:source];
+    [handle loadRequest:[self request] usingSource:source];
 
     [handle release];
 }
