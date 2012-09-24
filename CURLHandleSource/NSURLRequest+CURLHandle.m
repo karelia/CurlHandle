@@ -13,7 +13,7 @@
 
 - (curl_usessl)curl_desiredSSLLevel;
 {
-    return [[NSURLProtocol propertyForKey:@"curl_desiredSSLLevel" inRequest:self] longValue];
+    return (curl_usessl)[[NSURLProtocol propertyForKey:@"curl_desiredSSLLevel" inRequest:self] longValue];
 }
 
 - (BOOL)curl_shouldVerifySSLCertificate;

@@ -9,6 +9,7 @@
 
 #import "CURLHandle.h"
 #import "CURLRunLoopSource.h"
+#import "CURLResponse.h"
 
 #import "NSURLRequest+CURLHandle.h"
 
