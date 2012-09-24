@@ -22,6 +22,12 @@
 		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; };
 		2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
 		2270F4A316108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
+		2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4A5161090AB009B6F98 /* CURLResponse.h */; };
+		2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A6161090AB009B6F98 /* CURLResponse.m */; };
+		2270F4A9161090AB009B6F98 /* CURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A6161090AB009B6F98 /* CURLResponse.m */; };
+		2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */; };
+		2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */; };
+		2270F4AE16109133009B6F98 /* NSString+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */; };
 		22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */; };
 		22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
 		22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
@@ -59,6 +65,10 @@
 		223FD0B1160B63F800BE1C80 /* DevNotes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = DevNotes.txt; path = ../../DevNotes.txt; sourceTree = "<group>"; };
 		2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+CURLHandle.h"; sourceTree = "<group>"; };
 		2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+CURLHandle.m"; sourceTree = "<group>"; };
+		2270F4A5161090AB009B6F98 /* CURLResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLResponse.h; sourceTree = "<group>"; };
+		2270F4A6161090AB009B6F98 /* CURLResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLResponse.m; sourceTree = "<group>"; };
+		2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+CURLHandle.h"; sourceTree = "<group>"; };
+		2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+CURLHandle.m"; sourceTree = "<group>"; };
 		22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+CURLHandle.h"; sourceTree = "<group>"; };
 		22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+CURLHandle.m"; sourceTree = "<group>"; };
 		22767EDD161079A2008D0848 /* NSMutableURLRequest+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableURLRequest+CURLHandle.h"; sourceTree = "<group>"; };
@@ -157,6 +167,8 @@
 				79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */,
 				27229B3814C83905007D0FF1 /* CURLProtocol.h */,
 				27229B3914C83905007D0FF1 /* CURLProtocol.m */,
+				2270F4A5161090AB009B6F98 /* CURLResponse.h */,
+				2270F4A6161090AB009B6F98 /* CURLResponse.m */,
 				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
 				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
 				275707671503E21C00363512 /* CURLFTPSession.h */,
@@ -165,6 +177,8 @@
 				22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */,
 				22767EDD161079A2008D0848 /* NSMutableURLRequest+CURLHandle.h */,
 				22767EDE161079A2008D0848 /* NSMutableURLRequest+CURLHandle.m */,
+				2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */,
+				2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */,
 				2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */,
 				2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */,
 			);
@@ -254,6 +268,8 @@
 				22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */,
 				22767EDF161079A2008D0848 /* NSMutableURLRequest+CURLHandle.h in Headers */,
 				2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */,
+				2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */,
+				2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -371,6 +387,8 @@
 				22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 				22767EE1161079A2008D0848 /* NSMutableURLRequest+CURLHandle.m in Sources */,
 				2270F4A316108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
+				2270F4A9161090AB009B6F98 /* CURLResponse.m in Sources */,
+				2270F4AE16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +403,8 @@
 				22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 				22767EE0161079A2008D0848 /* NSMutableURLRequest+CURLHandle.m in Sources */,
 				2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
+				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,
+				2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

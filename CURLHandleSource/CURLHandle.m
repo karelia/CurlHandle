@@ -20,128 +20,41 @@
 //#define DEBUGCURL 1
 //#define DEBUGCURL_SLOW
 
+#pragma mark - Constants
 
 NSString * const CURLcodeErrorDomain = @"se.haxx.curl.libcurl.CURLcode";
 NSString * const CURLMcodeErrorDomain = @"se.haxx.curl.libcurl.CURLMcode";
 NSString * const CURLSHcodeErrorDomain = @"se.haxx.curl.libcurl.CURLSHcode";
 
+#pragma mark - Globals
+
 BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
 SCDynamicStoreRef	sSCDSRef = NULL;
 NSString			*sProxyUserIDAndPassword = nil;
 
+#pragma mark - Callback Prototypes
 
-@interface CURLResponse : NSHTTPURLResponse
-{
-@private
-    NSInteger       _statusCode;
-    NSDictionary    *_headerFields;
-}
+int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose);
+static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
+static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
+static size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
+static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *handle);
 
-- (id)initWithURL:(NSURL *)URL statusCode:(NSInteger)statusCode headerString:(NSString *)headerString;
-
-@end
-
-@interface NSString ( CurlHTTPExtensions )
-
-- (NSString *) headerStatus;
-- (NSString *) headerHTTPVersion;
-- (NSString *) headerMatchingKey:(NSString *)inKey;
-- (NSArray *) headersMatchingKey:(NSString *)inKey;
-- (NSDictionary *) allHTTPHeaderFields;
-- (NSString *) headerKey;
-- (NSString *) headerValue;
-- (NSArray *) componentsSeparatedByLineSeparators;
-
-@end
-
-
-int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose)
-{
-    if (purpose == CURLSOCKTYPE_IPCXN)
-    {
-        // FTP control connections should be kept alive. However, I'm fairly sure this is unlikely to have a real effect in practice since OS X's default time before it starts sending keep alive packets is 2 hours :(
-        if ([[URL scheme] isEqualToString:@"ftp"])
-        {
-            int keepAlive = 1;
-            socklen_t keepAliveLen = sizeof(keepAlive);
-            int result = setsockopt(curlfd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, keepAliveLen);
-            
-            if (result)
-            {
-                NSLog(@"Unable to set FTP control connection keepalive with error:%i", result);
-                return 1;
-            }
-        }
-    }
-    
-    return 0;
-}
-
-/*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
-	we can use that to get back into Objective C and do the work with the class.
-"*/
-
-size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
-{
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:NO];
-}
-
-/*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
-	we can use that to get back into Objective C and do the work with the class.
-"*/
-
-size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
-{
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:YES];
-}
-
-/*"	Callback to provide a chunk of data for sending.  Since we pass "self" in as the "data pointer",
- we can use that to get back into Objective C and do the work with the class.
- "*/
-
-size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
-{
-    return [self curlReadPtr:ptr size:size number:nmemb];
-}
-
-int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
-{
-    if (infoType != CURLINFO_HEADER_IN && infoType != CURLINFO_HEADER_OUT) return 0;
-    if (![[self delegate] respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)]) return 0;
-    
-    
-    NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
-    if (!string)
-    {
-        // FTP servers are fairly free to use whatever encoding they like. We've run into one that appears to be Hungarian; as far as I can tell ISO Latin 2 is the best compromise for that
-        string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSISOLatin2StringEncoding];
-    }
-    
-    if (!string)
-    {
-        // I don't yet know what causes this, but it does happen from time to time. If so, insist that something useful go in the log
-        if (infoLength == 0)
-        {
-            string = [@"<NULL> debug info" retain];
-        }
-        else
-        {
-            string = [[NSString alloc] initWithFormat:@"Invalid debug info: %@", [NSData dataWithBytes:info length:infoLength]];
-        }
-    }
-    
-    [[self delegate] handle:self didReceiveDebugInformation:string ofType:infoType];
-    [string release];
-    
-    return 0;
-}
 
 @interface CURLHandle()
+
+#pragma mark - Private Methods
+
+- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
+- (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
+
+#pragma mark - Private Properties
 
 @property (assign, nonatomic) struct curl_slist* httpHeaders;
 @property (assign, nonatomic) struct curl_slist* postQuoteCommands;
 
 @end
+
 
 @implementation CURLHandle
 
@@ -214,12 +127,12 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 - (CURL *) curl
 {
-	return mCURL;
+	return _curl;
 }
 
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption
 {
-	[mStringOptions setObject:inString forKey:[NSNumber numberWithInt:inCurlOption]];
+	[_stringOptions setObject:inString forKey:[NSNumber numberWithInt:inCurlOption]];
 }
 
 + (NSString *) curlVersion
@@ -234,11 +147,12 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 - (void) dealloc
 {
-	curl_easy_cleanup(mCURL);
-	mCURL = nil;
+	curl_easy_cleanup(_curl);
+	_curl = nil;
 	[_headerBuffer release];
-	[mStringOptions release];
-	[mProxies release];
+	[_stringOptions release];
+	[_proxies release];
+    
 	[super dealloc];
 }
 
@@ -254,15 +168,15 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 #endif
 	if (self = [super init])
 	{
-		mCURL = curl_easy_init();
-		if (nil == mCURL)
+		_curl = curl_easy_init();
+		if (nil == _curl)
 		{
 			return nil;
 		}
         
-        mErrorBuffer[0] = 0;	// initialize the error buffer to empty
+        _errorBuffer[0] = 0;	// initialize the error buffer to empty
 		_headerBuffer = [[NSMutableData alloc] init];
-		mStringOptions = [[NSMutableDictionary alloc] init];
+		_stringOptions = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -284,7 +198,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
     return result;
 }
 
-#define LOAD_REQUEST_SET_OPTION(option, parameter) if ((code = curl_easy_setopt(mCURL, option, parameter)) != CURLE_OK) return code;
+#define LOAD_REQUEST_SET_OPTION(option, parameter) if ((code = curl_easy_setopt(_curl, option, parameter)) != CURLE_OK) return code;
 
 - (CURLcode)setupRequest:(NSURLRequest *)request error:(NSError **)error
 {
@@ -302,7 +216,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
     // SET OPTIONS -- NOTE THAT WE DON'T SET ANY STRINGS DIRECTLY AT THIS STAGE.
     // Put error messages here
-    LOAD_REQUEST_SET_OPTION(CURLOPT_ERRORBUFFER, &mErrorBuffer);
+    LOAD_REQUEST_SET_OPTION(CURLOPT_ERRORBUFFER, &_errorBuffer);
 
     LOAD_REQUEST_SET_OPTION(CURLOPT_FOLLOWLOCATION, YES);
     LOAD_REQUEST_SET_OPTION(CURLOPT_FAILONERROR, YES);
@@ -346,11 +260,11 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 
     // Set the options
-    NSEnumerator *theEnum = [mStringOptions keyEnumerator];
+    NSEnumerator *theEnum = [_stringOptions keyEnumerator];
     NSString *theKey;
     while (nil != (theKey = [theEnum nextObject]) )
     {
-        id theObject = [mStringOptions objectForKey:theKey];
+        id theObject = [_stringOptions objectForKey:theKey];
 
         if ([theObject isKindOfClass:[NSNumber class]])
         {
@@ -374,33 +288,33 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         NSString *scheme = [[[request URL] scheme] lowercaseString];
 
         // Allocate and keep the proxy dictionary
-        if (nil == mProxies)
+        if (nil == _proxies)
         {
-            mProxies = (NSDictionary *) SCDynamicStoreCopyProxies(sSCDSRef);
+            _proxies = (NSDictionary *) SCDynamicStoreCopyProxies(sSCDSRef);
         }
 
 
-        if (mProxies
+        if (_proxies
             && [scheme isEqualToString:@"http"]
-            && [[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPEnable)] boolValue] )
+            && [[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPEnable)] boolValue] )
         {
-            proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesHTTPProxy)];
-            proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPPort)];
+            proxyHost = (NSString *) [_proxies objectForKey:NSS(kSCPropNetProxiesHTTPProxy)];
+            proxyPort = (NSNumber *)[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPPort)];
         }
-        if (mProxies
+        if (_proxies
             && [scheme isEqualToString:@"https"]
-            && [[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSEnable)] boolValue] )
+            && [[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPSEnable)] boolValue] )
         {
-            proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSProxy)];
-            proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSPort)];
+            proxyHost = (NSString *) [_proxies objectForKey:NSS(kSCPropNetProxiesHTTPSProxy)];
+            proxyPort = (NSNumber *)[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPSPort)];
         }
 
-        if (mProxies
+        if (_proxies
             && [scheme isEqualToString:@"ftp"]
-            && [[mProxies objectForKey:NSS(kSCPropNetProxiesFTPEnable)] boolValue] )
+            && [[_proxies objectForKey:NSS(kSCPropNetProxiesFTPEnable)] boolValue] )
         {
-            proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesFTPProxy)];
-            proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesFTPPort)];
+            proxyHost = (NSString *) [_proxies objectForKey:NSS(kSCPropNetProxiesFTPProxy)];
+            proxyPort = (NSNumber *)[_proxies objectForKey:NSS(kSCPropNetProxiesFTPPort)];
         }
 
         if (proxyHost && proxyPort)
@@ -523,7 +437,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 - (NSError*)errorForURL:(NSURL*)url code:(CURLcode)code
 {
-    NSString *description = [NSString stringWithUTF8String:mErrorBuffer];
+    NSString *description = [NSString stringWithUTF8String:_errorBuffer];
 
     NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                      url, NSURLErrorFailingURLErrorKey,
@@ -532,13 +446,13 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                                      nil];
 
     long responseCode;
-    if (curl_easy_getinfo(mCURL, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
+    if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
     {
         [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]];
     }
 
     long osErrorNumber = 0;
-    if (curl_easy_getinfo(mCURL, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
+    if (curl_easy_getinfo(_curl, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
     {
         [userInfo setObject:[NSError errorWithDomain:NSPOSIXErrorDomain code:osErrorNumber userInfo:nil]
                      forKey:NSUnderlyingErrorKey];
@@ -630,7 +544,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         case CURLE_SSL_CACERT:
         {
             struct curl_certinfo *certInfo = NULL;
-            if (curl_easy_getinfo(mCURL, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
+            if (curl_easy_getinfo(_curl, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
             {
                 // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
             }
@@ -673,7 +587,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
         code = [self setupRequest:request error:error];
         if (code == CURLE_OK)
         {
-            code = curl_easy_perform(mCURL);
+            code = curl_easy_perform(_curl);
         }
     }
     
@@ -723,7 +637,7 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 - (NSString *)initialFTPPath;
 {
     char *entryPath;
-    if (curl_easy_getinfo(mCURL, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
+    if (curl_easy_getinfo(_curl, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
     
     return (entryPath ? [NSString stringWithUTF8String:entryPath] : nil);
 }
@@ -760,10 +674,10 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
                 [_headerBuffer setLength:0];
                 
                 long code;
-                if (curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
+                if (curl_easy_getinfo(_curl, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
                 {
                     char *urlBuffer;
-                    if (curl_easy_getinfo(mCURL, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
+                    if (curl_easy_getinfo(_curl, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
                     {
                         NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
                         if (urlString)
@@ -827,164 +741,87 @@ int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t in
 
 @end
 
-// -----------------------------------------------------------------------------
-#pragma mark ----- CATEGORIES
-// -----------------------------------------------------------------------------
-
-#pragma mark -
+#pragma mark - Callbacks
 
 
-@implementation NSString ( CurlHeaderExtensions )
 
-- (NSString *) headerStatus
+int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose)
 {
-	// Get the first line of the headers
-	NSArray *components = [self componentsSeparatedByLineSeparators];
-	NSString *theFirstLine = [components objectAtIndex:0];
-	// Pull out from the second "word"
-	NSArray *theLineComponents = [theFirstLine componentsSeparatedByString: @" "];
-	NSRange theRange = NSMakeRange(2, [theLineComponents count] - 2);
-	NSString *theResult = [[theLineComponents subarrayWithRange: theRange] componentsJoinedByString: @" "];
-	return theResult;
-}
-
-- (NSString *) headerHTTPVersion
-{
-	NSString *result = nil;
-	// Get the first "word" of the first line of the headers
-	NSRange whereSpace = [self rangeOfString:@" "];
-	if (NSNotFound != whereSpace.location)
-	{
-		result = [self substringToIndex:whereSpace.location];
-	}
-	return result;
-}
-
-/*"	Create an array of values from the HTTP headers string that match the given header key.
-"*/
-
-- (NSArray *) headersMatchingKey:(NSString *)inKey
-{
-	NSMutableArray *result = [NSMutableArray array];
-	NSArray *components = [self componentsSeparatedByLineSeparators];
-	NSEnumerator *theEnum = [components objectEnumerator];
-	NSString *theLine = [theEnum nextObject];		// result code -- ignore
-	(void)theLine;
-	while (nil != (theLine = [theEnum nextObject]) )
-	{
-		if ([[theLine headerKey] isEqualToString:inKey])
-		{
-			// Add it to the resulting array
-			[result addObject:[theLine headerValue]];
-		}
-	}
-	return result;
-}
-
-
-/*" Return a the single (first) value of a header.  Returns NULL if not found. "*/
-
-- (NSString *)headerMatchingKey:(NSString *)inKey
-{
-	NSString *result = nil;
-	NSArray *headerArray = [self headersMatchingKey:inKey];
-	if ([headerArray count] > 0)
-	{
-		result = [headerArray objectAtIndex:0];
-	}
-	return result;
-}
-
-
-/*"	Create a dictionary from the HTTP headers. "*/
-
-- (NSDictionary *) allHTTPHeaderFields;
-{
-	NSArray *components = [self componentsSeparatedByLineSeparators];
-	NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:[components count] - 1];
-	
-	NSEnumerator *theEnum = [components objectEnumerator];
-	NSString *theLine = [theEnum nextObject];		// result code -- ignore
-	(void)theLine;
-	while (nil != (theLine = [theEnum nextObject]) )
-	{
-		NSString *key = [theLine headerKey];
-		NSString *value = [theLine headerValue];
-		if (nil != key && nil != value)
-		{
-			// Add a single dictionary for this header name/value
-			[result setObject:value forKey:key];
-		}
-	}
-	return result;
-}
-
-/*" Given a line of a header, e.g. "Foo: Bar" "*/
-
-- (NSString *) headerKey
-{
-	NSString *result = nil;
-	NSRange whereColon = [self rangeOfString:@": "];
-	if (NSNotFound != whereColon.location)
-	{
-		result = [self substringToIndex:whereColon.location];
-	}
-	return result;
-}
-
-/*" Given a line of a header, e.g. "Foo: Bar", return the value in lowercase form, e.g. "bar". "*/
-
-- (NSString *) headerValue
-{
-	NSString *result = nil;
-	NSRange whereColon = [self rangeOfString:@": "];
-	if (NSNotFound != whereColon.location)
-	{
-		result = [self substringFromIndex:whereColon.location + 2];
-	}
-	return result;
-}
-
-
-/*"	Split a string into lines separated by any of the various newline characters.  Equivalent to componentsSeparatedByString:@"\n" but it works with the different line separators: \r, \n, \r\n, 0x2028, 0x2029 "*/
-
-- (NSArray *) componentsSeparatedByLineSeparators
-{
-	NSMutableArray *result	= [NSMutableArray array];
-	NSRange range = NSMakeRange(0,0);
-	NSUInteger start, end;
-	NSUInteger contentsEnd = 0;
-	
-	while (contentsEnd < [self length])
-	{
-		[self getLineStart:&start end:&end contentsEnd:&contentsEnd forRange:range];
-		[result addObject:[self substringWithRange:NSMakeRange(start,contentsEnd-start)]];
-		range.location = end;
-		range.length = 0;
-	}
-	return result;
-}
-@end
-
-
-@implementation CURLResponse
-
-- (id)initWithURL:(NSURL *)URL statusCode:(NSInteger)statusCode headerString:(NSString *)headerString;
-{
-    NSDictionary *fields = [headerString allHTTPHeaderFields];
-    
-    if (self = [self initWithURL:URL
-                        MIMEType:[fields objectForKey:@"Content-Type"]
-           expectedContentLength:[[fields objectForKey:@"Content-Length"] integerValue]
-                textEncodingName:[fields objectForKey:@"Content-Encoding"]])
+    if (purpose == CURLSOCKTYPE_IPCXN)
     {
-        _statusCode = statusCode;
-        _headerFields = [fields copy];
+        // FTP control connections should be kept alive. However, I'm fairly sure this is unlikely to have a real effect in practice since OS X's default time before it starts sending keep alive packets is 2 hours :(
+        if ([[URL scheme] isEqualToString:@"ftp"])
+        {
+            int keepAlive = 1;
+            socklen_t keepAliveLen = sizeof(keepAlive);
+            int result = setsockopt(curlfd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, keepAliveLen);
+
+            if (result)
+            {
+                NSLog(@"Unable to set FTP control connection keepalive with error:%i", result);
+                return 1;
+            }
+        }
     }
-    return self;
+
+    return 0;
 }
 
-- (NSInteger)statusCode; { return _statusCode; }
-- (NSDictionary *)allHeaderFields; { return _headerFields; }
+/*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
+ we can use that to get back into Objective C and do the work with the class.
+ "*/
 
-@end
+size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+{
+	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:NO];
+}
+
+/*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
+ we can use that to get back into Objective C and do the work with the class.
+ "*/
+
+size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+{
+	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:YES];
+}
+
+/*"	Callback to provide a chunk of data for sending.  Since we pass "self" in as the "data pointer",
+ we can use that to get back into Objective C and do the work with the class.
+ "*/
+
+size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
+{
+    return [self curlReadPtr:ptr size:size number:nmemb];
+}
+
+int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
+{
+    if (infoType != CURLINFO_HEADER_IN && infoType != CURLINFO_HEADER_OUT) return 0;
+    if (![[self delegate] respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)]) return 0;
+
+
+    NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
+    if (!string)
+    {
+        // FTP servers are fairly free to use whatever encoding they like. We've run into one that appears to be Hungarian; as far as I can tell ISO Latin 2 is the best compromise for that
+        string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSISOLatin2StringEncoding];
+    }
+
+    if (!string)
+    {
+        // I don't yet know what causes this, but it does happen from time to time. If so, insist that something useful go in the log
+        if (infoLength == 0)
+        {
+            string = [@"<NULL> debug info" retain];
+        }
+        else
+        {
+            string = [[NSString alloc] initWithFormat:@"Invalid debug info: %@", [NSData dataWithBytes:info length:infoLength]];
+        }
+    }
+
+    [[self delegate] handle:self didReceiveDebugInformation:string ofType:infoType];
+    [string release];
+
+    return 0;
+}
