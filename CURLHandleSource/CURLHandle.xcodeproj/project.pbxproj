@@ -19,6 +19,9 @@
 		223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
 		223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 223FD0B1160B63F800BE1C80 /* DevNotes.txt */; };
+		22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */; };
+		22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
+		22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		275707691503E21D00363512 /* CURLFTPSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 275707671503E21C00363512 /* CURLFTPSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -48,6 +51,8 @@
 		223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CURLHandleTests-Prefix.pch"; sourceTree = "<group>"; };
 		223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleTests.m; sourceTree = "<group>"; };
 		223FD0B1160B63F800BE1C80 /* DevNotes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = DevNotes.txt; path = ../../DevNotes.txt; sourceTree = "<group>"; };
+		22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+CURLHandle.h"; sourceTree = "<group>"; };
+		22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+CURLHandle.m"; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
 		275707671503E21C00363512 /* CURLFTPSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLFTPSession.h; sourceTree = "<group>"; };
@@ -146,6 +151,8 @@
 				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
 				275707671503E21C00363512 /* CURLFTPSession.h */,
 				275707681503E21C00363512 /* CURLFTPSession.m */,
+				22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */,
+				22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -230,6 +237,7 @@
 				27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */,
 				275707691503E21D00363512 /* CURLFTPSession.h in Headers */,
 				221EAD11160B167900E4F270 /* CURLRunLoopSource.h in Headers */,
+				22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,6 +352,7 @@
 				223FD0A9160B55C200BE1C80 /* CURLRunLoopSource.m in Sources */,
 				223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */,
 				223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */,
+				22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -355,6 +364,7 @@
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
 				2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */,
 				221EAD12160B167900E4F270 /* CURLRunLoopSource.m in Sources */,
+				22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,6 +549,7 @@
 				223FD0A8160B523700BE1C80 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

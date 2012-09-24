@@ -129,8 +129,19 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     return result == CURLM_OK;
 }
 
+- (void)removeAllHandles
+{
+    for (CURLHandle* handle in self.handles)
+    {
+        curl_multi_remove_handle(self.multi, [handle curl]);
+    }
+
+    [self.handles removeAllObjects];
+}
+
 - (void)shutdown
 {
+    [self removeAllHandles];
     [self releaseThread];
     [self releaseSource];
     CURLHandleLog(@"shutdown");

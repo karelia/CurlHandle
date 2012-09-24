@@ -148,15 +148,4 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 @end
 
 
-#pragma mark -
-
-
-@interface NSDictionary ( CurlHTTPExtensions )
-
-- (NSString *) formatForHTTP;
-- (NSString *) formatForHTTPUsingEncoding:(NSStringEncoding)inEncoding;
-- (NSString *) formatForHTTPUsingEncoding:(NSStringEncoding)inEncoding ordering:(NSArray *)inOrdering;
-
-@end
-
 
