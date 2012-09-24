@@ -129,6 +129,21 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     return result == CURLM_OK;
 }
 
+- (CURLHandle*)handleWithEasyHandle:(CURL*)easy
+{
+    CURLHandle* result = nil;
+    for (CURLHandle* handle in self.handles)
+    {
+        if ([handle curl] == easy)
+        {
+            result = handle;
+            break;
+        }
+    }
+
+    return result;
+}
+
 - (void)removeAllHandles
 {
     for (CURLHandle* handle in self.handles)
@@ -246,7 +261,17 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
                 CURLHandleLog(@"got multi message %d", message->msg);
                 if (message->msg == CURLMSG_DONE)
                 {
-                    curl_multi_remove_handle(multi, message->easy_handle);
+                    CURLHandle* handle = [self handleWithEasyHandle:message->easy_handle];
+                    if (handle)
+                    {
+                        [handle completeForRunLoopSource:self];
+                    }
+                    else
+                    {
+                        // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
+                        CURLHandleLog(@"seem to have an easy handle without a matching CURLHandle");
+                        curl_multi_remove_handle(multi, message->easy_handle);
+                    }
                 }
             }
         }
@@ -257,5 +282,6 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
     CURLHandleLog(@"finished monitor thread");
 }
+
 
 @end
