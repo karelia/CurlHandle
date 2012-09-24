@@ -59,7 +59,12 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 @implementation CURLRunLoopSource
 
-@synthesize source;
+@synthesize handleAdded = _handleAdded;
+@synthesize handles = _handles;
+@synthesize multi = _multi;
+@synthesize source = _source;
+@synthesize thread = _thread;
+@synthesize timeout = _timeout;
 
 - (id)init
 {

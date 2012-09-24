@@ -8,10 +8,20 @@
 
 #import <Foundation/Foundation.h>
 
+#import <curl/curl.h>
+
 @class CURLHandle;
 
 @interface CURLRunLoopSource : NSObject
+{
+    CFRunLoopSourceRef _source;
+    NSThread* _thread;
+    CURLM* _multi;
+    BOOL _handleAdded;
+    NSMutableArray* _handles;
+    struct timeval _timeout;
 
+}
 - (id)init;
 
 - (void)addToRunLoop:(NSRunLoop*)runLoop;

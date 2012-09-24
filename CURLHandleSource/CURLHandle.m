@@ -59,6 +59,9 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 @implementation CURLHandle
 
+@synthesize httpHeaders = _httpHeaders;
+@synthesize postQuoteCommands = _postQuoteCommands;
+
 /*"	CURLHandle is a wrapper around a CURL.
 	This is in the public domain, but please report any improvements back to the author
 	(dwood_karelia_com).
@@ -148,12 +151,14 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (void) dealloc
 {
+    [self cleanup];
+
 	curl_easy_cleanup(_curl);
 	_curl = nil;
 	[_headerBuffer release];
-	[_stringOptions release];
 	[_proxies release];
-    
+	[_stringOptions release];
+
 	[super dealloc];
 }
 
