@@ -15,7 +15,9 @@
 @property (strong, nonatomic) __attribute__((NSObject)) CFRunLoopSourceRef source;
 @property (strong, nonatomic) NSThread* thread;
 @property (assign, nonatomic) CURLM* multi;
+@property (assign, atomic) BOOL handleAdded;
 @property (strong, nonatomic) NSMutableArray* handles;
+@property (assign, nonatomic) struct timeval timeout;
 
 @end
 
@@ -24,6 +26,7 @@
 static void schedule(void *info, CFRunLoopRef rl, CFStringRef mode);
 static void cancel(void *info, CFRunLoopRef rl, CFStringRef mode);
 static void perform(void *info);
+static int timeout_changed(CURLM *multi, long timeout_ms, void *userp);
 
 static void schedule(void *info, CFRunLoopRef rl, CFStringRef mode)
 {
@@ -40,6 +43,20 @@ static void perform(void *info)
     CURLHandleLog(@"runloop performed");
 }
 
+int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
+{
+    CURLRunLoopSource* source = userp;
+
+    struct timeval timeout;
+    timeout.tv_sec = timeout_ms / 1000;
+    timeout.tv_usec = (timeout_ms % 1000) * 1000;
+    source.timeout = timeout;
+
+    CURLHandleLog(@"timeout changed to %ldms", timeout_ms);
+
+    return CURLM_OK;
+}
+
 @implementation CURLRunLoopSource
 
 @synthesize source;
@@ -49,6 +66,10 @@ static void perform(void *info)
     if ((self = [super init]) != nil)
     {
         self.handles = [NSMutableArray array];
+        struct timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 1000;
+        self.timeout = timeout;
     }
 
     return self;
@@ -95,6 +116,7 @@ static void perform(void *info)
 {
     [self.handles addObject:handle];
     CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
+    self.handleAdded = YES;
 
     return result == CURLM_OK;
 }
@@ -178,14 +200,24 @@ static void perform(void *info)
     CURLM* multi = curl_multi_init();
     self.multi = multi;
 
+    curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_changed);
+    curl_multi_setopt(multi, CURLMOPT_TIMERDATA, self);
+    
     static int MAX_FDS = 128;
     fd_set read_fds;
     fd_set write_fds;
     fd_set exc_fds;
     int count = MAX_FDS;
 
+
     while (![self.thread isCancelled])
     {
+        if (self.handleAdded)
+        {
+            curl_multi_perform(multi, &count);
+            self.handleAdded = NO;
+        }
+        
         FD_ZERO(&read_fds);
         FD_ZERO(&write_fds);
         FD_ZERO(&exc_fds);
@@ -193,24 +225,17 @@ static void perform(void *info)
         CURLMcode result = curl_multi_fdset(multi, &read_fds, &write_fds, &exc_fds, &count);
         if (result == CURLM_OK)
         {
-            long timeoutMilliseconds;
-            curl_multi_timeout(multi, &timeoutMilliseconds);
-            struct timeval timeout;
-            timeout.tv_sec = timeoutMilliseconds / 1000;
-            timeout.tv_usec = (timeoutMilliseconds % 1000) * 1000;
+            struct timeval timeout = self.timeout;
+            count = select(count + 1, &read_fds, &write_fds, &exc_fds, &timeout);
+            curl_multi_perform(multi, &count);
 
-            int ready = select(count, &read_fds, &write_fds, &exc_fds, &timeout);
-            if (ready > 0)
+            CURLMsg* message;
+            while ((message = curl_multi_info_read(multi, &count)) != nil)
             {
-                curl_multi_perform(multi, &count);
-
-                CURLMsg* message;
-                while ((message = curl_multi_info_read(multi, &count)) != nil)
+                CURLHandleLog(@"got multi message %d", message->msg);
+                if (message->msg == CURLMSG_DONE)
                 {
-                    if (message->msg == CURLMSG_DONE)
-                    {
-                        curl_multi_remove_handle(multi, message->easy_handle);
-                    }
+                    curl_multi_remove_handle(multi, message->easy_handle);
                 }
             }
         }
