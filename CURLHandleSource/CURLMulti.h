@@ -1,5 +1,5 @@
 //
-//  CURLRunLoopSource.h
+//  CURLMulti.h
 //
 //  Created by Sam Deane on 20/09/2012.
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
@@ -11,7 +11,7 @@
 
 @class CURLHandle;
 
-@interface CURLRunLoopSource : NSObject
+@interface CURLMulti : NSObject
 {
     NSThread* _thread;
     CURLM* _multi;

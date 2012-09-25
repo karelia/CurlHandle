@@ -8,7 +8,7 @@
 //
 
 #import "CURLHandle.h"
-#import "CURLRunLoopSource.h"
+#import "CURLMulti.h"
 #import "CURLResponse.h"
 
 #import "NSURLRequest+CURLHandle.h"
@@ -628,7 +628,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return code == CURLE_OK;
 }
 
-- (BOOL)loadRequest:(NSURLRequest *)request usingSource:(CURLRunLoopSource *)source
+- (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti *)multi
 {
     CURLcode code = CURLE_FAILED_INIT;
     NSError* error = nil;
@@ -642,7 +642,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     {
         if (code == CURLE_OK)
         {
-            [source addHandle:self error:&error];
+            [multi addHandle:self error:&error];
         }
         else
         {
@@ -656,7 +656,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return code == CURLE_OK;
 }
 
-- (void)completeUsingSource:(CURLRunLoopSource*)source
+- (void)completeWithMulti:(CURLMulti *)multi
 {
     if (!_cancelled)
     {
@@ -667,7 +667,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     }
 
     NSError* error = nil;
-    [source removeHandle:self error:&error];
+    [multi removeHandle:self error:&error];
     [self cleanup];
 }
 

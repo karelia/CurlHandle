@@ -9,13 +9,13 @@
 /* Begin PBXBuildFile section */
 		22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22002EDC161097EC00464D33 /* CURLProtocolTests.m */; };
 		22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
-		221EAD11160B167900E4F270 /* CURLRunLoopSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */; };
-		221EAD12160B167900E4F270 /* CURLRunLoopSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLRunLoopSource.m */; };
+		221EAD11160B167900E4F270 /* CURLMulti.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMulti.h */; };
+		221EAD12160B167900E4F270 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
 		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
 		223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD096160B523700BE1C80 /* Cocoa.framework */; };
 		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
-		223FD0A4160B523700BE1C80 /* CURLRunLoopSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLRunLoopSourceTests.m */; };
-		223FD0A9160B55C200BE1C80 /* CURLRunLoopSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLRunLoopSource.m */; };
+		223FD0A4160B523700BE1C80 /* CURLMultiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLMultiTests.m */; };
+		223FD0A9160B55C200BE1C80 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
 		223FD0AA160B564800BE1C80 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C5DA93115AFD699006F518F /* libcurl.4.dylib */; };
 		223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */; };
 		223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
@@ -50,8 +50,8 @@
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		22002EDC161097EC00464D33 /* CURLProtocolTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocolTests.m; sourceTree = "<group>"; };
-		221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLRunLoopSource.h; sourceTree = "<group>"; };
-		221EAD10160B167900E4F270 /* CURLRunLoopSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLRunLoopSource.m; sourceTree = "<group>"; };
+		221EAD0F160B167900E4F270 /* CURLMulti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMulti.h; sourceTree = "<group>"; };
+		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
 		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		223FD094160B523700BE1C80 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		223FD096160B523700BE1C80 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
@@ -60,7 +60,7 @@
 		223FD09B160B523700BE1C80 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
 		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		223FD0A3160B523700BE1C80 /* CURLRunLoopSourceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLRunLoopSourceTests.m; sourceTree = "<group>"; };
+		223FD0A3160B523700BE1C80 /* CURLMultiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLMultiTests.m; sourceTree = "<group>"; };
 		223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CURLHandleTests-Prefix.pch"; sourceTree = "<group>"; };
 		223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleTests.m; sourceTree = "<group>"; };
 		223FD0B1160B63F800BE1C80 /* DevNotes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = DevNotes.txt; path = ../../DevNotes.txt; sourceTree = "<group>"; };
@@ -162,8 +162,8 @@
 			children = (
 				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
 				79B96CBC0A6360F90060AC12 /* CURLHandle.m */,
-				221EAD0F160B167900E4F270 /* CURLRunLoopSource.h */,
-				221EAD10160B167900E4F270 /* CURLRunLoopSource.m */,
+				221EAD0F160B167900E4F270 /* CURLMulti.h */,
+				221EAD10160B167900E4F270 /* CURLMulti.m */,
 				79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */,
 				79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */,
 				27229B3814C83905007D0FF1 /* CURLProtocol.h */,
@@ -231,7 +231,7 @@
 				229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */,
 				223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */,
 				22002EDC161097EC00464D33 /* CURLProtocolTests.m */,
-				223FD0A3160B523700BE1C80 /* CURLRunLoopSourceTests.m */,
+				223FD0A3160B523700BE1C80 /* CURLMultiTests.m */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
 			path = CURLHandleTests;
@@ -266,7 +266,7 @@
 				79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */,
 				27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */,
 				275707691503E21D00363512 /* CURLFTPSession.h in Headers */,
-				221EAD11160B167900E4F270 /* CURLRunLoopSource.h in Headers */,
+				221EAD11160B167900E4F270 /* CURLMulti.h in Headers */,
 				22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */,
 				2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */,
 				2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */,
@@ -381,8 +381,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				223FD0A4160B523700BE1C80 /* CURLRunLoopSourceTests.m in Sources */,
-				223FD0A9160B55C200BE1C80 /* CURLRunLoopSource.m in Sources */,
+				223FD0A4160B523700BE1C80 /* CURLMultiTests.m in Sources */,
+				223FD0A9160B55C200BE1C80 /* CURLMulti.m in Sources */,
 				223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */,
 				223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */,
 				22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
@@ -402,7 +402,7 @@
 				79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */,
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
 				2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */,
-				221EAD12160B167900E4F270 /* CURLRunLoopSource.m in Sources */,
+				221EAD12160B167900E4F270 /* CURLMulti.m in Sources */,
 				22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 				2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
 				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,

@@ -12,7 +12,7 @@
 #define CURLHandleLog NSLog
 #endif
 
-@class CURLRunLoopSource;
+@class CURLMulti;
 
 @protocol CURLHandleDelegate;
 
@@ -68,8 +68,8 @@ extern NSString				*sProxyUserIDAndPassword;
 #pragma mark - RunLoop Support
 
 @interface CURLHandle(RunLoopSupport)
-- (BOOL)loadRequest:(NSURLRequest *)request usingSource:(CURLRunLoopSource *)source;
-- (void)completeUsingSource:(CURLRunLoopSource*)source;
+- (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti*)multi;
+- (void)completeWithMulti:(CURLMulti*)multi;
 @end
 
 #pragma mark - Old API

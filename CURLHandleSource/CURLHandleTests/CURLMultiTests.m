@@ -1,46 +1,42 @@
 //
-//  CURLRunLoopSourceTests.m
+//  CURLMultiTests.m
 //
 //  Created by Sam Deane on 20/09/2012.
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
-#import "CURLRunLoopSource.h"
+#import "CURLMulti.h"
 #import "CURLHandleBasedTest.h"
 
-@interface CURLRunLoopSource(PrivateUnitTestOnly)
-- (CFRunLoopSourceRef)source;
-@end
-
-@interface CURLRunLoopSourceTests : CURLHandleBasedTest
+@interface CURLMultiTests : CURLHandleBasedTest
 
 @end
 
-@implementation CURLRunLoopSourceTests
+@implementation CURLMultiTests
 
 - (void)testStartupShutdown
 {
-    CURLRunLoopSource* source = [[CURLRunLoopSource alloc] init];
+    CURLMulti* multi = [[CURLMulti alloc] init];
 
-    [source startup];
+    [multi startup];
 
-    [source shutdown];
+    [multi shutdown];
 
-    [source release];
+    [multi release];
 }
 
 - (void)testHandleWithLoop
 {
-    CURLRunLoopSource* source = [[CURLRunLoopSource alloc] init];
+    CURLMulti* multi = [[CURLMulti alloc] init];
 
-    [source startup];
+    [multi startup];
 
     CURLHandle* handle = [[CURLHandle alloc] init];
     handle.delegate = self;
 
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
 
-    BOOL ok = [handle loadRequest:request usingSource:source];
+    BOOL ok = [handle loadRequest:request withMulti:multi];
     STAssertTrue(ok, @"failed to load request");
 
     [self runUntilDone];
@@ -49,9 +45,9 @@
 
     [handle release];
 
-    [source shutdown];
+    [multi shutdown];
 
-    [source release];
+    [multi release];
 
 }
 @end

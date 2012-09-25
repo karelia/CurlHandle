@@ -6,7 +6,6 @@
 //
 
 #import "CURLHandleBasedTest.h"
-#import "CURLRunLoopSource.h"
 
 @implementation CURLHandleBasedTest
 

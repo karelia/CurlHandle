@@ -1,15 +1,15 @@
 //
-//  CURLRunLoopSource.m
+//  CURLMulti.m
 //
 //  Created by Sam Deane on 20/09/2012.
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
-#import "CURLRunLoopSource.h"
+#import "CURLMulti.h"
 
 #import "CURLHandle.h"
 
-@interface CURLRunLoopSource()
+@interface CURLMulti()
 
 @property (strong, nonatomic) NSThread* thread;
 @property (assign, nonatomic) CURLM* multi;
@@ -24,7 +24,7 @@ static int timeout_changed(CURLM *multi, long timeout_ms, void *userp);
 
 int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
-    CURLRunLoopSource* source = userp;
+    CURLMulti* source = userp;
 
     struct timeval timeout;
     timeout.tv_sec = timeout_ms / 1000;
@@ -36,7 +36,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     return CURLM_OK;
 }
 
-@implementation CURLRunLoopSource
+@implementation CURLMulti
 
 @synthesize handles = _handles;
 @synthesize multi = _multi;
@@ -189,7 +189,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
                     CURLHandle* handle = [self handleWithEasyHandle:message->easy_handle];
                     if (handle)
                     {
-                        [handle completeUsingSource:self];
+                        [handle completeWithMulti:self];
                     }
                     else
                     {

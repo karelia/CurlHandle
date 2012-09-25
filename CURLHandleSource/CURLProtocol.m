@@ -6,7 +6,7 @@
 //
 
 #import "CURLProtocol.h"
-#import "CURLRunLoopSource.h"
+#import "CURLMulti.h"
 #import "CURLHandle.h"
 #import "NSURLRequest+CURLHandle.h"
 
@@ -14,7 +14,7 @@
 
 @property (strong, nonatomic) CURLHandle* handle;
 
-- (CURLRunLoopSource*)sourceForCurrentRunLoop;
+- (CURLMulti*)multiForCurrentRunLoop;
 
 @end
 
@@ -46,7 +46,7 @@
 
 - (void)startLoading;
 {
-    CURLRunLoopSource* source = [self sourceForCurrentRunLoop];
+    CURLMulti* multi = [self multiForCurrentRunLoop];
 
     CURLHandle *handle = [[CURLHandle alloc] init];
     [handle setDelegate:self];
@@ -54,7 +54,7 @@
     // Turn automatic redirects off by default, so can properly report them to delegate
     curl_easy_setopt([handle curl], CURLOPT_FOLLOWLOCATION, NO);
     
-    [handle loadRequest:[self request] usingSource:source];
+    [handle loadRequest:[self request] withMulti:multi];
 
     self.handle = handle;
     [handle release];
@@ -62,29 +62,29 @@
 
 - (void)stopLoading;
 {
-    CURLRunLoopSource* source = [self sourceForCurrentRunLoop];
+    CURLMulti* multi = [self multiForCurrentRunLoop];
 
     [self.handle cancel];
-    [self.handle completeUsingSource:source];
+    [self.handle completeWithMulti:multi];
     self.handle = nil;
 }
 
 #pragma mark - Utilities
 
 
-- (CURLRunLoopSource*)sourceForCurrentRunLoop
+- (CURLMulti*)multiForCurrentRunLoop
 {
-    // TODO: need to create a new source for each run loop?
+    // TODO: need to create a new multi for each run loop?
 
-    static CURLRunLoopSource* gSource = nil;
+    static CURLMulti* gMulti = nil;
 
-    if (!gSource)
+    if (!gMulti)
     {
-        gSource = [[CURLRunLoopSource alloc] init];
-        [gSource startup];
+        gMulti = [[CURLMulti alloc] init];
+        [gMulti startup];
     }
 
-    return gSource;
+    return gMulti;
 }
 
 
