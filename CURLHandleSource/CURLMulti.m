@@ -48,19 +48,23 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
     if ((self = [super init]) != nil)
     {
-        self.multi = curl_multi_init(); // TODO: check for failure here?
-        curl_multi_setopt(self.multi, CURLMOPT_TIMERFUNCTION, timeout_changed);
-        curl_multi_setopt(self.multi, CURLMOPT_TIMERDATA, self);
-
-        self.handles = [NSMutableArray array];
-        NSOperationQueue* queue = [[NSOperationQueue alloc] init];
-        queue.maxConcurrentOperationCount = 1;
-        self.queue = queue;
-        [queue release];
-        struct timeval timeout;
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 1000;
-        self.timeout = timeout;
+        if ([self createMulti] == CURLM_OK)
+        {
+            self.handles = [NSMutableArray array];
+            NSOperationQueue* queue = [[NSOperationQueue alloc] init];
+            queue.maxConcurrentOperationCount = 1;
+            self.queue = queue;
+            [queue release];
+            struct timeval timeout;
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 1000;
+            self.timeout = timeout;
+        }
+        else
+        {
+            [self release];
+            self = nil;
+        }
     }
 
     return self;
@@ -139,10 +143,36 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
         [self releaseThread];
         [self.queue waitUntilAllOperationsAreFinished];
 
-        curl_multi_cleanup(self.multi);
-        self.multi = nil;
+        [self releaseMulti];
         CURLHandleLog(@"shutdown");
     }
+}
+
+
+- (CURLMcode)createMulti
+{
+    CURLMcode result = CURLM_OK;
+    CURLM* multi = curl_multi_init();
+    if (multi)
+    {
+        result = curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_changed);
+        if (result == CURLM_OK)
+        {
+            result = curl_multi_setopt(self.multi, CURLMOPT_TIMERDATA, self);
+            if (result == CURLM_OK)
+            {
+                self.multi = multi;
+            }
+        }
+    }
+
+    return result;
+}
+
+- (void)releaseMulti
+{
+    curl_multi_cleanup(self.multi);
+    self.multi = nil;
 }
 
 - (BOOL)createThread // TODO: turn this into getter
