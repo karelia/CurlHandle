@@ -7,7 +7,7 @@
 //
 
 #import "CURLFTPSession.h"
-#import "NSMutableURLRequest+CURLHandle.h"
+#import "NSURLRequest+CURLHandle.h"
 
 @implementation CURLFTPSession
 

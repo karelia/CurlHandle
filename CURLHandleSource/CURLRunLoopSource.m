@@ -1,9 +1,8 @@
 //
 //  CURLRunLoopSource.m
-//  CURLHandle
 //
 //  Created by Sam Deane on 20/09/2012.
-//
+//  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
 #import "CURLRunLoopSource.h"
