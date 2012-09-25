@@ -41,6 +41,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 @synthesize handles = _handles;
 @synthesize multi = _multi;
+@synthesize queue = _queue;
 @synthesize thread = _thread;
 @synthesize timeout = _timeout;
 

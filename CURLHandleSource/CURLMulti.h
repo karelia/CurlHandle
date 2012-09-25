@@ -15,9 +15,9 @@
 {
     NSThread* _thread;
     CURLM* _multi;
+    NSOperationQueue* _queue;
     NSMutableArray* _handles;
     struct timeval _timeout;
-
 }
 
 + (CURLMulti*)sharedInstance;
