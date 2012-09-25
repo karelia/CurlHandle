@@ -81,7 +81,7 @@
     if (!gSource)
     {
         gSource = [[CURLRunLoopSource alloc] init];
-        [gSource addToRunLoop:[NSRunLoop currentRunLoop]];
+        [gSource scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
     }
 
     return gSource;

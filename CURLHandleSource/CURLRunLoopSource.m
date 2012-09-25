@@ -21,25 +21,7 @@
 
 #pragma mark - Callbacks
 
-static void schedule(void *info, CFRunLoopRef rl, CFStringRef mode);
-static void cancel(void *info, CFRunLoopRef rl, CFStringRef mode);
-static void perform(void *info);
 static int timeout_changed(CURLM *multi, long timeout_ms, void *userp);
-
-static void schedule(void *info, CFRunLoopRef rl, CFStringRef mode)
-{
-    CURLHandleLog(@"runloop scheduled for mode %@", mode);
-}
-
-static void cancel(void *info, CFRunLoopRef rl, CFStringRef mode)
-{
-    CURLHandleLog(@"runloop cancelled for mode %@", mode);
-}
-
-static void perform(void *info)
-{
-    CURLHandleLog(@"runloop performed");
-}
 
 int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
@@ -87,17 +69,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     [super dealloc];
 }
 
-- (void)addToRunLoop:(NSRunLoop*)runLoop
-{
-    [self addToRunLoop:runLoop mode:(NSString*)kCFRunLoopCommonModes];
-}
-
-- (void)removeFromRunLoop:(NSRunLoop*)runLoop
-{
-    [self removeFromRunLoop:runLoop mode:(NSString*)kCFRunLoopCommonModes];
-}
-
-- (void)addToRunLoop:(NSRunLoop*)runLoop mode:(NSString*)mode;
+- (void)scheduleInRunLoop:(NSRunLoop *)runLoop forMode:(NSString *)mode
 
 {
     if ([self createSource])
@@ -108,13 +80,13 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     }
 }
 
-- (void)removeFromRunLoop:(NSRunLoop*)runLoop mode:(NSString*)mode;
+- (void)unscheduleFromRunLoop:(NSRunLoop *)runLoop forMode:(NSString *)mode
 {
     CFRunLoopRef cf = [runLoop getCFRunLoop];
     CFRunLoopRemoveSource(cf, self.source, (CFStringRef)mode);
 }
 
-- (BOOL)addHandle:(CURLHandle*)handle
+- (BOOL)addHandle:(CURLHandle*)handle error:(NSError**)error
 {
     [self.handles addObject:handle];
     CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
@@ -122,7 +94,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     return result == CURLM_OK;
 }
 
-- (BOOL)removeHandle:(CURLHandle*)handle
+- (BOOL)removeHandle:(CURLHandle*)handle error:(NSError**)error
 {
     CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
     [self.handles removeObject:handle];
@@ -170,9 +142,6 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
         CFRunLoopSourceContext context;
         memset(&context, 0, sizeof(context));
         context.info = self;
-        context.schedule = schedule;
-        context.perform = perform;
-        context.cancel = cancel;
         self.source = CFRunLoopSourceCreate(nil, 0, &context);
         CURLHandleLog(self.source ? @"created source" : @"failed to create source");
 
@@ -191,7 +160,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     }
 }
 
-- (BOOL)createThread
+- (BOOL)createThread // TODO: turn this into getter
 {
     if (!self.thread)
     {

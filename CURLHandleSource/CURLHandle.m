@@ -642,7 +642,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     {
         if (code == CURLE_OK)
         {
-            [source addHandle:self];
+            [source addHandle:self error:&error];
         }
         else
         {
@@ -666,8 +666,9 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         }
     }
 
+    NSError* error = nil;
+    [source removeHandle:self error:&error];
     [self cleanup];
-    [source removeHandle:self];
 }
 
 - (void)cancel;

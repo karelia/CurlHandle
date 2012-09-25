@@ -24,13 +24,13 @@
 
     NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
 
-    [source addToRunLoop:runLoop];
+    [source scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
 
     CFRunLoopRef cf = [runLoop getCFRunLoop];
     BOOL sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
     STAssertTrue(sourceAttachedToLoop, @"added source to runloop");
 
-    [source removeFromRunLoop:runLoop];
+    [source unscheduleFromRunLoop:runLoop forMode:NSRunLoopCommonModes];
     sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
     STAssertFalse(sourceAttachedToLoop, @"removed source from runloop");
 
@@ -45,7 +45,7 @@
 
     NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
 
-    [source addToRunLoop:runLoop];
+    [source scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
 
     CFRunLoopRef cf = [runLoop getCFRunLoop];
     BOOL sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
@@ -64,7 +64,7 @@
 
     [handle release];
 
-    [source removeFromRunLoop:runLoop];
+    [source unscheduleFromRunLoop:runLoop forMode:NSRunLoopCommonModes];
     sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
 
     [source shutdown];
