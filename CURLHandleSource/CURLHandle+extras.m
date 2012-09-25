@@ -4,8 +4,6 @@
 // Created by Dan Wood <dwood@karelia.com> on Mon Oct 01 2001.
 // This is in the public domain, but please report any improvements back to the author.
 //
-//	The current version of CURLHandle is 1.9.
-//
 
 #import "CURLHandle+extras.h"
 
