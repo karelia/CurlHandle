@@ -248,7 +248,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     {
         struct timeval timeout = self.timeout;
         count = select(count + 1, &read_fds, &write_fds, &exc_fds, &timeout);
-        curl_multi_perform(self.multi, &count);
+        result = curl_multi_perform(self.multi, &count);
 
         CURLMsg* message;
         while ((message = curl_multi_info_read(self.multi, &count)) != nil)
@@ -268,13 +268,18 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
                 {
                     // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
                     CURLHandleLog(@"seem to have an easy handle without a matching CURLHandle");
-                    curl_multi_remove_handle(self.multi, message->easy_handle);
+                    result = curl_multi_remove_handle(self.multi, message->easy_handle);
                 }
             }
         }
     }
 
-    if (!self.cancelled)
+    if (result != CURLM_OK)
+    {
+        CURLHandleLog(@"curl error encountered whilst monitoring multi %d", result);
+    }
+
+    if ((result == CURLM_OK) && !self.cancelled)
     {
         [self.queue addOperationWithBlock:^{
             [self monitorMulti];
