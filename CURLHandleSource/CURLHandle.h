@@ -69,9 +69,10 @@ extern NSString				*sProxyUserIDAndPassword;
 
 #pragma mark - RunLoop Support
 
-@interface CURLHandle(RunLoopSupport)
+@interface CURLHandle(MultiSupport)
 - (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti*)multi;
-- (void)completeWithCode:(CURLMcode)code withMulti:(CURLMulti*)multi;
+- (void)completeWithCode:(CURLMcode)code;
+- (BOOL)hasCompleted;
 @end
 
 #pragma mark - Old API

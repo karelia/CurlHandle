@@ -62,10 +62,12 @@
 
 - (void)stopLoading;
 {
-    CURLMulti* multi = [self multiForCurrentRunLoop];
+    if (![self.handle hasCompleted])
+    {
+        CURLMulti* multi = [self multiForCurrentRunLoop];
+        [multi cancelHandle:self.handle];
+    }
 
-    [self.handle cancel];
-    [self.handle completeWithCode:CURLM_CANCELLED withMulti:multi];
     self.handle = nil;
 }
 

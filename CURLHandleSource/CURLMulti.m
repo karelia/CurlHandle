@@ -96,7 +96,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
         }
         else
         {
-            [handle completeWithCode:result withMulti:self.multi];
+            [handle completeWithCode:result];
         }
     }];
 }
@@ -104,11 +104,28 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 - (void)removeHandle:(CURLHandle*)handle
 {
     [self.queue addOperationWithBlock:^{
-        CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
-        NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
-        [self.handles removeObject:handle];
+        [self removeHandleInternal:handle];
     }];
 
+}
+
+- (void)cancelHandle:(CURLHandle*)handle
+{
+    [self.queue addOperationWithBlock:^{
+        [handle retain];
+        [self removeHandleInternal:handle];
+        [handle cancel];
+        [handle completeWithCode:CURLM_CANCELLED];
+        [handle release];
+    }];
+
+}
+
+- (void)removeHandleInternal:(CURLHandle*)handle
+{
+    CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
+    NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
+    [self.handles removeObject:handle];
 }
 
 - (CURLHandle*)handleWithEasyHandle:(CURL*)easy
@@ -247,7 +264,10 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
                         CURLHandle* handle = [self handleWithEasyHandle:message->easy_handle];
                         if (handle)
                         {
-                            [handle completeWithCode:CURLM_OK withMulti:self];
+                            [handle retain];
+                            [self removeHandleInternal:handle];
+                            [handle completeWithCode:CURLM_OK];
+                            [handle release];
                         }
                         else
                         {

@@ -26,6 +26,7 @@
 
 - (void)addHandle:(CURLHandle*)handle;
 - (void)removeHandle:(CURLHandle*)handle;
+- (void)cancelHandle:(CURLHandle*)handle;
 
 
 @end

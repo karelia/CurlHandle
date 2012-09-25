@@ -48,7 +48,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 - (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
-- (void)failWithCode:(CURLMcode)code withMulti:(CURLMulti*)multi;
+- (void)failWithCode:(CURLMcode)code;
 
 #pragma mark - Private Properties
 
@@ -575,6 +575,11 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     _executing = NO;
 }
 
+- (BOOL)hasCompleted
+{
+    return _executing == NO;
+}
+
 /*" %{Loads the receiver's data in the synchronously.}
 
  	Actually set up for loading and do the perform.  This happens in either
@@ -630,13 +635,13 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     }
     else
     {
-        [self failWithCode:code withMulti:multi];
+        [self failWithCode:code];
     }
 
     return code == CURLE_OK;
 }
 
-- (void)completeWithCode:(CURLMcode)code withMulti:(CURLMulti *)multi
+- (void)completeWithCode:(CURLMcode)code
 {
     if (code == CURLM_OK)
     {
@@ -647,14 +652,13 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     }
     else if (code != CURLM_CANCELLED)
     {
-        [self failWithCode:code withMulti:multi];
+        [self failWithCode:code];
     }
 
-    [multi removeHandle:self];
     [self cleanup];
 }
 
-- (void)failWithCode:(CURLMcode)code withMulti:(CURLMulti*)multi
+- (void)failWithCode:(CURLMcode)code
 {
     NSError* error = [self errorForURL:nil code:code];
     if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
