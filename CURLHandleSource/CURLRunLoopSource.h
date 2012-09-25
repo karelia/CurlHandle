@@ -13,7 +13,6 @@
 
 @interface CURLRunLoopSource : NSObject
 {
-    CFRunLoopSourceRef _source;
     NSThread* _thread;
     CURLM* _multi;
     NSMutableArray* _handles;
@@ -22,12 +21,11 @@
 }
 - (id)init;
 
-- (void)scheduleInRunLoop:(NSRunLoop*)runLoop forMode:(NSString*)mode;
-- (void)unscheduleFromRunLoop:(NSRunLoop*)runLoop forMode:(NSString*)mode;
+- (void)startup;
+- (void)shutdown;
 
 - (BOOL)addHandle:(CURLHandle*)handle error:(NSError**)error;
 - (BOOL)removeHandle:(CURLHandle*)handle error:(NSError**)error;
 
-- (void)shutdown;
 
 @end

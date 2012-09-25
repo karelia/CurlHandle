@@ -18,24 +18,14 @@
 
 @implementation CURLRunLoopSourceTests
 
-- (void)testAddingLoop
+- (void)testStartupShutdown
 {
     CURLRunLoopSource* source = [[CURLRunLoopSource alloc] init];
 
-    NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
-
-    [source scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
-
-    CFRunLoopRef cf = [runLoop getCFRunLoop];
-    BOOL sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
-    STAssertTrue(sourceAttachedToLoop, @"added source to runloop");
-
-    [source unscheduleFromRunLoop:runLoop forMode:NSRunLoopCommonModes];
-    sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
-    STAssertFalse(sourceAttachedToLoop, @"removed source from runloop");
+    [source startup];
 
     [source shutdown];
-    
+
     [source release];
 }
 
@@ -43,12 +33,7 @@
 {
     CURLRunLoopSource* source = [[CURLRunLoopSource alloc] init];
 
-    NSRunLoop* runLoop = [NSRunLoop currentRunLoop];
-
-    [source scheduleInRunLoop:runLoop forMode:NSRunLoopCommonModes];
-
-    CFRunLoopRef cf = [runLoop getCFRunLoop];
-    BOOL sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
+    [source startup];
 
     CURLHandle* handle = [[CURLHandle alloc] init];
     handle.delegate = self;
@@ -63,9 +48,6 @@
     [self checkDownloadedBufferWasCorrect];
 
     [handle release];
-
-    [source unscheduleFromRunLoop:runLoop forMode:NSRunLoopCommonModes];
-    sourceAttachedToLoop = CFRunLoopContainsSource(cf, [source source], kCFRunLoopDefaultMode);
 
     [source shutdown];
 

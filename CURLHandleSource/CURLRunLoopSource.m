@@ -11,7 +11,6 @@
 
 @interface CURLRunLoopSource()
 
-@property (strong, nonatomic) __attribute__((NSObject)) CFRunLoopSourceRef source;
 @property (strong, nonatomic) NSThread* thread;
 @property (assign, nonatomic) CURLM* multi;
 @property (strong, nonatomic) NSMutableArray* handles;
@@ -41,7 +40,6 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 @synthesize handles = _handles;
 @synthesize multi = _multi;
-@synthesize source = _source;
 @synthesize thread = _thread;
 @synthesize timeout = _timeout;
 
@@ -69,21 +67,10 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     [super dealloc];
 }
 
-- (void)scheduleInRunLoop:(NSRunLoop *)runLoop forMode:(NSString *)mode
+- (void)startup
 
 {
-    if ([self createSource])
-    {
-        CFRunLoopRef cf = [runLoop getCFRunLoop];
-        CFRunLoopAddSource(cf, self.source, (CFStringRef)mode);
-        [self createThread];
-    }
-}
-
-- (void)unscheduleFromRunLoop:(NSRunLoop *)runLoop forMode:(NSString *)mode
-{
-    CFRunLoopRef cf = [runLoop getCFRunLoop];
-    CFRunLoopRemoveSource(cf, self.source, (CFStringRef)mode);
+    [self createThread];
 }
 
 - (BOOL)addHandle:(CURLHandle*)handle error:(NSError**)error
@@ -131,33 +118,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
     [self removeAllHandles];
     [self releaseThread];
-    [self releaseSource];
     CURLHandleLog(@"shutdown");
-}
-
-- (BOOL)createSource
-{
-    if (self.source == nil)
-    {
-        CFRunLoopSourceContext context;
-        memset(&context, 0, sizeof(context));
-        context.info = self;
-        self.source = CFRunLoopSourceCreate(nil, 0, &context);
-        CURLHandleLog(self.source ? @"created source" : @"failed to create source");
-
-    }
-
-    return (self.source != nil);
-}
-
-- (void)releaseSource
-{
-    if (self.source)
-    {
-        CFRunLoopSourceInvalidate(self.source);
-        self.source = nil;
-        CURLHandleLog(@"released source");
-    }
 }
 
 - (BOOL)createThread // TODO: turn this into getter
