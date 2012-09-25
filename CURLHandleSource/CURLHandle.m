@@ -152,10 +152,11 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (void) dealloc
 {
-    CURLHandleLog(@"dealloced handle %@", self);
+    CURLHandleLog(@"dealloced handle %@ curl %p", self, _curl);
 
     [self cleanup];
 
+    curl_easy_reset(_curl);
 	curl_easy_cleanup(_curl);
 	_curl = nil;
 	[_headerBuffer release];

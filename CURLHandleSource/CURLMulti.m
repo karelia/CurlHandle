@@ -125,12 +125,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
         if (result == CURLM_OK)
         {
-            CURLHandleLog(@"added handle %@ to multi %@", handle, self);
+            CURLHandleLog(@"added handle %@ (%p) to multi %@", handle, [handle curl], self);
             [self.handles addObject:handle];
         }
         else
         {
-            CURLHandleLog(@"failed to add handle %@ to multi %@", handle, self);
+            CURLHandleLog(@"failed to add handle %@ (%p) to multi %@", handle, [handle curl], self);
             [handle completeWithCode:result];
         }
     });
@@ -158,7 +158,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeHandleInternal:(CURLHandle*)handle
 {
-    CURLHandleLog(@"removed handle %@ from multi %@", handle, self);
+    CURLHandleLog(@"removed handle %@ (%p) from multi %@", handle, [handle curl], self);
     CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [self.handles removeObject:handle];
@@ -296,6 +296,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         dispatch_async(self.queue, ^{
             [self monitorMulti];
         });
+    }
+    else
+    {
+        CURLHandleLog(@"stopped monitoring");
     }
 }
 

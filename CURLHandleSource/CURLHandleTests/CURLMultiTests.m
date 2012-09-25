@@ -74,9 +74,9 @@
 
     [self checkDownloadedBufferWasCorrect];
 
-    [multi shutdown];
-
     [handle release];
+
+    [multi shutdown];
 
     [multi release];
 }
