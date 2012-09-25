@@ -16,36 +16,20 @@
 @property (assign, nonatomic) BOOL cancelled;
 @property (strong, nonatomic) NSMutableArray* handles;
 @property (assign, nonatomic) CURLM* multi;
-@property (strong, nonatomic) NSOperationQueue* queue;
+@property (assign, nonatomic) dispatch_queue_t queue;
 @property (assign, nonatomic) struct timeval timeout;
+
+- (void)updateTimeout:(NSInteger)timeout;
 
 @end
 
-#pragma mark - Callbacks
-
 static int kMaximumTimeoutMilliseconds = 1000;
 
-static int timeout_changed(CURLM *multi, long timeout_ms, void *userp);
+#pragma mark - Callback Prototypes
 
-int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
-{
-    CURLMulti* source = userp;
+static int timeout_callback(CURLM *multi, long timeout_ms, void *userp);
+static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *socketp);
 
-    // cap the timeout
-    if ((timeout_ms == -1) || (timeout_ms > kMaximumTimeoutMilliseconds))
-    {
-        timeout_ms = kMaximumTimeoutMilliseconds;
-    }
-
-    struct timeval timeout;
-    timeout.tv_sec = timeout_ms / 1000;
-    timeout.tv_usec = (timeout_ms % 1000) * 1000;
-    source.timeout = timeout;
-
-    CURLHandleLog(@"timeout changed to %ldms", timeout_ms);
-
-    return CURLM_OK;
-}
 
 @implementation CURLMulti
 
@@ -78,10 +62,8 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
         if ([self createMulti] == CURLM_OK)
         {
             self.handles = [NSMutableArray array];
-            NSOperationQueue* queue = [[NSOperationQueue alloc] init];
-            queue.maxConcurrentOperationCount = 1;
-            self.queue = queue;
-            [queue release];
+            self.queue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
+            dispatch_set_target_queue(self.queue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
             struct timeval timeout;
             timeout.tv_sec = 0;
             timeout.tv_usec = 1000;
@@ -102,7 +84,6 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     [self shutdown];
 
     [_handles release];
-    [_queue release];
 
     [super dealloc];
 }
@@ -123,9 +104,15 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     {
         [self removeAllHandles];
         self.cancelled = YES;
-        [self.queue waitUntilAllOperationsAreFinished];
 
-        [self releaseMulti];
+        dispatch_queue_t queue = self.queue;
+        dispatch_sync(queue, ^{
+            [self releaseMulti];
+        });
+
+        self.queue = nil;
+        dispatch_release(queue);
+        
         CURLHandleLog(@"shutdown");
     }
 }
@@ -134,41 +121,44 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 - (void)addHandle:(CURLHandle*)handle
 {
-    [self.queue addOperationWithBlock:^{
+    dispatch_async(self.queue, ^{
         CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
         if (result == CURLM_OK)
         {
+            CURLHandleLog(@"added handle %@ to multi %@", handle, self);
             [self.handles addObject:handle];
         }
         else
         {
+            CURLHandleLog(@"failed to add handle %@ to multi %@", handle, self);
             [handle completeWithCode:result];
         }
-    }];
+    });
 }
 
 - (void)removeHandle:(CURLHandle*)handle
 {
-    [self.queue addOperationWithBlock:^{
+    dispatch_async(self.queue, ^{
         [self removeHandleInternal:handle];
-    }];
+    });
 
 }
 
 - (void)cancelHandle:(CURLHandle*)handle
 {
-    [self.queue addOperationWithBlock:^{
+    dispatch_async(self.queue, ^{
         [handle retain];
         [self removeHandleInternal:handle];
         [handle cancel];
         [handle completeWithCode:CURLM_CANCELLED];
         [handle release];
-    }];
+    });
 
 }
 
 - (void)removeHandleInternal:(CURLHandle*)handle
 {
+    CURLHandleLog(@"removed handle %@ from multi %@", handle, self);
     CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [self.handles removeObject:handle];
@@ -191,14 +181,19 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 - (void)removeAllHandles
 {
-    [self.queue addOperationWithBlock:^{
-        for (CURLHandle* handle in self.handles)
+    NSArray* handles = [self.handles copy];
+    dispatch_sync(self.queue, ^{
+        for (CURLHandle* handle in handles)
         {
-            curl_multi_remove_handle(self.multi, [handle curl]);
+            [self removeHandleInternal:handle];
         }
 
-        [self.handles removeAllObjects];
-    }];
+    });
+
+    // we may be the last thing holding on to the handles
+    // curl should be finished with them by now, but for safety's sake we autorelease our
+    // array copy
+    [handles autorelease];
 }
 
 #pragma mark - Multi Handle Management
@@ -209,14 +204,25 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     CURLM* multi = curl_multi_init();
     if (multi)
     {
-        result = curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_changed);
+        result = curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_callback);
         if (result == CURLM_OK)
         {
             result = curl_multi_setopt(multi, CURLMOPT_TIMERDATA, self);
-            if (result == CURLM_OK)
-            {
-                self.multi = multi;
-            }
+        }
+
+//        if (result == CURLM_OK)
+//        {
+//            result = curl_multi_setopt(multi, CURLMOPT_SOCKETFUNCTION, socket_callback);
+//        }
+//
+//        if (result == CURLM_OK)
+//        {
+//            result = curl_multi_setopt(multi, CURLMOPT_SOCKETDATA, self);
+//        }
+
+        if (result == CURLM_OK)
+        {
+            self.multi = multi;
         }
     }
 
@@ -225,12 +231,18 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 - (void)releaseMulti
 {
-    curl_multi_cleanup(self.multi);
+    CURLHandleLog(@"released multi %@", self);
+
+    CURLMcode result = curl_multi_cleanup(self.multi);
+    NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
     self.multi = nil;
 }
 
 - (void)monitorMulti
 {
+//    int running;
+//    curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
+    
     static int MAX_FDS = 128;
     fd_set read_fds;
     fd_set write_fds;
@@ -281,10 +293,56 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
     if ((result == CURLM_OK) && !self.cancelled)
     {
-        [self.queue addOperationWithBlock:^{
+        dispatch_async(self.queue, ^{
             [self monitorMulti];
-        }];
+        });
     }
+}
+
+#pragma mark - Callback Support
+
+- (void)updateTimeout:(NSInteger)timeout
+{
+    // cap the timeout
+    if ((timeout == -1) || (timeout > kMaximumTimeoutMilliseconds))
+    {
+        timeout = kMaximumTimeoutMilliseconds;
+    }
+
+    struct timeval tv;
+    tv.tv_sec = timeout / 1000;
+    tv.tv_usec = (timeout % 1000) * 1000;
+    self.timeout = tv;
+
+    CURLHandleLog(@"timeout changed to %ldms", timeout);
+}
+
+- (void)updateSocket:(curl_socket_t)socket what:(NSInteger)what source:(dispatch_source_t)source
+{
+    CURLHandleLog(@"socket callback what: %ld socket: %p", what, (void*) socket);
+    if (!source)
+    {
+        source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socket, 0, self.queue);
+    }
+}
+
+#pragma mark - Callbacks
+
+
+int timeout_callback(CURLM *multi, long timeout_ms, void *userp)
+{
+    CURLMulti* source = userp;
+    [source updateTimeout:timeout_ms];
+
+    return CURLM_OK;
+}
+
+int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *socketp)
+{
+    CURLMulti* source = userp;
+    [source updateSocket:s what:what source:socketp];
+
+    return CURLM_OK;
 }
 
 

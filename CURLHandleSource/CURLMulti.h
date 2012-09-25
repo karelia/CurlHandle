@@ -16,7 +16,7 @@
     BOOL _cancelled;
     NSMutableArray* _handles;
     CURLM* _multi;
-    NSOperationQueue* _queue;
+    dispatch_queue_t _queue;
     struct timeval _timeout;
 }
 

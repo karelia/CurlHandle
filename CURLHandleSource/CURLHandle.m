@@ -152,6 +152,8 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (void) dealloc
 {
+    CURLHandleLog(@"dealloced handle %@", self);
+
     [self cleanup];
 
 	curl_easy_cleanup(_curl);
@@ -569,6 +571,12 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 - (void)cleanup
 {
     // Cleanup
+//    curl_easy_setopt(_curl, CURLOPT_DEBUGFUNCTION, 0);
+//    curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, 0);
+//    curl_easy_setopt(_curl, CURLOPT_READFUNCTION, 0);
+//    curl_easy_setopt(_curl, CURLOPT_HEADERFUNCTION, 0);
+//    curl_easy_setopt(_curl, CURLOPT_SOCKOPTFUNCTION, 0);
+
     [_uploadStream close];
     if (self.httpHeaders) curl_slist_free_all(self.httpHeaders);
     if (self.postQuoteCommands) curl_slist_free_all(self.postQuoteCommands);
