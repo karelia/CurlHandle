@@ -11,9 +11,10 @@
 
 @interface CURLMulti()
 
-@property (strong, nonatomic) NSThread* thread;
-@property (assign, nonatomic) CURLM* multi;
 @property (strong, nonatomic) NSMutableArray* handles;
+@property (assign, nonatomic) CURLM* multi;
+@property (strong, nonatomic) NSOperationQueue* queue;
+@property (strong, nonatomic) NSThread* thread;
 @property (assign, nonatomic) struct timeval timeout;
 
 @end
@@ -47,7 +48,15 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
     if ((self = [super init]) != nil)
     {
+        self.multi = curl_multi_init(); // TODO: check for failure here?
+        curl_multi_setopt(self.multi, CURLMOPT_TIMERFUNCTION, timeout_changed);
+        curl_multi_setopt(self.multi, CURLMOPT_TIMERDATA, self);
+
         self.handles = [NSMutableArray array];
+        NSOperationQueue* queue = [[NSOperationQueue alloc] init];
+        queue.maxConcurrentOperationCount = 1;
+        self.queue = queue;
+        [queue release];
         struct timeval timeout;
         timeout.tv_sec = 0;
         timeout.tv_usec = 1000;
@@ -75,18 +84,24 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 - (BOOL)addHandle:(CURLHandle*)handle error:(NSError**)error
 {
-    [self.handles addObject:handle];
-    CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
+    [self.queue addOperationWithBlock:^{
+        [self.handles addObject:handle];
+        CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
+        (void)result; // TODO: handle result
+    }];
 
-    return result == CURLM_OK;
+    return YES;
 }
 
 - (BOOL)removeHandle:(CURLHandle*)handle error:(NSError**)error
 {
-    CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
-    [self.handles removeObject:handle];
+    [self.queue addOperationWithBlock:^{
+        CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
+        (void)result; // TODO: handle result
+        [self.handles removeObject:handle];
+    }];
 
-    return result == CURLM_OK;
+    return YES;
 }
 
 - (CURLHandle*)handleWithEasyHandle:(CURL*)easy
@@ -106,19 +121,28 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 - (void)removeAllHandles
 {
-    for (CURLHandle* handle in self.handles)
-    {
-        curl_multi_remove_handle(self.multi, [handle curl]);
-    }
+    [self.queue addOperationWithBlock:^{
+        for (CURLHandle* handle in self.handles)
+        {
+            curl_multi_remove_handle(self.multi, [handle curl]);
+        }
 
-    [self.handles removeAllObjects];
+        [self.handles removeAllObjects];
+    }];
 }
 
 - (void)shutdown
 {
-    [self removeAllHandles];
-    [self releaseThread];
-    CURLHandleLog(@"shutdown");
+    if (self.multi)
+    {
+        [self removeAllHandles];
+        [self releaseThread];
+        [self.queue waitUntilAllOperationsAreFinished];
+
+        curl_multi_cleanup(self.multi);
+        self.multi = nil;
+        CURLHandleLog(@"shutdown");
+    }
 }
 
 - (BOOL)createThread // TODO: turn this into getter
@@ -154,56 +178,56 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
     CURLHandleLog(@"started monitor thread");
 
-    CURLM* multi = curl_multi_init();
-    self.multi = multi;
 
-    curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_changed);
-    curl_multi_setopt(multi, CURLMOPT_TIMERDATA, self);
-    
     static int MAX_FDS = 128;
-    fd_set read_fds;
-    fd_set write_fds;
-    fd_set exc_fds;
-    int count = MAX_FDS;
-
+    __block fd_set read_fds;
+    __block fd_set write_fds;
+    __block fd_set exc_fds;
+    __block int count = MAX_FDS;
+    __block CURLMcode result;
 
     while (![self.thread isCancelled])
     {
-        FD_ZERO(&read_fds);
-        FD_ZERO(&write_fds);
-        FD_ZERO(&exc_fds);
-        count = FD_SETSIZE;
-        CURLMcode result = curl_multi_fdset(multi, &read_fds, &write_fds, &exc_fds, &count);
+        [self.queue addOperationWithBlock:^{
+            FD_ZERO(&read_fds);
+            FD_ZERO(&write_fds);
+            FD_ZERO(&exc_fds);
+            count = FD_SETSIZE;
+            result = curl_multi_fdset(self.multi, &read_fds, &write_fds, &exc_fds, &count);
+        }];
+
+        [self.queue waitUntilAllOperationsAreFinished];
+
         if (result == CURLM_OK)
         {
             struct timeval timeout = self.timeout;
             count = select(count + 1, &read_fds, &write_fds, &exc_fds, &timeout);
-            curl_multi_perform(multi, &count);
+            [self.queue addOperationWithBlock:^{
+                curl_multi_perform(self.multi, &count);
 
-            CURLMsg* message;
-            while ((message = curl_multi_info_read(multi, &count)) != nil)
-            {
-                CURLHandleLog(@"got multi message %d", message->msg);
-                if (message->msg == CURLMSG_DONE)
+                CURLMsg* message;
+                while ((message = curl_multi_info_read(self.multi, &count)) != nil)
                 {
-                    CURLHandle* handle = [self handleWithEasyHandle:message->easy_handle];
-                    if (handle)
+                    CURLHandleLog(@"got multi message %d", message->msg);
+                    if (message->msg == CURLMSG_DONE)
                     {
-                        [handle completeWithMulti:self];
-                    }
-                    else
-                    {
-                        // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
-                        CURLHandleLog(@"seem to have an easy handle without a matching CURLHandle");
-                        curl_multi_remove_handle(multi, message->easy_handle);
+                        CURLHandle* handle = [self handleWithEasyHandle:message->easy_handle];
+                        if (handle)
+                        {
+                            [handle completeWithMulti:self];
+                        }
+                        else
+                        {
+                            // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
+                            CURLHandleLog(@"seem to have an easy handle without a matching CURLHandle");
+                            curl_multi_remove_handle(self.multi, message->easy_handle);
+                        }
                     }
                 }
-            }
+            }];
+
         }
     }
-
-    self.multi = nil;
-    curl_multi_cleanup(multi);
 
     CURLHandleLog(@"finished monitor thread");
 }
