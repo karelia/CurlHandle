@@ -156,7 +156,11 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
     [self cleanup];
 
+    // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
+    // can get accessed when calling curl_multi_cleanup, even though the easy handle has been removed from the multi, and cleaned up itself!
+    // see http://curl.haxx.se/mail/lib-2009-10/0222.html
     curl_easy_reset(_curl);
+
 	curl_easy_cleanup(_curl);
 	_curl = nil;
 	[_headerBuffer release];
