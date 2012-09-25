@@ -23,17 +23,6 @@ extern	BOOL				sAllowsProxy;
 /*" Proxy User ID:Password combo for all uses of CURL. "*/
 extern NSString				*sProxyUserIDAndPassword;
 
-/*"	Callbacks from reading a chunk of data.  Since we pass "self" in as the "data pointer",
-	we can use that to get back into Objective C and do the work with the class.
-"*/
-
-@class CURLHandle;
-int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose);
-extern size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
-extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
-extern size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
-extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *handle);
-
 @interface CURLHandle : NSObject
 {
 	CURL			*mCURL;					/*" Pointer to the actual CURL object that does all the hard work "*/
