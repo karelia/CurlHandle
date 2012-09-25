@@ -37,6 +37,11 @@
     self.exitRunLoop = YES;
 }
 
+- (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite;
+{
+    self.sending = YES;
+}
+
 - (void)testHTTPDownload
 {
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
@@ -57,7 +62,6 @@
     request.shouldUseCurlHandle = YES;
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
     [connection cancel];
@@ -75,7 +79,6 @@
     request.shouldUseCurlHandle = YES;
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
     [self runUntilDone];
@@ -101,17 +104,13 @@
     [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
     [self runUntilDone];
 
-    STAssertTrue(self.sending, @"should have set sending flag");
-    STAssertNotNil(self.response, @"got no response");
-    STAssertTrue([self.buffer length] > 0, @"got no data, expected %ld", self.expected);
     STAssertNil(self.error, @"got error %@", self.error);
-
-    
+    STAssertNil(self.response, @"got unexpected response %@", self.response);
+    STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
 }
 
 @end

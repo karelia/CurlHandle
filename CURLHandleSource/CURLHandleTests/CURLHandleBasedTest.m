@@ -78,4 +78,14 @@
     STAssertTrue([receivedNotes isEqualToString:devNotes], @"received notes didn't match: was:\n%@\n\nshould have been:\n%@", receivedNotes, devNotes);
 }
 
+- (NSURL*)ftpTestServer
+{
+    NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleFTPTestURL"];
+    STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleFTPTestURL \"ftp://user:password@ftp.test.com\"");
+
+    NSURL* result = [NSURL URLWithString:ftpTest];
+
+    return result;
+}
+
 @end

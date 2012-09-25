@@ -95,6 +95,10 @@
     [[self client] URLProtocolDidFinishLoading:self];
 }
 
+- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
+{
+// TODO: need to pass this info on to the client
+}
 @end
 
 

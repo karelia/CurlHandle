@@ -22,5 +22,7 @@
 - (void)checkDownloadedBufferWasCorrect;
 - (void)runUntilDone;
 
+- (NSURL*)ftpTestServer;
+
 @end
 
