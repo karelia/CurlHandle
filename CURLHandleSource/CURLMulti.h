@@ -19,7 +19,8 @@
     struct timeval _timeout;
 
 }
-- (id)init;
+
++ (CURLMulti*)sharedInstance;
 
 - (void)startup;
 - (void)shutdown;

@@ -44,6 +44,18 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 @synthesize thread = _thread;
 @synthesize timeout = _timeout;
 
++ (CURLMulti*)sharedInstance;
+{
+    static CURLMulti* instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[CURLMulti alloc] init];
+        [instance startup];
+    });
+
+    return instance;
+}
+
 - (id)init
 {
     if ((self = [super init]) != nil)

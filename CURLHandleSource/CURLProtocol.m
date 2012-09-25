@@ -14,8 +14,6 @@
 
 @property (strong, nonatomic) CURLHandle* handle;
 
-- (CURLMulti*)multiForCurrentRunLoop;
-
 @end
 
 @implementation CURLProtocol
@@ -46,7 +44,7 @@
 
 - (void)startLoading;
 {
-    CURLMulti* multi = [self multiForCurrentRunLoop];
+    CURLMulti* multi = [CURLMulti sharedInstance];
 
     CURLHandle *handle = [[CURLHandle alloc] init];
     [handle setDelegate:self];
@@ -65,7 +63,7 @@
     self.handle.delegate = nil;
     if (![self.handle hasCompleted])
     {
-        CURLMulti* multi = [self multiForCurrentRunLoop];
+        CURLMulti* multi = [CURLMulti sharedInstance];
         [multi cancelHandle:self.handle];
     }
 
@@ -73,22 +71,6 @@
 }
 
 #pragma mark - Utilities
-
-
-- (CURLMulti*)multiForCurrentRunLoop
-{
-    // TODO: need to create a new multi for each run loop?
-
-    static CURLMulti* gMulti = nil;
-
-    if (!gMulti)
-    {
-        gMulti = [[CURLMulti alloc] init];
-        [gMulti startup];
-    }
-
-    return gMulti;
-}
 
 
 #pragma mark - CURLHandleDelegate
