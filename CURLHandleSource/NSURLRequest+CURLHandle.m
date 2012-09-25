@@ -5,6 +5,9 @@
 //  This is in the public domain, but please report any improvements back to the author.
 
 #import "NSURLRequest+CURLHandle.h"
+#import "CURLProtocol.h"
+
+static NSString *const UseCurlHandleKey = @"useCurlHandle";
 
 @implementation NSURLRequest (CURLOptionsFTP)
 
@@ -63,3 +66,25 @@
 }
 
 @end
+
+
+@implementation NSURLRequest (CURLProtocol)
+
+- (BOOL)shouldUseCurlHandle;
+{
+    return [[NSURLProtocol propertyForKey:UseCurlHandleKey inRequest:self] boolValue];
+}
+
+@end
+
+
+@implementation NSMutableURLRequest (CURLProtocol)
+
+- (void)setShouldUseCurlHandle:(BOOL)useCurl;
+{
+    [NSURLProtocol setProperty:[NSNumber numberWithBool:useCurl] forKey:UseCurlHandleKey inRequest:self];
+    [NSURLProtocol registerClass:[CURLProtocol class]];
+}
+
+@end
+

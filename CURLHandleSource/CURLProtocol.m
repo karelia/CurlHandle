@@ -8,8 +8,30 @@
 #import "CURLProtocol.h"
 #import "CURLRunLoopSource.h"
 #import "CURLHandle.h"
+#import "NSURLRequest+CURLHandle.h"
+
+@interface CURLProtocol()
+
+@property (strong, nonatomic) CURLHandle* handle;
+
+- (CURLRunLoopSource*)sourceForCurrentRunLoop;
+
+@end
 
 @implementation CURLProtocol
+
+@synthesize handle = _handle;
+
+#pragma mark - Object Lifecycle
+
+- (void)dealloc
+{
+    [_handle release];
+
+    [super dealloc];
+}
+
+#pragma mark - NSURLProtocol Support
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)request;
 {
@@ -17,31 +39,9 @@
     return result;
 }
 
-+ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request; { return request; }
-
-- (id)initWithRequest:(NSURLRequest *)request cachedResponse:(NSCachedURLResponse *)cachedResponse client:(id <NSURLProtocolClient>)client
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
 {
-    if ((self = [super initWithRequest:request cachedResponse:cachedResponse client:client]))
-    {
-        CURLHandleLog(@"made new protocol object %@", self);
-    }
-
-    return self;
-}
-
-- (CURLRunLoopSource*)sourceForCurrentRunLoop
-{
-    // TODO: need to create a new source for each run loop?
-    
-    static CURLRunLoopSource* gSource = nil;
-
-    if (!gSource)
-    {
-        gSource = [[CURLRunLoopSource alloc] init];
-        [gSource addToRunLoop:[NSRunLoop currentRunLoop]];
-    }
-
-    return gSource;
+    return request;
 }
 
 - (void)startLoading;
@@ -56,13 +56,39 @@
     
     [handle loadRequest:[self request] usingSource:source];
 
+    self.handle = handle;
     [handle release];
 }
 
 - (void)stopLoading;
 {
-    // TODO: Instruct handle to cancel
+    CURLRunLoopSource* source = [self sourceForCurrentRunLoop];
+
+    [self.handle cancel];
+    [self.handle completeUsingSource:source];
+    self.handle = nil;
 }
+
+#pragma mark - Utilities
+
+
+- (CURLRunLoopSource*)sourceForCurrentRunLoop
+{
+    // TODO: need to create a new source for each run loop?
+
+    static CURLRunLoopSource* gSource = nil;
+
+    if (!gSource)
+    {
+        gSource = [[CURLRunLoopSource alloc] init];
+        [gSource addToRunLoop:[NSRunLoop currentRunLoop]];
+    }
+
+    return gSource;
+}
+
+
+#pragma mark - CURLHandleDelegate
 
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 {
@@ -82,27 +108,6 @@
 - (void)handleDidFinish:(CURLHandle *)handle
 {
     [[self client] URLProtocolDidFinishLoading:self];
-}
-
-@end
-
-
-@implementation NSURLRequest (CURLProtocol)
-
-- (BOOL)shouldUseCurlHandle;
-{
-    return [[NSURLProtocol propertyForKey:@"useCurlHandle" inRequest:self] boolValue];
-}
-
-@end
-
-
-@implementation NSMutableURLRequest (CURLProtocol)
-
-- (void)setShouldUseCurlHandle:(BOOL)useCurl;
-{
-    [NSURLProtocol setProperty:[NSNumber numberWithBool:useCurl] forKey:@"useCurlHandle" inRequest:self];
-    [NSURLProtocol registerClass:[CURLProtocol class]];
 }
 
 @end

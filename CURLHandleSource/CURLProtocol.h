@@ -8,17 +8,9 @@
 #import "CURLHandle.h"
 
 
-@interface NSURLRequest (CURLProtocol)
-- (BOOL)shouldUseCurlHandle;
-@end
-
-
-@interface NSMutableURLRequest (CURLProtocol)
-// Setting to YES automatically registers CURLProtocol with NSURLProtocol. You can do so earlier, manually if required
-- (void)setShouldUseCurlHandle:(BOOL)useCurl;
-@end
-
-
 @interface CURLProtocol : NSURLProtocol <CURLHandleDelegate>
+{
+    CURLHandle* _handle;
+}
 
 @end

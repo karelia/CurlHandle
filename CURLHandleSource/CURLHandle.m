@@ -658,9 +658,12 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (void)completeUsingSource:(CURLRunLoopSource*)source
 {
-    if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
+    if (!_cancelled)
     {
-        [self.delegate handleDidFinish:self];
+        if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
+        {
+            [self.delegate handleDidFinish:self];
+        }
     }
 
     [self cleanup];

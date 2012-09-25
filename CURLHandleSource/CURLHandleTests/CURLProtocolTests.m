@@ -1,12 +1,11 @@
 //
 //  CURLProtocolTests.m
-//  CURLProtocolTests
 //
 //  Created by Sam Deane on 20/09/2012.
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
-#import "CURLProtocol.h"
+#import "NSURLRequest+CURLHandle.h"
 #import "CURLHandleBasedTest.h"
 
 @interface CURLProtocolTests : CURLHandleBasedTest<NSURLConnectionDelegate, NSURLConnectionDataDelegate>
