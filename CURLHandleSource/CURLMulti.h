@@ -13,10 +13,10 @@
 
 @interface CURLMulti : NSObject
 {
-    NSThread* _thread;
+    BOOL _cancelled;
+    NSMutableArray* _handles;
     CURLM* _multi;
     NSOperationQueue* _queue;
-    NSMutableArray* _handles;
     struct timeval _timeout;
 }
 
