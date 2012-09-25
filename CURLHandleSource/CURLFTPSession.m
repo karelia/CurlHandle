@@ -1,6 +1,5 @@
 //
 //  CURLFTPSession.m
-//  CURLHandle
 //
 //  Created by Mike Abdullah on 04/03/2012.
 //  Copyright (c) 2012 Karelia Software. All rights reserved.

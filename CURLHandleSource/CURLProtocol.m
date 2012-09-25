@@ -1,6 +1,5 @@
 //
 //  CURLProtocol.m
-//  CURLHandle
 //
 //  Created by Mike Abdullah on 19/01/2012.
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
