@@ -50,4 +50,37 @@
     [multi release];
 
 }
+
+
+- (void)testCancelling
+{
+    CURLMulti* multi = [[CURLMulti alloc] init];
+
+    [multi startup];
+
+    CURLHandle* handle = [[CURLHandle alloc] init];
+    handle.delegate = self;
+
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+
+    BOOL ok = [handle loadRequest:request withMulti:multi];
+    STAssertTrue(ok, @"failed to load request");
+
+    [multi cancelHandle:handle];
+
+    [self runUntilDone];
+
+    STAssertTrue(self.cancelled, @"should have been cancelled");
+    STAssertNil(self.response, @"should have no response");
+    STAssertTrue([self.buffer length] == 0, @"should have no data");
+    STAssertNil(self.error, @"got error %@", self.error);
+
+    [handle release];
+
+    [multi shutdown];
+    
+    [multi release];
+
+}
+
 @end

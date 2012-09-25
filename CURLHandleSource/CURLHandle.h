@@ -16,7 +16,7 @@
 
 @protocol CURLHandleDelegate;
 
-enum { CURLM_CANCELLED = CURLM_LAST + 100 };
+enum { CURLM_CANCELLED = -2 };
 
 /*" YES if CURLHandle will allow use of a proxy server "*/
 extern	BOOL				sAllowsProxy;
@@ -93,6 +93,7 @@ extern NSString				*sProxyUserIDAndPassword;
 @optional
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 - (void)handleDidFinish:(CURLHandle *)handle;
+- (void)handleWasCancelled:(CURLHandle *)handle;
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError*)error;
 
 // When sending data to the server, this reports just before it goes out on the wire. Reports a length of 0 when the end of the data is written so you can get a nice heads up that an upload is about to complete

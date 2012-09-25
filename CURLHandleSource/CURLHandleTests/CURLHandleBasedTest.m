@@ -43,6 +43,12 @@
     self.exitRunLoop = YES;
 }
 
+- (void)handleWasCancelled:(CURLHandle *)handle
+{
+    self.cancelled = YES;
+    self.exitRunLoop = YES;
+}
+
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
 {
     CURLHandleLog(@"handle failed with error %@", error);

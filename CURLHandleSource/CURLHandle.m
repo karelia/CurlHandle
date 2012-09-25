@@ -598,27 +598,10 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         code = curl_easy_perform(_curl);
     }
 
-    [self cleanup];
-
-    if (code == CURLE_OK)
+    [self completeWithCode:_cancelled ? CURLM_CANCELLED : code];
+    if ((code != CURLE_OK) && error)
     {
-        if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
-        {
-            [self.delegate handleDidFinish:self];
-        }
-
-    }
-    else
-    {
-        NSError* result = [self errorForURL:[request URL] code:code];
-        if ([[self delegate] respondsToSelector:@selector(handle:didFailWithError:)])
-        {
-            [self.delegate handle:self didFailWithError:result];
-        }
-        if (error)
-        {
-            *error = result;
-        }
+        *error = [self errorForURL:[request URL] code:code];
     }
 
     [self release]; // was retained at start
@@ -650,7 +633,14 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
             [self.delegate handleDidFinish:self];
         }
     }
-    else if (code != CURLM_CANCELLED)
+    else if (code == CURLM_CANCELLED)
+    {
+        if ([[self delegate] respondsToSelector:@selector(handleWasCancelled:)])
+        {
+            [self.delegate handleWasCancelled:self];
+        }
+    }
+    else
     {
         [self failWithCode:code];
     }

@@ -62,6 +62,7 @@
 
 - (void)stopLoading;
 {
+    self.handle.delegate = nil;
     if (![self.handle hasCompleted])
     {
         CURLMulti* multi = [self multiForCurrentRunLoop];
