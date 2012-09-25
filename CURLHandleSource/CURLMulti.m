@@ -21,11 +21,19 @@
 
 #pragma mark - Callbacks
 
+static int kMaximumTimeoutMilliseconds = 1000;
+
 static int timeout_changed(CURLM *multi, long timeout_ms, void *userp);
 
 int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
     CURLMulti* source = userp;
+
+    // cap the timeout
+    if ((timeout_ms == -1) || (timeout_ms > kMaximumTimeoutMilliseconds))
+    {
+        timeout_ms = kMaximumTimeoutMilliseconds;
+    }
 
     struct timeval timeout;
     timeout.tv_sec = timeout_ms / 1000;
