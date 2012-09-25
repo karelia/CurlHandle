@@ -48,6 +48,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 - (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
+- (void)failWithCode:(CURLMcode)code withMulti:(CURLMulti*)multi;
 
 #pragma mark - Private Properties
 
@@ -622,37 +623,44 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti *)multi
 {
-    NSError* error = nil;
     CURLcode code = [self setupRequest:request];
-
     if (code == CURLE_OK)
     {
-        [multi addHandle:self error:&error];
+        [multi addHandle:self];
     }
     else
     {
-        if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
-        {
-            [self.delegate handle:self didFailWithError:error];
-        }
+        [self failWithCode:code withMulti:multi];
     }
 
     return code == CURLE_OK;
 }
 
-- (void)completeWithMulti:(CURLMulti *)multi
+- (void)completeWithCode:(CURLMcode)code withMulti:(CURLMulti *)multi
 {
-    if (!_cancelled)
+    if (code == CURLM_OK)
     {
         if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
         {
             [self.delegate handleDidFinish:self];
         }
     }
+    else if (code != CURLM_CANCELLED)
+    {
+        [self failWithCode:code withMulti:multi];
+    }
 
-    NSError* error = nil;
-    [multi removeHandle:self error:&error];
+    [multi removeHandle:self];
     [self cleanup];
+}
+
+- (void)failWithCode:(CURLMcode)code withMulti:(CURLMulti*)multi
+{
+    NSError* error = [self errorForURL:nil code:code];
+    if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
+    {
+        [self.delegate handle:self didFailWithError:error];
+    }
 }
 
 - (void)cancel;

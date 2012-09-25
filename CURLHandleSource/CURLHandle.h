@@ -16,6 +16,8 @@
 
 @protocol CURLHandleDelegate;
 
+enum { CURLM_CANCELLED = CURLM_LAST + 100 };
+
 /*" YES if CURLHandle will allow use of a proxy server "*/
 extern	BOOL				sAllowsProxy;
 
@@ -69,7 +71,7 @@ extern NSString				*sProxyUserIDAndPassword;
 
 @interface CURLHandle(RunLoopSupport)
 - (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti*)multi;
-- (void)completeWithMulti:(CURLMulti*)multi;
+- (void)completeWithCode:(CURLMcode)code withMulti:(CURLMulti*)multi;
 @end
 
 #pragma mark - Old API

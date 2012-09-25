@@ -65,7 +65,7 @@
     CURLMulti* multi = [self multiForCurrentRunLoop];
 
     [self.handle cancel];
-    [self.handle completeWithMulti:multi];
+    [self.handle completeWithCode:CURLM_CANCELLED withMulti:multi];
     self.handle = nil;
 }
 

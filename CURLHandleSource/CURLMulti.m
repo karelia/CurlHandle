@@ -86,26 +86,29 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
     [self createThread];
 }
 
-- (BOOL)addHandle:(CURLHandle*)handle error:(NSError**)error
+- (void)addHandle:(CURLHandle*)handle
 {
     [self.queue addOperationWithBlock:^{
-        [self.handles addObject:handle];
         CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
-        (void)result; // TODO: handle result
+        if (result == CURLM_OK)
+        {
+            [self.handles addObject:handle];
+        }
+        else
+        {
+            [handle completeWithCode:result withMulti:self.multi];
+        }
     }];
-
-    return YES;
 }
 
-- (BOOL)removeHandle:(CURLHandle*)handle error:(NSError**)error
+- (void)removeHandle:(CURLHandle*)handle
 {
     [self.queue addOperationWithBlock:^{
         CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
-        (void)result; // TODO: handle result
+        NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
         [self.handles removeObject:handle];
     }];
 
-    return YES;
 }
 
 - (CURLHandle*)handleWithEasyHandle:(CURL*)easy
@@ -158,7 +161,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
         result = curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_changed);
         if (result == CURLM_OK)
         {
-            result = curl_multi_setopt(self.multi, CURLMOPT_TIMERDATA, self);
+            result = curl_multi_setopt(multi, CURLMOPT_TIMERDATA, self);
             if (result == CURLM_OK)
             {
                 self.multi = multi;
@@ -244,7 +247,7 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
                         CURLHandle* handle = [self handleWithEasyHandle:message->easy_handle];
                         if (handle)
                         {
-                            [handle completeWithMulti:self];
+                            [handle completeWithCode:CURLM_OK withMulti:self];
                         }
                         else
                         {

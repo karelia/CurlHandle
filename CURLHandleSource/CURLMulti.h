@@ -24,8 +24,8 @@
 - (void)startup;
 - (void)shutdown;
 
-- (BOOL)addHandle:(CURLHandle*)handle error:(NSError**)error;
-- (BOOL)removeHandle:(CURLHandle*)handle error:(NSError**)error;
+- (void)addHandle:(CURLHandle*)handle;
+- (void)removeHandle:(CURLHandle*)handle;
 
 
 @end
