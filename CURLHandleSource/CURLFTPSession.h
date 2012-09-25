@@ -58,6 +58,8 @@
 
 - (BOOL)removeDirectoryAtPath:(NSString *)path error:(NSError **)error;
 
+- (BOOL)renameItem:(NSString *)fromPath toPath:(NSString *)toPath error:(NSError **)error;
+
 #pragma mark Setting Attributes
 // Only NSFilePosixPermissions is recognised at present. Note that some servers don't support this so will return an error (code 500)
 // All other attributes are ignored
