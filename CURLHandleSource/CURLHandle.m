@@ -586,43 +586,35 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 {
     [self retain];  // so can't be accidentally deallocated mid-operation
 
-    CURLcode code = CURLE_OK;
-
-    @try
+    CURLcode code = [self setupRequest:request];
+    if (code == CURLE_OK)
     {
-        code = [self setupRequest:request];
-        if (code == CURLE_OK)
+        code = curl_easy_perform(_curl);
+    }
+
+    [self cleanup];
+
+    if (code == CURLE_OK)
+    {
+        if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
         {
-            code = curl_easy_perform(_curl);
+            [self.delegate handleDidFinish:self];
+        }
+
+    }
+    else
+    {
+        NSError* result = [self errorForURL:[request URL] code:code];
+        if ([[self delegate] respondsToSelector:@selector(handle:didFailWithError:)])
+        {
+            [self.delegate handle:self didFailWithError:result];
+        }
+        if (error)
+        {
+            *error = result;
         }
     }
-    
-    @finally
-    {
-        [self cleanup];
 
-        if (code == CURLE_OK)
-        {
-            if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
-            {
-                [self.delegate handleDidFinish:self];
-            }
-
-        }
-        else
-        {
-            NSError* result = [self errorForURL:[request URL] code:code];
-            if ([[self delegate] respondsToSelector:@selector(handle:didFailWithError:)])
-            {
-                [self.delegate handle:self didFailWithError:result];
-            }
-            if (error)
-            {
-                *error = result;
-            }
-        }
-    }
-    
     [self release]; // was retained at start
 
     return code == CURLE_OK;
@@ -630,26 +622,18 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti *)multi
 {
-    CURLcode code = CURLE_FAILED_INIT;
     NSError* error = nil;
+    CURLcode code = [self setupRequest:request];
 
-    @try
+    if (code == CURLE_OK)
     {
-        code = [self setupRequest:request];
+        [multi addHandle:self error:&error];
     }
-
-    @finally
+    else
     {
-        if (code == CURLE_OK)
+        if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
         {
-            [multi addHandle:self error:&error];
-        }
-        else
-        {
-            if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
-            {
-                [self.delegate handle:self didFailWithError:error];
-            }
+            [self.delegate handle:self didFailWithError:error];
         }
     }
 
