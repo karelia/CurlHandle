@@ -50,4 +50,22 @@
     [self checkDownloadedBufferWasCorrect];
 }
 
+//- (void)testCancelling
+//{
+//    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+//    request.shouldUseCurlHandle = YES;
+//
+//    NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
+//
+//    STAssertNotNil(connection, @"failed to get connection for request %@", request);
+//
+//    [connection cancel];
+//
+//    [self runUntilDone];
+//
+//    STAssertNil(self.response, @"should have no response");
+//    STAssertTrue([self.buffer length] == 0, @"should have no data");
+//    STAssertNil(self.error, @"got error %@", self.error);
+//}
+
 @end

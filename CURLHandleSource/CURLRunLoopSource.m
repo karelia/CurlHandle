@@ -14,7 +14,6 @@
 @property (strong, nonatomic) __attribute__((NSObject)) CFRunLoopSourceRef source;
 @property (strong, nonatomic) NSThread* thread;
 @property (assign, nonatomic) CURLM* multi;
-@property (assign, atomic) BOOL handleAdded;
 @property (strong, nonatomic) NSMutableArray* handles;
 @property (assign, nonatomic) struct timeval timeout;
 
@@ -58,7 +57,6 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
 @implementation CURLRunLoopSource
 
-@synthesize handleAdded = _handleAdded;
 @synthesize handles = _handles;
 @synthesize multi = _multi;
 @synthesize source = _source;
@@ -120,7 +118,6 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 {
     [self.handles addObject:handle];
     CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
-    self.handleAdded = YES;
 
     return result == CURLM_OK;
 }
@@ -242,12 +239,6 @@ int timeout_changed(CURLM *multi, long timeout_ms, void *userp)
 
     while (![self.thread isCancelled])
     {
-        if (self.handleAdded)
-        {
-            curl_multi_perform(multi, &count);
-            self.handleAdded = NO;
-        }
-        
         FD_ZERO(&read_fds);
         FD_ZERO(&write_fds);
         FD_ZERO(&exc_fds);

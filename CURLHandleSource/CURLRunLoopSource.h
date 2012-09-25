@@ -16,7 +16,6 @@
     CFRunLoopSourceRef _source;
     NSThread* _thread;
     CURLM* _multi;
-    BOOL _handleAdded;
     NSMutableArray* _handles;
     struct timeval _timeout;
 
