@@ -6,6 +6,7 @@
 //
 
 #import "NSURLRequest+CURLHandle.h"
+
 #import "CURLHandleBasedTest.h"
 
 @interface CURLProtocolTests : CURLHandleBasedTest<NSURLConnectionDelegate, NSURLConnectionDataDelegate>
@@ -36,7 +37,7 @@
     self.exitRunLoop = YES;
 }
 
-- (void)testSimpleDownload
+- (void)testHTTPDownload
 {
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
     request.shouldUseCurlHandle = YES;
@@ -60,6 +61,57 @@
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
     [connection cancel];
+}
+
+- (void)testFTPDownload
+{
+    NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleFTPTestURL"];
+    STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleFTPTestURL \"ftp://user:password@ftp.test.com\"");
+
+    NSURL* ftpRoot = [NSURL URLWithString:ftpTest];
+    NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
+    request.shouldUseCurlHandle = YES;
+
+    NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
+
+    STAssertNotNil(connection, @"failed to get connection for request %@", request);
+
+    [self runUntilDone];
+
+    [self checkDownloadedBufferWasCorrect];
+}
+
+- (void)testFTPUpload
+{
+    NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleTestsFTPServer"];
+    STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleTestsFTPServer \"ftp://user:password@ftp.test.com\"");
+
+    NSURL* ftpRoot = [NSURL URLWithString:ftpTest];
+    NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
+
+    NSError* error = nil;
+    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
+    request.shouldUseCurlHandle = YES;
+    [request curl_setCreateIntermediateDirectories:1];
+    [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+
+    NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
+
+    STAssertNotNil(connection, @"failed to get connection for request %@", request);
+
+    [self runUntilDone];
+
+    STAssertTrue(self.sending, @"should have set sending flag");
+    STAssertNotNil(self.response, @"got no response");
+    STAssertTrue([self.buffer length] > 0, @"got no data, expected %ld", self.expected);
+    STAssertNil(self.error, @"got error %@", self.error);
+
+    
 }
 
 @end

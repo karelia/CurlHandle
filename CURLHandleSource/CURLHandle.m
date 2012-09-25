@@ -159,6 +159,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 	[_headerBuffer release];
 	[_proxies release];
 	[_stringOptions release];
+    [_uploadStream release];
 
 	[super dealloc];
 }
@@ -393,12 +394,12 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     NSData *uploadData = [request HTTPBody];
     if (uploadData)
     {
-        _uploadStream = [[[NSInputStream alloc] initWithData:uploadData] autorelease];
+        _uploadStream = [[NSInputStream alloc] initWithData:uploadData];
         LOAD_REQUEST_SET_OPTION(CURLOPT_INFILESIZE, [uploadData length]);
     }
     else
     {
-        _uploadStream = [request HTTPBodyStream];
+        _uploadStream = [[request HTTPBodyStream] retain];
     }
 
     if (_uploadStream)
