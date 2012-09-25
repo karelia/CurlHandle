@@ -22,9 +22,9 @@ NSString * const CURLcodeErrorDomain = @"se.haxx.curl.libcurl.CURLcode";
 NSString * const CURLMcodeErrorDomain = @"se.haxx.curl.libcurl.CURLMcode";
 NSString * const CURLSHcodeErrorDomain = @"se.haxx.curl.libcurl.CURLSHcode";
 
-BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
+static BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
 SCDynamicStoreRef	sSCDSRef = NULL;
-NSString			*sProxyUserIDAndPassword = nil;
+static NSString			*sProxyUserIDAndPassword = nil;
 
 
 @interface CURLResponse : NSHTTPURLResponse

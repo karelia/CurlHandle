@@ -17,12 +17,6 @@ extern NSString * const CURLcodeErrorDomain;
 extern NSString * const CURLMcodeErrorDomain;
 extern NSString * const CURLSHcodeErrorDomain;
 
-/*" YES if CURLHandle will allow use of a proxy server "*/
-extern	BOOL				sAllowsProxy;
-
-/*" Proxy User ID:Password combo for all uses of CURL. "*/
-extern NSString				*sProxyUserIDAndPassword;
-
 @interface CURLHandle : NSObject
 {
 	CURL			*mCURL;					/*" Pointer to the actual CURL object that does all the hard work "*/
