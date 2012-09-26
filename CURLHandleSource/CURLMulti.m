@@ -65,24 +65,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         if ([self createMulti] == CURLM_OK)
         {
             self.handles = [NSMutableArray array];
-            self.queue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
-            dispatch_set_target_queue(self.queue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
-            self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
-            dispatch_source_set_event_handler(self.timer, ^{
-                if (self.multi)
-                {
-                    int running;
-                    curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
-                    [self processMulti];
-                }
-            });
-
-            dispatch_source_set_cancel_handler(self.timer, ^{
-                CURLHandleLog(@"cancelled timer");
-                dispatch_release(self.timer);
-                self.timer = nil;
-            });
-
+            [self createQueue];
+            [self createTimer];
         }
         else
         {
@@ -116,24 +100,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)shutdown
 {
-    if (self.timer)
-    {
-        dispatch_source_cancel(self.timer);
-    }
-
+    [self releaseTimer];
     if (self.multi)
     {
         [self removeAllHandles];
         self.cancelled = YES;
+        [self releaseQueue];
 
-        dispatch_queue_t queue = self.queue;
-        dispatch_sync(queue, ^{
-            [self releaseMulti];
-        });
-
-        self.queue = nil;
-        dispatch_release(queue);
-        
         CURLHandleLog(@"shutdown");
     }
 }
@@ -142,6 +115,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)addHandle:(CURLHandle*)handle
 {
+    NSAssert(self.queue, @"need queue");
+    NSAssert(self.handles, @"need handles");
+
     dispatch_async(self.queue, ^{
         CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
         if (result == CURLM_OK)
@@ -159,6 +135,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeHandle:(CURLHandle*)handle
 {
+    NSAssert(self.queue, @"need queue");
+
     dispatch_async(self.queue, ^{
         [self removeHandleInternal:handle];
     });
@@ -167,6 +145,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)cancelHandle:(CURLHandle*)handle
 {
+    NSAssert(self.queue, @"need queue");
+
     dispatch_async(self.queue, ^{
         [handle retain];
         [self removeHandleInternal:handle];
@@ -179,6 +159,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeHandleInternal:(CURLHandle*)handle
 {
+    NSAssert(self.handles, @"need handles");
+
     CURLHandleLog(@"removed handle %@ (%p) from multi %@", handle, [handle curl], self);
     CURLMcode result = curl_multi_remove_handle(self.multi, [handle curl]);
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
@@ -187,6 +169,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (CURLHandle*)findHandleWithEasyHandle:(CURL*)easy
 {
+    NSAssert(self.handles, @"need handles");
+
     CURLHandle* result = nil;
     for (CURLHandle* handle in self.handles)
     {
@@ -259,49 +243,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     self.multi = nil;
 }
 
-//- (void)monitorMulti
-//{
-//    int running;
-//    curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
-//
-//    static int MAX_FDS = 128;
-//    fd_set read_fds;
-//    fd_set write_fds;
-//    fd_set exc_fds;
-//    int count = MAX_FDS;
-//    CURLMcode result;
-//
-//    FD_ZERO(&read_fds);
-//    FD_ZERO(&write_fds);
-//    FD_ZERO(&exc_fds);
-//    count = FD_SETSIZE;
-//    result = curl_multi_fdset(self.multi, &read_fds, &write_fds, &exc_fds, &count);
-//
-//    if (result == CURLM_OK)
-//    {
-//        struct timeval timeout = self.timeout;
-//        count = select(count + 1, &read_fds, &write_fds, &exc_fds, &timeout);
-//        result = curl_multi_perform(self.multi, &count);
-//
-//        [self processMulti];
-//    }
-//
-//    if (result != CURLM_OK)
-//    {
-//        CURLHandleLog(@"curl error encountered whilst monitoring multi %d", result);
-//    }
-//
-//    if ((result == CURLM_OK) && !self.cancelled)
-//    {
-//        dispatch_async(self.queue, ^{
-//            [self monitorMulti];
-//        });
-//    }
-//    else
-//    {
-//        CURLHandleLog(@"stopped monitoring");
-//    }
-//}
 
 - (void)processMulti
 {
@@ -328,6 +269,54 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
             }
         }
+    }
+}
+
+#pragma mark - Queue Management
+
+- (void)createQueue
+{
+    self.queue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
+    dispatch_set_target_queue(self.queue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
+}
+
+- (void)releaseQueue
+{
+    dispatch_queue_t queue = self.queue;
+    dispatch_sync(queue, ^{
+        [self releaseMulti];
+    });
+
+    self.queue = nil;
+    dispatch_release(queue);
+}
+
+#pragma mark - Timer Management
+
+- (void)createTimer
+{
+    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
+    dispatch_source_set_event_handler(self.timer, ^{
+        if (self.multi)
+        {
+            int running;
+            curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
+            [self processMulti];
+        }
+    });
+
+    dispatch_source_set_cancel_handler(self.timer, ^{
+        CURLHandleLog(@"cancelled timer");
+        dispatch_release(self.timer);
+        self.timer = nil;
+    });
+}
+
+- (void)releaseTimer
+{
+    if (self.timer)
+    {
+        dispatch_source_cancel(self.timer);
     }
 }
 
