@@ -29,5 +29,6 @@
 - (void)removeHandle:(CURLHandle*)handle;
 - (void)cancelHandle:(CURLHandle*)handle;
 
+- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket required:(BOOL)required;
 
 @end

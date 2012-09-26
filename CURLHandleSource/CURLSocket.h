@@ -8,13 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-#import <curl/curl.h>
+@class CURLMulti;
 
 @interface CURLSocket : NSObject
 
 @property (assign, nonatomic) dispatch_source_t reader;
 @property (assign, nonatomic) dispatch_source_t writer;
 
-- (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLM*)multi queue:(dispatch_queue_t)queue;
+- (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMulti*)multi;
 
 @end

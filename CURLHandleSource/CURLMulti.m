@@ -350,13 +350,61 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
 {
     CURLHandleLog(@"socket callback what: %ld socket:%@", what, (void*) socket);
+    switch(what)
+    {
+        case CURL_POLL_NONE:
+            NSAssert(socket == nil, @"should have no socket object first time");
+            break;
+
+        case CURL_POLL_REMOVE:
+            NSAssert(socket != nil, @"should have socket");
+            [socket release];
+            curl_multi_assign(self.multi, raw, nil);
+            break;
+    }
+
     if (!socket)
     {
         socket = [[CURLSocket alloc] init];
         curl_multi_assign(self.multi, raw, socket);
     }
 
-    [socket updateSourcesForSocket:raw mode:what multi:self.multi queue:self.queue];
+    [socket updateSourcesForSocket:raw mode:what multi:self];
+}
+
+- (NSString*)nameForType:(dispatch_source_type_t)type
+{
+    return (type == DISPATCH_SOURCE_TYPE_READ) ? @"reader" : @"writer";
+}
+
+- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket required:(BOOL)required
+{
+    if (required)
+    {
+        if (!source)
+        {
+            CURLHandleLog(@"added source %@ for socket %d", [self nameForType:type], socket);
+            source = dispatch_source_create(type, socket, 0, self.queue);
+            dispatch_source_set_event_handler(source, ^{
+                CURLHandleLog(@"socket %d ready to read", socket);
+                int running;
+                curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
+                [self processMulti];
+            });
+            dispatch_source_set_cancel_handler(source, ^{
+                CURLHandleLog(@"removed %@ for socket %d", [self nameForType:type], socket);
+                dispatch_release(source);
+            });
+            dispatch_resume(source);
+        }
+    }
+    else if (source)
+    {
+        dispatch_source_cancel(source);
+        source = nil;
+    }
+
+    return source;
 }
 
 #pragma mark - Callbacks
