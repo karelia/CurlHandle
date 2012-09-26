@@ -59,11 +59,28 @@
 - (void)shutdown;
 
 /**
- * Add a CURLHandle to the multi.
+ * Assign a CURLHandle to the multi to manage.
+ * CURLHandle uses this method internally when you call loadRequest:withMulti: on a handle,
+ * so generally you don't need to call it directly.
+ * The multi will retain the handle for as long as it needs it, but will silently release it once
+ * the handle's upload/download has completed or failed.
+ *
+ * @param handle The handle to manage. Will be retained by the multi.
  */
 
-- (void)addHandle:(CURLHandle*)handle;
-- (void)removeHandle:(CURLHandle*)handle;
+- (void)manageHandle:(CURLHandle*)handle;
+
+/** 
+ * Cancel a handle, and remove it from the multi.
+ * Cancelling the handle will cause the multi to release it, will stop any progress on it, will call
+ * the cancel method on the handle, and will report to the delegate that it was cancelled.
+ *
+ * It is safe to call this method for a handle that has already been cancelled, or has completed,
+ * (or indeed was never managed by the multi). Doing so will simply do nothing.
+ *
+ * @param handle The handle to cancel. Should have previously been added with manageHandle:.
+ */
+
 - (void)cancelHandle:(CURLHandle*)handle;
 
 - (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket required:(BOOL)required;

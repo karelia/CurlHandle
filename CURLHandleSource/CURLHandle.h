@@ -103,11 +103,4 @@ extern NSString				*sProxyUserIDAndPassword;
 
 @end
 
-#pragma mark - Error Domains
-
-extern NSString * const CURLcodeErrorDomain;
-extern NSString * const CURLMcodeErrorDomain;
-extern NSString * const CURLSHcodeErrorDomain;
-
-
 

@@ -110,10 +110,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Easy Handle Management
 
-- (void)addHandle:(CURLHandle*)handle
+- (void)manageHandle:(CURLHandle*)handle
 {
     NSAssert(self.queue, @"need queue");
     NSAssert(self.handles, @"need handles");
+    NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
 
     dispatch_async(self.queue, ^{
         CURLMcode result = curl_multi_add_handle(self.multi, [handle curl]);
@@ -130,26 +131,19 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     });
 }
 
-- (void)removeHandle:(CURLHandle*)handle
-{
-    NSAssert(self.queue, @"need queue");
-
-    dispatch_async(self.queue, ^{
-        [self removeHandleInternal:handle];
-    });
-
-}
-
 - (void)cancelHandle:(CURLHandle*)handle
 {
     NSAssert(self.queue, @"need queue");
 
     dispatch_async(self.queue, ^{
-        [handle retain];
-        [self removeHandleInternal:handle];
-        [handle cancel];
-        [handle completeWithCode:CURLM_CANCELLED];
-        [handle release];
+        if ([self.handles containsObject:handle])
+        {
+            [handle retain];
+            [self removeHandleInternal:handle];
+            [handle cancel];
+            [handle completeWithCode:CURLM_CANCELLED];
+            [handle release];
+        }
     });
 
 }

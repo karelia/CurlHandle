@@ -628,7 +628,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     CURLcode code = [self setupRequest:request];
     if (code == CURLE_OK)
     {
-        [multi addHandle:self];
+        [multi manageHandle:self];
     }
     else
     {
