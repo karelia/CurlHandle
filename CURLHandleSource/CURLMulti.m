@@ -38,7 +38,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Synthesized Properties
 
-@synthesize cancelled = _cancelled;
 @synthesize handles = _handles;
 @synthesize multi = _multi;
 @synthesize queue = _queue;
