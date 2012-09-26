@@ -11,6 +11,7 @@
 		22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		221EAD11160B167900E4F270 /* CURLMulti.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMulti.h */; };
 		221EAD12160B167900E4F270 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
+		222FCC24161311BA00AB477F /* CURLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22731037161305FF00D6D49E /* CURLSocket.m */; };
 		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
 		223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD096160B523700BE1C80 /* Cocoa.framework */; };
 		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
@@ -30,6 +31,8 @@
 		2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */; };
 		2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */; };
 		2270F4AE16109133009B6F98 /* NSString+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */; };
+		22731038161305FF00D6D49E /* CURLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 22731036161305FF00D6D49E /* CURLSocket.h */; };
+		22731039161305FF00D6D49E /* CURLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22731037161305FF00D6D49E /* CURLSocket.m */; };
 		22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */; };
 		22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
 		22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
@@ -70,6 +73,8 @@
 		2270F4A6161090AB009B6F98 /* CURLResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLResponse.m; sourceTree = "<group>"; };
 		2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+CURLHandle.h"; sourceTree = "<group>"; };
 		2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+CURLHandle.m"; sourceTree = "<group>"; };
+		22731036161305FF00D6D49E /* CURLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLSocket.h; sourceTree = "<group>"; };
+		22731037161305FF00D6D49E /* CURLSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLSocket.m; sourceTree = "<group>"; };
 		22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+CURLHandle.h"; sourceTree = "<group>"; };
 		22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+CURLHandle.m"; sourceTree = "<group>"; };
 		229748FA1610C1AE0042A51A /* CURLHandleBasedTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLHandleBasedTest.h; sourceTree = "<group>"; };
@@ -164,6 +169,8 @@
 				79B96CBC0A6360F90060AC12 /* CURLHandle.m */,
 				221EAD0F160B167900E4F270 /* CURLMulti.h */,
 				221EAD10160B167900E4F270 /* CURLMulti.m */,
+				22731036161305FF00D6D49E /* CURLSocket.h */,
+				22731037161305FF00D6D49E /* CURLSocket.m */,
 				79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */,
 				79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */,
 				27229B3814C83905007D0FF1 /* CURLProtocol.h */,
@@ -271,6 +278,7 @@
 				2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */,
 				2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */,
 				2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */,
+				22731038161305FF00D6D49E /* CURLSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,6 +400,7 @@
 				22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */,
 				22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */,
 				229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */,
+				222FCC24161311BA00AB477F /* CURLSocket.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +416,7 @@
 				2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
 				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,
 				2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
+				22731039161305FF00D6D49E /* CURLSocket.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

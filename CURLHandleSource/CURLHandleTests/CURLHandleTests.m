@@ -14,6 +14,11 @@
 
 @implementation CURLHandleTests
 
+- (void)testVersion
+{
+    CURLHandleLog(@"curl version %@", [CURLHandle curlVersion]);
+}
+
 - (void)testHTTPDownload
 {
     CURLHandle* handle = [[CURLHandle alloc] init];

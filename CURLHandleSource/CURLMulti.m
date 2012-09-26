@@ -8,6 +8,7 @@
 #import "CURLMulti.h"
 
 #import "CURLHandle.h"
+#import "CURLSocket.h"
 
 @interface CURLMulti()
 
@@ -17,9 +18,11 @@
 @property (strong, nonatomic) NSMutableArray* handles;
 @property (assign, nonatomic) CURLM* multi;
 @property (assign, nonatomic) dispatch_queue_t queue;
-@property (assign, nonatomic) struct timeval timeout;
+@property (assign, nonatomic) dispatch_source_t timer;
 
 - (void)updateTimeout:(NSInteger)timeout;
+- (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what;
+- (void)processMulti;
 
 @end
 
@@ -39,7 +42,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 @synthesize handles = _handles;
 @synthesize multi = _multi;
 @synthesize queue = _queue;
-@synthesize timeout = _timeout;
+@synthesize timer = _timer;
 
 #pragma mark - Object Lifecycle
 
@@ -64,10 +67,22 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             self.handles = [NSMutableArray array];
             self.queue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
             dispatch_set_target_queue(self.queue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
-            struct timeval timeout;
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 1000;
-            self.timeout = timeout;
+            self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
+            dispatch_source_set_event_handler(self.timer, ^{
+                if (self.multi)
+                {
+                    int running;
+                    curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
+                    [self processMulti];
+                }
+            });
+
+            dispatch_source_set_cancel_handler(self.timer, ^{
+                CURLHandleLog(@"cancelled timer");
+                dispatch_release(self.timer);
+                self.timer = nil;
+            });
+
         }
         else
         {
@@ -94,12 +109,18 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 {
     CURLHandleLog(@"started monitoring");
-    [self monitorMulti];
+    dispatch_resume(self.timer);
+    //[self monitorMulti];
 }
 
 
 - (void)shutdown
 {
+    if (self.timer)
+    {
+        dispatch_source_cancel(self.timer);
+    }
+
     if (self.multi)
     {
         [self removeAllHandles];
@@ -210,15 +231,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             result = curl_multi_setopt(multi, CURLMOPT_TIMERDATA, self);
         }
 
-//        if (result == CURLM_OK)
-//        {
-//            result = curl_multi_setopt(multi, CURLMOPT_SOCKETFUNCTION, socket_callback);
-//        }
-//
-//        if (result == CURLM_OK)
-//        {
-//            result = curl_multi_setopt(multi, CURLMOPT_SOCKETDATA, self);
-//        }
+        if (result == CURLM_OK)
+        {
+            result = curl_multi_setopt(multi, CURLMOPT_SOCKETFUNCTION, socket_callback);
+        }
+
+        if (result == CURLM_OK)
+        {
+            result = curl_multi_setopt(multi, CURLMOPT_SOCKETDATA, self);
+        }
 
         if (result == CURLM_OK)
         {
@@ -238,68 +259,75 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     self.multi = nil;
 }
 
-- (void)monitorMulti
-{
+//- (void)monitorMulti
+//{
 //    int running;
 //    curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
-    
-    static int MAX_FDS = 128;
-    fd_set read_fds;
-    fd_set write_fds;
-    fd_set exc_fds;
-    int count = MAX_FDS;
-    CURLMcode result;
+//
+//    static int MAX_FDS = 128;
+//    fd_set read_fds;
+//    fd_set write_fds;
+//    fd_set exc_fds;
+//    int count = MAX_FDS;
+//    CURLMcode result;
+//
+//    FD_ZERO(&read_fds);
+//    FD_ZERO(&write_fds);
+//    FD_ZERO(&exc_fds);
+//    count = FD_SETSIZE;
+//    result = curl_multi_fdset(self.multi, &read_fds, &write_fds, &exc_fds, &count);
+//
+//    if (result == CURLM_OK)
+//    {
+//        struct timeval timeout = self.timeout;
+//        count = select(count + 1, &read_fds, &write_fds, &exc_fds, &timeout);
+//        result = curl_multi_perform(self.multi, &count);
+//
+//        [self processMulti];
+//    }
+//
+//    if (result != CURLM_OK)
+//    {
+//        CURLHandleLog(@"curl error encountered whilst monitoring multi %d", result);
+//    }
+//
+//    if ((result == CURLM_OK) && !self.cancelled)
+//    {
+//        dispatch_async(self.queue, ^{
+//            [self monitorMulti];
+//        });
+//    }
+//    else
+//    {
+//        CURLHandleLog(@"stopped monitoring");
+//    }
+//}
 
-    FD_ZERO(&read_fds);
-    FD_ZERO(&write_fds);
-    FD_ZERO(&exc_fds);
-    count = FD_SETSIZE;
-    result = curl_multi_fdset(self.multi, &read_fds, &write_fds, &exc_fds, &count);
-
-    if (result == CURLM_OK)
+- (void)processMulti
+{
+    CURLMsg* message;
+    int count;
+    while ((message = curl_multi_info_read(self.multi, &count)) != nil)
     {
-        struct timeval timeout = self.timeout;
-        count = select(count + 1, &read_fds, &write_fds, &exc_fds, &timeout);
-        result = curl_multi_perform(self.multi, &count);
-
-        CURLMsg* message;
-        while ((message = curl_multi_info_read(self.multi, &count)) != nil)
+        CURLHandleLog(@"got multi message %d", message->msg);
+        if (message->msg == CURLMSG_DONE)
         {
-            CURLHandleLog(@"got multi message %d", message->msg);
-            if (message->msg == CURLMSG_DONE)
+            CURLHandle* handle = [self findHandleWithEasyHandle:message->easy_handle];
+            if (handle)
             {
-                CURLHandle* handle = [self findHandleWithEasyHandle:message->easy_handle];
-                if (handle)
-                {
-                    [handle retain];
-                    [self removeHandleInternal:handle];
-                    [handle completeWithCode:CURLM_OK];
-                    [handle release];
-                }
-                else
-                {
-                    // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
-                    CURLHandleLog(@"seem to have an easy handle without a matching CURLHandle");
-                    result = curl_multi_remove_handle(self.multi, message->easy_handle);
-                }
+                [handle retain];
+                [self removeHandleInternal:handle];
+                [handle completeWithCode:CURLM_OK];
+                [handle release];
+            }
+            else
+            {
+                // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
+                CURLHandleLog(@"seem to have an easy handle without a matching CURLHandle");
+                CURLMcode result = curl_multi_remove_handle(self.multi, message->easy_handle);
+                NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
             }
         }
-    }
-
-    if (result != CURLM_OK)
-    {
-        CURLHandleLog(@"curl error encountered whilst monitoring multi %d", result);
-    }
-
-    if ((result == CURLM_OK) && !self.cancelled)
-    {
-        dispatch_async(self.queue, ^{
-            [self monitorMulti];
-        });
-    }
-    else
-    {
-        CURLHandleLog(@"stopped monitoring");
     }
 }
 
@@ -313,21 +341,22 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         timeout = kMaximumTimeoutMilliseconds;
     }
 
-    struct timeval tv;
-    tv.tv_sec = timeout / 1000;
-    tv.tv_usec = (timeout % 1000) * 1000;
-    self.timeout = tv;
+    int64_t nano_timeout = timeout * 1000000LL;
+    dispatch_source_set_timer(self.timer, DISPATCH_TIME_NOW, nano_timeout, nano_timeout / 100);
 
     CURLHandleLog(@"timeout changed to %ldms", timeout);
 }
 
-- (void)updateSocket:(curl_socket_t)socket what:(NSInteger)what source:(dispatch_source_t)source
+- (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
 {
-    CURLHandleLog(@"socket callback what: %ld socket: %p", what, (void*) socket);
-    if (!source)
+    CURLHandleLog(@"socket callback what: %ld socket:%@", what, (void*) socket);
+    if (!socket)
     {
-        source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socket, 0, self.queue);
+        socket = [[CURLSocket alloc] init];
+        curl_multi_assign(self.multi, raw, socket);
     }
+
+    [socket updateSourcesForSocket:raw mode:what multi:self.multi queue:self.queue];
 }
 
 #pragma mark - Callbacks
@@ -344,7 +373,7 @@ int timeout_callback(CURLM *multi, long timeout_ms, void *userp)
 int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *socketp)
 {
     CURLMulti* source = userp;
-    [source updateSocket:s what:what source:socketp];
+    [source updateSocket:socketp raw:s what:what];
 
     return CURLM_OK;
 }

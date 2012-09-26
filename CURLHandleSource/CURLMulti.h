@@ -17,7 +17,7 @@
     NSMutableArray* _handles;
     CURLM* _multi;
     dispatch_queue_t _queue;
-    struct timeval _timeout;
+    dispatch_source_t _timer;
 }
 
 + (CURLMulti*)sharedInstance;
