@@ -11,6 +11,7 @@
 #import "CURLMulti.h"
 #import "CURLResponse.h"
 
+#import "NSString+CURLHandle.h"
 #import "NSURLRequest+CURLHandle.h"
 
 #define NSS(s) (NSString *)(s)
@@ -734,12 +735,16 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
                             NSURL *url = [[NSURL alloc] initWithString:urlString];
                             if (url)
                             {
-                                NSURLResponse *response = [[CURLResponse alloc] initWithURL:url
-                                                                                 statusCode:code
-                                                                               headerString:headerString];
+                                Class responseClass = ([NSHTTPURLResponse instancesRespondToSelector:@selector(initWithURL:statusCode:HTTPVersion:headerFields:)] ? [NSHTTPURLResponse class] : [CURLResponse class]);
+                                
+                                NSURLResponse *response = [[responseClass alloc] initWithURL:url
+                                                                                  statusCode:code
+                                                                                 HTTPVersion:[headerString headerHTTPVersion]
+                                                                                headerFields:[headerString allHTTPHeaderFields]];
                                 
                                 [[self delegate] handle:self didReceiveResponse:response];
                                 [response release];
+                                
                                 [url release];
                             }
                             

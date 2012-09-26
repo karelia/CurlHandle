@@ -13,6 +13,6 @@
     NSDictionary    *_headerFields;
 }
 
-- (id)initWithURL:(NSURL *)URL statusCode:(NSInteger)statusCode headerString:(NSString *)headerString;
+// Implements -initWithURL:statusCode:HTTPVersion:headerFields: on release prior to 10.7.2
 
 @end

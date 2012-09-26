@@ -6,14 +6,11 @@
 
 #import "CURLResponse.h"
 
-#import "NSString+CURLHandle.h"
 
 @implementation CURLResponse
 
-- (id)initWithURL:(NSURL *)URL statusCode:(NSInteger)statusCode headerString:(NSString *)headerString;
-{
-    NSDictionary *fields = [headerString allHTTPHeaderFields];
-    
+- (id)initWithURL:(NSURL *)URL statusCode:(NSInteger)statusCode HTTPVersion:(NSString *)HTTPVersion headerFields:(NSDictionary *)fields;
+{    
     if (self = [self initWithURL:URL
                         MIMEType:[fields objectForKey:@"Content-Type"]
            expectedContentLength:[[fields objectForKey:@"Content-Length"] integerValue]
