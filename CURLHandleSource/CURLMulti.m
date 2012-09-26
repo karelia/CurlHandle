@@ -349,6 +349,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             CURLHandleLog(@"removed socket:%@", socket);
 #ifndef __clang_analyzer__
             [socket release];
+            socket = nil;
 #endif
             curl_multi_assign(self.multi, raw, nil);
             break;
@@ -380,10 +381,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             CURLHandleLog(@"%@ added for socket %d", [self nameForType:type], socket);
             source = dispatch_source_create(type, socket, 0, self.queue);
             dispatch_source_set_event_handler(source, ^{
-                CURLHandleLog(@"%@ for socket %d ready", [self nameForType:type], socket);
-                int running;
-                curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
-                [self processMulti];
+                if (self.multi)
+                {
+                    CURLHandleLog(@"%@ for socket %d ready", [self nameForType:type], socket);
+                    int running;
+                    curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
+                    [self processMulti];
+                }
             });
             dispatch_source_set_cancel_handler(source, ^{
                 CURLHandleLog(@"%@ removed for socket %d", [self nameForType:type], socket);
