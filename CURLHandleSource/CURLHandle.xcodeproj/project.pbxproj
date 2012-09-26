@@ -22,7 +22,7 @@
 		223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
 		223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 223FD0B1160B63F800BE1C80 /* DevNotes.txt */; };
-		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; };
+		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
 		2270F4A316108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
 		2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4A5161090AB009B6F98 /* CURLResponse.h */; };
