@@ -11,7 +11,15 @@
 
 #import <curl/curl.h>
 
+@interface CURLSocket()
+@property (assign, nonatomic) dispatch_source_t reader;
+@property (assign, nonatomic) dispatch_source_t writer;
+@end
+
 @implementation CURLSocket
+
+@synthesize reader = _reader;
+@synthesize writer = _writer;
 
 - (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMulti*)multi
 {

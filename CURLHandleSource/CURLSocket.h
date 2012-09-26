@@ -11,9 +11,10 @@
 @class CURLMulti;
 
 @interface CURLSocket : NSObject
-
-@property (assign, nonatomic) dispatch_source_t reader;
-@property (assign, nonatomic) dispatch_source_t writer;
+{
+    dispatch_source_t _reader;
+    dispatch_source_t _writer;
+}
 
 - (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMulti*)multi;
 

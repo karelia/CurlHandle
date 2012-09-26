@@ -333,7 +333,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     int64_t nano_timeout = timeout * 1000000LL;
     dispatch_source_set_timer(self.timer, DISPATCH_TIME_NOW, nano_timeout, nano_timeout / 100);
 
-    CURLHandleLog(@"timeout changed to %ldms", timeout);
+    CURLHandleLog(@"timeout changed to %ldms", (long)timeout);
 }
 
 - (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
