@@ -349,7 +349,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
 {
-    CURLHandleLog(@"socket callback what: %ld socket:%@", what, (void*) socket);
     switch(what)
     {
         case CURL_POLL_NONE:
@@ -358,15 +357,21 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
         case CURL_POLL_REMOVE:
             NSAssert(socket != nil, @"should have socket");
+            CURLHandleLog(@"removed socket:%@", socket);
+#ifndef __clang_analyzer__
             [socket release];
+#endif
             curl_multi_assign(self.multi, raw, nil);
             break;
     }
 
     if (!socket)
     {
+#ifndef __clang_analyzer__
         socket = [[CURLSocket alloc] init];
+#endif
         curl_multi_assign(self.multi, raw, socket);
+        CURLHandleLog(@"new socket:%@", socket);
     }
 
     [socket updateSourcesForSocket:raw mode:what multi:self];
@@ -383,16 +388,16 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         if (!source)
         {
-            CURLHandleLog(@"added source %@ for socket %d", [self nameForType:type], socket);
+            CURLHandleLog(@"%@ added for socket %d", [self nameForType:type], socket);
             source = dispatch_source_create(type, socket, 0, self.queue);
             dispatch_source_set_event_handler(source, ^{
-                CURLHandleLog(@"socket %d ready to read", socket);
+                CURLHandleLog(@"%@ for socket %d ready", [self nameForType:type], socket);
                 int running;
                 curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
                 [self processMulti];
             });
             dispatch_source_set_cancel_handler(source, ^{
-                CURLHandleLog(@"removed %@ for socket %d", [self nameForType:type], socket);
+                CURLHandleLog(@"%@ removed for socket %d", [self nameForType:type], socket);
                 dispatch_release(source);
             });
             dispatch_resume(source);
