@@ -14,7 +14,6 @@
 
 #pragma mark - Private Properties
 
-@property (assign, nonatomic) BOOL cancelled;
 @property (strong, nonatomic) NSMutableArray* handles;
 @property (assign, nonatomic) CURLM* multi;
 @property (assign, nonatomic) dispatch_queue_t queue;
@@ -103,7 +102,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     if (self.multi)
     {
         [self removeAllHandles];
-        self.cancelled = YES;
         [self releaseQueue];
 
         CURLHandleLog(@"shutdown");

@@ -45,8 +45,22 @@
 
 + (CURLMulti*)sharedInstance;
 
+
+/** Prepare the multi for work. Needs to be called once before addHandle is called. Should be matched with a call to shutdown
+ * before the multi is destroyed.
+ */
+
 - (void)startup;
+
+/** 
+ * Shut down the multi and clean up all resources that it was using.
+ */
+
 - (void)shutdown;
+
+/**
+ * Add a CURLHandle to the multi.
+ */
 
 - (void)addHandle:(CURLHandle*)handle;
 - (void)removeHandle:(CURLHandle*)handle;
