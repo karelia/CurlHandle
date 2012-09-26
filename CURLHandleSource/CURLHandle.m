@@ -161,8 +161,9 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     // see http://curl.haxx.se/mail/lib-2009-10/0222.html
     curl_easy_reset(_curl);
 
-	curl_easy_cleanup(_curl);
-	_curl = nil;
+    curl_easy_cleanup(_curl);
+    _curl = nil;
+
 	[_headerBuffer release];
 	[_proxies release];
 	[_stringOptions release];
@@ -575,16 +576,22 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 - (void)cleanup
 {
-    // Cleanup
-//    curl_easy_setopt(_curl, CURLOPT_DEBUGFUNCTION, 0);
-//    curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, 0);
-//    curl_easy_setopt(_curl, CURLOPT_READFUNCTION, 0);
-//    curl_easy_setopt(_curl, CURLOPT_HEADERFUNCTION, 0);
-//    curl_easy_setopt(_curl, CURLOPT_SOCKOPTFUNCTION, 0);
+    if (_uploadStream)
+    {
+        [_uploadStream close];
+    }
 
-    [_uploadStream close];
-    if (self.httpHeaders) curl_slist_free_all(self.httpHeaders);
-    if (self.postQuoteCommands) curl_slist_free_all(self.postQuoteCommands);
+    if (self.httpHeaders)
+    {
+        curl_slist_free_all(self.httpHeaders);
+        self.httpHeaders = nil;
+    }
+
+    if (self.postQuoteCommands)
+    {
+        curl_slist_free_all(self.postQuoteCommands);
+        self.postQuoteCommands = nil;
+    }
 
     _executing = NO;
 }
