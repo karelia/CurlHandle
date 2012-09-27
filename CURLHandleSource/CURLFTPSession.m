@@ -167,27 +167,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
     _connectionFinishedBlock = [_connectionFinishedBlock copy];
 }
 
-- (void)handle:(CURLHandle *)handle didFailWithError:(NSError *)error;
-{
-    if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
-    _connectionFinishedBlock(error);
-    
-    // Clean up
-    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_enumerationURL release]; _enumerationURL = nil;
-    [_data release]; _data = nil;
-}
-
-- (void)handleDidFinish:(CURLHandle *)handle;
-{
-    _connectionFinishedBlock(nil);
-    
-    // Clean up
-    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_enumerationURL release]; _enumerationURL = nil;
-    [_data release]; _data = nil;
-}
-
 #pragma mark Discovering Directory Contents
 
 - (void)enumerateContentsOfDirectoryAtPath:(NSString *)path usingBlock:(void (^)(NSDictionary *parsedResourceListing, NSError *error))block;
@@ -380,6 +359,17 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 @synthesize delegate = _delegate;
 
+- (void)handle:(CURLHandle *)handle didFailWithError:(NSError *)error;
+{
+    if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
+    _connectionFinishedBlock(error);
+    
+    // Clean up
+    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
+    [_enumerationURL release]; _enumerationURL = nil;
+    [_data release]; _data = nil;
+}
+
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
 {
     [_data appendData:data];
@@ -391,6 +381,16 @@ createIntermediateDirectories:(BOOL)createIntermediates
     {
         _progressBlock(bytesWritten);
     }
+}
+
+- (void)handleDidFinish:(CURLHandle *)handle;
+{
+    _connectionFinishedBlock(nil);
+    
+    // Clean up
+    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
+    [_enumerationURL release]; _enumerationURL = nil;
+    [_data release]; _data = nil;
 }
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
