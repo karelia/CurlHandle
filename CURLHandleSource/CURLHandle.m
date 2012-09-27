@@ -631,8 +631,24 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return code == CURLE_OK;
 }
 
-- (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti *)multi
+- (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti*)multi credential:(NSURLCredential *)credential;
 {
+    if (credential)
+    {
+        NSString *username = [credential user];
+        [self setString:username forKey:CURLOPT_USERNAME];
+        
+        NSString *password = [credential password];
+        if (password)
+        {
+            [self setString:password forKey:CURLOPT_PASSWORD];
+        }
+        else
+        {
+            NSLog(@"Credential with no password");
+        }
+    }
+    
     CURLcode code = [self setupRequest:request];
     if (code == CURLE_OK)
     {

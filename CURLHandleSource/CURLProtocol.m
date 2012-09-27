@@ -52,7 +52,7 @@
     // Turn automatic redirects off by default, so can properly report them to delegate
     curl_easy_setopt([handle curl], CURLOPT_FOLLOWLOCATION, NO);
     
-    [handle loadRequest:[self request] withMulti:multi];
+    [handle loadRequest:[self request] withMulti:multi credential:nil];
 
     self.handle = handle;
     [handle release];
