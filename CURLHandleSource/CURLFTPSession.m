@@ -172,6 +172,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     _data = [[NSMutableData alloc] init];
     
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
+    [request setShouldUseCurlHandle:YES];
     _enumerationURL = [[request URL] copy];
     
     [NSURLConnection connectionWithRequest:request delegate:self];
