@@ -239,7 +239,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLMsg* message;
     int count;
-    while ((message = curl_multi_info_read(self.multi, &count)) != nil)
+    while ((message = curl_multi_info_read(self.multi, &count)) != NULL)
     {
         CURLHandleLog(@"got multi message %d", message->msg);
         if (message->msg == CURLMSG_DONE)
