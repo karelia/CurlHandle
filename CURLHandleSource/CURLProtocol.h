@@ -8,7 +8,7 @@
 #import "CURLHandle.h"
 
 
-@interface CURLProtocol : NSURLProtocol <CURLHandleDelegate>
+@interface CURLProtocol : NSURLProtocol <CURLHandleDelegate, NSURLAuthenticationChallengeSender>
 {
     CURLHandle* _handle;
 }

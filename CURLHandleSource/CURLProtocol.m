@@ -44,6 +44,42 @@
 
 - (void)startLoading;
 {
+    // Request auth before trying FTP connection
+    NSURL *url = [[self request] URL];
+    NSString *scheme = [url scheme];
+    
+    if ([@"ftp" caseInsensitiveCompare:scheme] == NSOrderedSame || [@"ftps" caseInsensitiveCompare:scheme] == NSOrderedSame)
+    {
+        NSString *protocol = ([@"ftps" caseInsensitiveCompare:scheme] == NSOrderedSame ? @"ftps" : NSURLProtectionSpaceFTP);
+        
+        NSURLProtectionSpace *space = [[NSURLProtectionSpace alloc] initWithHost:[url host]
+                                                                            port:[[url port] integerValue]
+                                                                        protocol:protocol
+                                                                           realm:nil
+                                                            authenticationMethod:NSURLAuthenticationMethodDefault];
+        
+        NSURLCredential *credential = [[NSURLCredentialStorage sharedCredentialStorage] defaultCredentialForProtectionSpace:space];
+        
+        NSURLAuthenticationChallenge *challenge = [[NSURLAuthenticationChallenge alloc] initWithProtectionSpace:space
+                                                                                             proposedCredential:credential
+                                                                                           previousFailureCount:0
+                                                                                                failureResponse:nil
+                                                                                                          error:nil
+                                                                                                         sender:self];
+        
+        [space release];
+        
+        [[self client] URLProtocol:self didReceiveAuthenticationChallenge:challenge];
+        [challenge release];
+        
+        return;
+    }
+    
+    [self startLoadingWithCredential:nil];
+}
+
+- (void)startLoadingWithCredential:(NSURLCredential *)credential;
+{
     CURLMulti* multi = [CURLMulti sharedInstance];
 
     CURLHandle *handle = [[CURLHandle alloc] init];
@@ -52,7 +88,7 @@
     // Turn automatic redirects off by default, so can properly report them to delegate
     curl_easy_setopt([handle curl], CURLOPT_FOLLOWLOCATION, NO);
     
-    [handle loadRequest:[self request] withMulti:multi credential:nil];
+    [handle loadRequest:[self request] withMulti:multi credential:credential];
 
     self.handle = handle;
     [handle release];
@@ -99,6 +135,26 @@
 {
 // TODO: need to pass this info on to the client
 }
+
+#pragma mark NSURLAuthenticationChallengeSender
+
+- (void)useCredential:(NSURLCredential *)credential forAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+{
+    [self startLoadingWithCredential:credential];
+}
+
+- (void)continueWithoutCredentialForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+{
+    [self startLoadingWithCredential:nil];
+}
+
+- (void)cancelAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+{
+    [[self client] URLProtocol:self didFailWithError:[NSError errorWithDomain:NSURLErrorDomain
+                                                                         code:NSURLErrorUserAuthenticationRequired
+                                                                     userInfo:nil]];
+}
+
 @end
 
 
