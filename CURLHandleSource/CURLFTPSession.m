@@ -140,6 +140,27 @@ createIntermediateDirectories:(BOOL)createIntermediates
     return result;
 }
 
+- (void)sendRequest:(NSURLRequest *)request completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
+{
+    _data = [[NSMutableData alloc] init];
+
+    request = [request copy];
+    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
+    
+    _connectionFinishedBlock = ^(NSError *error){
+        
+        handler(handle, error);
+        
+        // Clean up
+        [handle release];
+        [request release];  // release late to work around CURLHandle bug
+    };
+    
+    _connectionFinishedBlock = [_connectionFinishedBlock copy];
+}
+
+#pragma mark Home Directory
+
 - (void)findHomeDirectoryWithCompletionHandler:(void (^)(NSString *path, NSError *error))handler;
 {
     // Deliberately want a request that should avoid doing any work
@@ -147,9 +168,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     [request setURL:[NSURL URLWithString:@"/" relativeToURL:[request URL]]];
     [request setHTTPMethod:@"HEAD"];
     
-    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
-    
-    _connectionFinishedBlock = ^(NSError *error){
+    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
         
         if (error)
         {
@@ -159,12 +178,9 @@ createIntermediateDirectories:(BOOL)createIntermediates
         {
             handler([handle initialFTPPath], error);
         }
-        
-        [handle release];
-        [request release];  // release late to work around CURLHandle bug
-    };
+    }];
     
-    _connectionFinishedBlock = [_connectionFinishedBlock copy];
+    [request release];
 }
 
 #pragma mark Discovering Directory Contents
@@ -172,13 +188,10 @@ createIntermediateDirectories:(BOOL)createIntermediates
 - (void)enumerateContentsOfDirectoryAtPath:(NSString *)path usingBlock:(void (^)(NSDictionary *parsedResourceListing, NSError *error))block;
 {
     if (!path) path = @".";
-    
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
-    _enumerationURL = [[request URL] copy];
     
-    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
-    
-    _connectionFinishedBlock = ^(NSError *error){
+    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
+        
         if (error)
         {
             block(nil, error);
@@ -209,8 +222,8 @@ createIntermediateDirectories:(BOOL)createIntermediates
                 {
                     // error!
                     NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                              _enumerationURL, NSURLErrorFailingURLErrorKey,
-                                              [_enumerationURL absoluteString], NSURLErrorFailingURLStringErrorKey,
+                                              [request URL], NSURLErrorFailingURLErrorKey,
+                                              [[request URL] absoluteString], NSURLErrorFailingURLStringErrorKey,
                                               nil];
                     
                     NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
@@ -226,13 +239,9 @@ createIntermediateDirectories:(BOOL)createIntermediates
                 }
             }
         }
-        
-        [handle release];
-        [request release];  // release late to work around CURLHandle bug
-    };
+    }];
     
-    _connectionFinishedBlock = [_connectionFinishedBlock copy];
-    _data = [[NSMutableData alloc] init];
+    [request release];
 }
 
 #pragma mark Creating and Deleting Items
@@ -366,7 +375,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
     
     // Clean up
     [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_enumerationURL release]; _enumerationURL = nil;
     [_data release]; _data = nil;
 }
 
@@ -389,7 +397,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
     
     // Clean up
     [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_enumerationURL release]; _enumerationURL = nil;
     [_data release]; _data = nil;
 }
 

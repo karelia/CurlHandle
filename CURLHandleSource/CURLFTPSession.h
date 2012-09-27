@@ -25,7 +25,6 @@
     // Directory enumeration
     NSMutableData   *_data;
     void            (^_connectionFinishedBlock)(NSError *error);
-    NSURL           *_enumerationURL;
 }
 
 // Returns nil if not a supported FTP URL
