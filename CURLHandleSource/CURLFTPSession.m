@@ -164,19 +164,45 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 #pragma mark Discovering Directory Contents
 
-- (BOOL)enumerateContentsOfDirectoryAtPath:(NSString *)path
-                                     error:(NSError **)error
-                                usingBlock:(void (^)(NSDictionary *parsedResourceListing))block;
+- (void)enumerateContentsOfDirectoryAtPath:(NSString *)path usingBlock:(void (^)(NSDictionary *parsedResourceListing, NSError *error))block;
 {
     if (!path) path = @".";
     
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
-    
+    _enumerationBlock = [block copy];
     _data = [[NSMutableData alloc] init];
-    BOOL result = [_handle loadRequest:request error:error];
     
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
+    _enumerationURL = [[request URL] copy];
+    
+    [NSURLConnection connectionWithRequest:request delegate:self];
+    [request release];
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
+{
+    if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
+    _enumerationBlock(nil, error);
+    
+    // Clean up
+    [_enumerationBlock release]; _enumerationBlock = nil;
+    [_enumerationURL release]; _enumerationURL = nil;
+    [_data release]; _data = nil;
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+{
+    [[challenge sender] useCredential:_credential forAuthenticationChallenge:challenge];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
+{
+    [_data appendData:data];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection;
+{
     // Process the data to make a directory listing
-    while (result)
+    while (1)
     {
         CFDictionaryRef parsedDict = NULL;
         CFIndex bytesConsumed = CFFTPCreateParsedResourceListing(NULL,
@@ -189,7 +215,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
             // parse the incoming data
             if (parsedDict)
             {
-                block((NSDictionary *)parsedDict);
+                _enumerationBlock((NSDictionary *)parsedDict, nil);
                 CFRelease(parsedDict);
             }
             
@@ -198,29 +224,28 @@ createIntermediateDirectories:(BOOL)createIntermediates
         else if (bytesConsumed < 0)
         {
             // error!
-            if (error)
-            {
-                NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                          [request URL], NSURLErrorFailingURLErrorKey,
-                                          [[request URL] absoluteString], NSURLErrorFailingURLStringErrorKey,
-                                          nil];
-                
-                *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
-                [userInfo release];
-            }
-            result = NO;
+            NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                      _enumerationURL, NSURLErrorFailingURLErrorKey,
+                                      [_enumerationURL absoluteString], NSURLErrorFailingURLStringErrorKey,
+                                      nil];
+            
+            NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
+            [userInfo release];
+            
+            _enumerationBlock(nil, error);
+            break;
         }
         else
         {
+            _enumerationBlock(nil, nil);
             break;
         }
     }
     
-    [request release];
+    // Clean up
+    [_enumerationBlock release]; _enumerationBlock = nil;
+    [_enumerationURL release]; _enumerationURL = nil;
     [_data release]; _data = nil;
-    
-    
-    return result;
 }
 
 #pragma mark Creating and Deleting Items

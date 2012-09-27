@@ -11,7 +11,7 @@
 @protocol CURLFTPSessionDelegate;
 
 
-@interface CURLFTPSession : NSObject <CURLHandleDelegate>
+@interface CURLFTPSession : NSObject <CURLHandleDelegate, NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 {
   @private
     CURLHandle          *_handle;
@@ -20,8 +20,12 @@
     
     id <CURLFTPSessionDelegate> _delegate;
     
-    NSMutableData   *_data;
     void            (^_progressBlock)(NSUInteger bytesWritten);
+    
+    // Directory enumeration
+    NSMutableData   *_data;
+    void            (^_enumerationBlock)(NSDictionary *parsedResourceListing, NSError *error);
+    NSURL           *_enumerationURL;
 }
 
 // Returns nil if not a supported FTP URL
@@ -37,10 +41,8 @@
 
 #pragma mark Discovering Directory Contents
 
-// Potentially, directory listings arrive in pieces. As the listing is parsed, each resource is passed to the block as dictionary with keys such as kCFFTPResourceName
-- (BOOL)enumerateContentsOfDirectoryAtPath:(NSString *)path
-                                     error:(NSError **)error
-                                usingBlock:(void (^)(NSDictionary *parsedResourceListing))block;
+// Potentially, directory listings arrive in pieces. As the listing is received & parsed, each resource is passed to the block as dictionary with keys such as kCFFTPResourceName. When the listing finishes, the block is invoked with a parsedResourceListing of nil. The same happens upon failure with an error object supplied too
+- (void)enumerateContentsOfDirectoryAtPath:(NSString *)path usingBlock:(void (^)(NSDictionary *parsedResourceListing, NSError *error))block;
 
 
 #pragma mark Creating and Deleting Items
