@@ -118,10 +118,10 @@
 
 #pragma mark Operations
 
-- (BOOL)executeCustomCommands:(NSArray *)commands
+- (void)executeCustomCommands:(NSArray *)commands
                   inDirectory:(NSString *)directory
 createIntermediateDirectories:(BOOL)createIntermediates
-                        error:(NSError **)error;
+            completionHandler:(void (^)(NSError *error))handler;
 {
     // Navigate to the directory
     // @"HEAD" => CURLOPT_NOBODY, which stops libcurl from trying to list the directory's contents
@@ -134,10 +134,11 @@ createIntermediateDirectories:(BOOL)createIntermediates
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the command twice in my testing
     [request curl_setPostTransferCommands:commands];
     
+    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
+        handler(error);
+    }];
     
-    BOOL result = [_handle loadRequest:request error:error];
     [request release];
-    return result;
 }
 
 - (void)sendRequest:(NSURLRequest *)request completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
@@ -319,15 +320,15 @@ createIntermediateDirectories:(BOOL)createIntermediates
     }];
 }
 
-- (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
+- (void)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates completionHandler:(void (^)(NSError *error))handler;
 {
     return [self executeCustomCommands:[NSArray arrayWithObject:[@"MKD " stringByAppendingString:[path lastPathComponent]]]
                            inDirectory:[path stringByDeletingLastPathComponent]
          createIntermediateDirectories:createIntermediates
-                                 error:error];
+                     completionHandler:handler];
 }
 
-- (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
+- (void)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path completionHandler:(void (^)(NSError *error))handler;
 {
     NSParameterAssert(attributes);
     NSParameterAssert(path);
@@ -340,23 +341,23 @@ createIntermediateDirectories:(BOOL)createIntermediates
                                                       [permissions unsignedLongValue],
                                                       [path lastPathComponent]]];
         
-        BOOL result = [self executeCustomCommands:commands
-                                      inDirectory:[path stringByDeletingLastPathComponent]
-                    createIntermediateDirectories:NO
-                                            error:error];
+        [self executeCustomCommands:commands
+                        inDirectory:[path stringByDeletingLastPathComponent]
+      createIntermediateDirectories:NO
+                  completionHandler:handler];
         
-        if (!result) return NO;
+        return;
     }
     
-    return YES;
+    handler(nil);
 }
 
-- (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
+- (void)removeFileAtPath:(NSString *)path completionHandler:(void (^)(NSError *error))handler;
 {
     return [self executeCustomCommands:[NSArray arrayWithObject:[@"DELE " stringByAppendingString:[path lastPathComponent]]]
                            inDirectory:[path stringByDeletingLastPathComponent]
          createIntermediateDirectories:NO
-                                 error:error];
+                     completionHandler:handler];
 }
 
 #pragma mark Cancellation

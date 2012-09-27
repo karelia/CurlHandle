@@ -51,15 +51,15 @@
 
 - (void)createFileAtPath:(NSString *)path withContentsOfURL:(NSURL *)url withIntermediateDirectories:(BOOL)createIntermediates progressBlock:(void (^)(NSUInteger bytesWritten, NSError *error))progressBlock;
 
-- (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
+- (void)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates completionHandler:(void (^)(NSError *error))handler;
 
-- (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
+- (void)removeFileAtPath:(NSString *)path completionHandler:(void (^)(NSError *error))handler;
 
 
 #pragma mark Setting Attributes
 // Only NSFilePosixPermissions is recognised at present. Note that some servers don't support this so will return an error (code 500)
 // All other attributes are ignored
-- (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
+- (void)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path completionHandler:(void (^)(NSError *error))handler;
 
 
 #pragma mark Cancellation
