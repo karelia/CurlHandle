@@ -194,6 +194,11 @@ createIntermediateDirectories:(BOOL)createIntermediates
 {
     if (!path) path = @".";
     
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
+    _enumerationURL = [[request URL] copy];
+    
+    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
+    
     _connectionFinishedBlock = ^(NSError *error){
         if (error)
         {
@@ -242,48 +247,13 @@ createIntermediateDirectories:(BOOL)createIntermediates
                 }
             }
         }
+        
+        [handle release];
+        [request release];  // release late to work around CURLHandle bug
     };
     
     _connectionFinishedBlock = [_connectionFinishedBlock copy];
     _data = [[NSMutableData alloc] init];
-    
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
-    [request setShouldUseCurlHandle:YES];
-    _enumerationURL = [[request URL] copy];
-    
-    [NSURLConnection connectionWithRequest:request delegate:self];
-    [request release];
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
-{
-    if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
-    _connectionFinishedBlock(error);
-    
-    // Clean up
-    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_enumerationURL release]; _enumerationURL = nil;
-    [_data release]; _data = nil;
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
-{
-    [[challenge sender] useCredential:_credential forAuthenticationChallenge:challenge];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
-{
-    [_data appendData:data];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection;
-{
-    _connectionFinishedBlock(nil);
-    
-    // Clean up
-    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_enumerationURL release]; _enumerationURL = nil;
-    [_data release]; _data = nil;
 }
 
 #pragma mark Creating and Deleting Items

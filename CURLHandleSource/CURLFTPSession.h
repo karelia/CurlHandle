@@ -11,7 +11,7 @@
 @protocol CURLFTPSessionDelegate;
 
 
-@interface CURLFTPSession : NSObject <CURLHandleDelegate, NSURLConnectionDelegate, NSURLConnectionDataDelegate>
+@interface CURLFTPSession : NSObject <CURLHandleDelegate>
 {
   @private
     CURLHandle          *_handle;
