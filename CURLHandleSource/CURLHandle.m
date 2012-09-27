@@ -151,6 +151,17 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 #pragma mark ----- NSURLHANDLE OVERRIDES
 // -----------------------------------------------------------------------------
 
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+{
+    if (self = [self init])
+    {
+        [self setDelegate:delegate];
+        [self loadRequest:request withMulti:[CURLMulti sharedInstance] credential:credential];
+    }
+    
+    return self;
+}
+
 - (void) dealloc
 {
     CURLHandleLog(@"dealloced handle %@ curl %p", self, _curl);

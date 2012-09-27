@@ -39,6 +39,8 @@ extern NSString				*sProxyUserIDAndPassword;
     NSInputStream           *_uploadStream;
 }
 
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+
 @property(nonatomic, assign) id <CURLHandleDelegate> delegate;
 
 //  Loading respects as many of NSURLRequest's built-in features as possible, including:
