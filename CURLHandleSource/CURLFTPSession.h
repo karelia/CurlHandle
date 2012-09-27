@@ -24,7 +24,7 @@
     
     // Directory enumeration
     NSMutableData   *_data;
-    void            (^_enumerationBlock)(NSDictionary *parsedResourceListing, NSError *error);
+    void            (^_connectionFinishedBlock)(NSError *error);
     NSURL           *_enumerationURL;
 }
 
@@ -35,8 +35,8 @@
 
 - (void)useCredential:(NSURLCredential *)credential;
 
-// Note that it's possible for this method to return nil with an error of nil, although I don't know what circumstances could cause this
-- (NSString *)homeDirectoryPath:(NSError **)error;
+// Path is nil if fails for some reason. Note that it's possible for this method fail with an error of nil, although I don't know what circumstances could cause this
+- (void)findHomeDirectoryWithCompletionHandler:(void (^)(NSString *path, NSError *error))handler;
 
 
 #pragma mark Discovering Directory Contents

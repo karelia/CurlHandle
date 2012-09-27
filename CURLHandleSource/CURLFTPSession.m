@@ -140,26 +140,28 @@ createIntermediateDirectories:(BOOL)createIntermediates
     return result;
 }
 
-- (NSString *)homeDirectoryPath:(NSError **)error;
+- (void)findHomeDirectoryWithCompletionHandler:(void (^)(NSString *path, NSError *error))handler;
 {
     // Deliberately want a request that should avoid doing any work
     NSMutableURLRequest *request = [_request mutableCopy];
     [request setURL:[NSURL URLWithString:@"/" relativeToURL:[request URL]]];
     [request setHTTPMethod:@"HEAD"];
+    [request setShouldUseCurlHandle:YES];
     
-    BOOL success = [_handle loadRequest:request error:error];
+    _connectionFinishedBlock = ^(NSError *error){
+        if (error)
+        {
+            handler(nil, error);
+        }
+        else
+        {
+            handler([_handle initialFTPPath], error);
+        }
+    };
+    
+    _connectionFinishedBlock = [_connectionFinishedBlock copy];
+    [NSURLConnection connectionWithRequest:request delegate:self];
     [request release];
-    
-    if (success)
-    {
-        NSString *result = [_handle initialFTPPath];
-        if (!result && error) *error = nil; // I don't how the request would succeed, and this then fail, but it might
-        return result;
-    }
-    else
-    {
-        return nil;
-    }
 }
 
 #pragma mark Discovering Directory Contents
@@ -168,7 +170,57 @@ createIntermediateDirectories:(BOOL)createIntermediates
 {
     if (!path) path = @".";
     
-    _enumerationBlock = [block copy];
+    _connectionFinishedBlock = ^(NSError *error){
+        if (error)
+        {
+            block(nil, error);
+        }
+        else
+        {
+            // Process the data to make a directory listing
+            while (1)
+            {
+                CFDictionaryRef parsedDict = NULL;
+                CFIndex bytesConsumed = CFFTPCreateParsedResourceListing(NULL,
+                                                                         [_data bytes], [_data length],
+                                                                         &parsedDict);
+                
+                if (bytesConsumed > 0)
+                {
+                    // Make sure CFFTPCreateParsedResourceListing was able to properly
+                    // parse the incoming data
+                    if (parsedDict)
+                    {
+                        block((NSDictionary *)parsedDict, nil);
+                        CFRelease(parsedDict);
+                    }
+                    
+                    [_data replaceBytesInRange:NSMakeRange(0, bytesConsumed) withBytes:NULL length:0];
+                }
+                else if (bytesConsumed < 0)
+                {
+                    // error!
+                    NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                              _enumerationURL, NSURLErrorFailingURLErrorKey,
+                                              [_enumerationURL absoluteString], NSURLErrorFailingURLStringErrorKey,
+                                              nil];
+                    
+                    NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
+                    [userInfo release];
+                    
+                    block(nil, error);
+                    break;
+                }
+                else
+                {
+                    block(nil, nil);
+                    break;
+                }
+            }
+        }
+    };
+    
+    _connectionFinishedBlock = [_connectionFinishedBlock copy];
     _data = [[NSMutableData alloc] init];
     
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
@@ -182,10 +234,10 @@ createIntermediateDirectories:(BOOL)createIntermediates
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
 {
     if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
-    _enumerationBlock(nil, error);
+    _connectionFinishedBlock(error);
     
     // Clean up
-    [_enumerationBlock release]; _enumerationBlock = nil;
+    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
     [_enumerationURL release]; _enumerationURL = nil;
     [_data release]; _data = nil;
 }
@@ -202,49 +254,10 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection;
 {
-    // Process the data to make a directory listing
-    while (1)
-    {
-        CFDictionaryRef parsedDict = NULL;
-        CFIndex bytesConsumed = CFFTPCreateParsedResourceListing(NULL,
-                                                                 [_data bytes], [_data length],
-                                                                 &parsedDict);
-        
-        if (bytesConsumed > 0)
-        {
-            // Make sure CFFTPCreateParsedResourceListing was able to properly
-            // parse the incoming data
-            if (parsedDict)
-            {
-                _enumerationBlock((NSDictionary *)parsedDict, nil);
-                CFRelease(parsedDict);
-            }
-            
-            [_data replaceBytesInRange:NSMakeRange(0, bytesConsumed) withBytes:NULL length:0];
-        }
-        else if (bytesConsumed < 0)
-        {
-            // error!
-            NSDictionary *userInfo = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                      _enumerationURL, NSURLErrorFailingURLErrorKey,
-                                      [_enumerationURL absoluteString], NSURLErrorFailingURLStringErrorKey,
-                                      nil];
-            
-            NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotParseResponse userInfo:userInfo];
-            [userInfo release];
-            
-            _enumerationBlock(nil, error);
-            break;
-        }
-        else
-        {
-            _enumerationBlock(nil, nil);
-            break;
-        }
-    }
+    _connectionFinishedBlock(nil);
     
     // Clean up
-    [_enumerationBlock release]; _enumerationBlock = nil;
+    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
     [_enumerationURL release]; _enumerationURL = nil;
     [_data release]; _data = nil;
 }
