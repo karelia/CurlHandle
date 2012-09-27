@@ -146,22 +146,46 @@ createIntermediateDirectories:(BOOL)createIntermediates
     NSMutableURLRequest *request = [_request mutableCopy];
     [request setURL:[NSURL URLWithString:@"/" relativeToURL:[request URL]]];
     [request setHTTPMethod:@"HEAD"];
-    [request setShouldUseCurlHandle:YES];
+    
+    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
     
     _connectionFinishedBlock = ^(NSError *error){
+        
         if (error)
         {
             handler(nil, error);
         }
         else
         {
-            handler([_handle initialFTPPath], error);
+            handler([handle initialFTPPath], error);
         }
+        
+        [handle release];
+        [request release];  // release late to work around CURLHandle bug
     };
     
     _connectionFinishedBlock = [_connectionFinishedBlock copy];
-    [NSURLConnection connectionWithRequest:request delegate:self];
-    [request release];
+}
+
+- (void)handle:(CURLHandle *)handle didFailWithError:(NSError *)error;
+{
+    if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
+    _connectionFinishedBlock(error);
+    
+    // Clean up
+    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
+    [_enumerationURL release]; _enumerationURL = nil;
+    [_data release]; _data = nil;
+}
+
+- (void)handleDidFinish:(CURLHandle *)handle;
+{
+    _connectionFinishedBlock(nil);
+    
+    // Clean up
+    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
+    [_enumerationURL release]; _enumerationURL = nil;
+    [_data release]; _data = nil;
 }
 
 #pragma mark Discovering Directory Contents
