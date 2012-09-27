@@ -246,19 +246,17 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 #pragma mark Creating and Deleting Items
 
-- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
+- (void)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates progressBlock:(void (^)(NSUInteger bytesWritten, NSError *error))progressBlock;
 {
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO];
     [request setHTTPBody:data];
     [request curl_setCreateIntermediateDirectories:createIntermediates];
     
-    BOOL result = [self createFileWithRequest:request error:error progressBlock:nil];
+    [self createFileWithRequest:request progressBlock:progressBlock];
     [request release];
-    
-    return result;
 }
 
-- (BOOL)createFileAtPath:(NSString *)path withContentsOfURL:(NSURL *)url withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock;
+- (void)createFileAtPath:(NSString *)path withContentsOfURL:(NSURL *)url withIntermediateDirectories:(BOOL)createIntermediates progressBlock:(void (^)(NSUInteger bytesWritten, NSError *error))progressBlock;
 {
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO];
     
@@ -271,7 +269,9 @@ createIntermediateDirectories:(BOOL)createIntermediates
     }
     else
     {
-        NSData *data = [[NSData alloc] initWithContentsOfURL:url options:0 error:error];
+        NSError *error;
+        NSData *data = [[NSData alloc] initWithContentsOfURL:url options:0 error:&error];
+        
         if (data)
         {
             [request setHTTPBody:data];
@@ -280,44 +280,43 @@ createIntermediateDirectories:(BOOL)createIntermediates
         else
         {
             [request release];
-            return NO;
+            if (!error) error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:nil];
+            progressBlock(0, error);
+            return;
         }
     }
     
     [request curl_setCreateIntermediateDirectories:createIntermediates];
     
-    BOOL result = [self createFileWithRequest:request error:error progressBlock:progressBlock];
+    [self createFileWithRequest:request progressBlock:progressBlock];
     [request release];
-    
-    return result;
 }
 
-- (BOOL)createFileWithRequest:(NSURLRequest *)request error:(NSError **)outError progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock;
+- (void)createFileWithRequest:(NSURLRequest *)request progressBlock:(void (^)(NSUInteger bytesWritten, NSError *error))progressBlock;
 {
     // Use our own progress block to watch for the file end being reached before passing onto the original requester
     __block BOOL atEnd = NO;
+    
     _progressBlock = ^(NSUInteger bytesWritten){
         if (bytesWritten == 0) atEnd = YES;
-        if (progressBlock) progressBlock(bytesWritten);
+        if (bytesWritten && progressBlock) progressBlock(bytesWritten, nil);
     };
     
-    NSError *error;
-    BOOL result = [_handle loadRequest:request error:&error];
-    _progressBlock = NULL;
+    _progressBlock = [_progressBlock copy];
     
-    
-    // Long FTP uploads have a tendency to have the control connection cutoff for idling. As a hack, assume that if we reached the end of the body stream, a timeout is likely because of that
-    if (!result)
-    {
-        if (atEnd && [error code] == NSURLErrorTimedOut && [[error domain] isEqualToString:NSURLErrorDomain])
+    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
+        
+        // Long FTP uploads have a tendency to have the control connection cutoff for idling. As a hack, assume that if we reached the end of the body stream, a timeout is likely because of that
+        if (error && atEnd && [error code] == NSURLErrorTimedOut && [[error domain] isEqualToString:NSURLErrorDomain])
         {
-            return YES;
+            error = nil;
         }
         
-        if (outError) *outError = error;
-    }
-    
-    return result;
+        progressBlock(0, error);
+        
+        // Clean up
+        [_progressBlock release]; _progressBlock = nil;
+    }];
 }
 
 - (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
