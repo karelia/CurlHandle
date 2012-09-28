@@ -11,11 +11,14 @@
 @protocol CURLFTPSessionDelegate;
 
 
-@interface CURLFTPSession : NSObject <CURLHandleDelegate>
+@interface CURLFTPSession : NSObject <CURLHandleDelegate, NSURLAuthenticationChallengeSender>
 {
   @private
     NSURLRequest        *_request;
+    
+    // Auth
     NSURLCredential     *_credential;
+    NSOperationQueue    *_opsAwaitingAuth;
     
     id <CURLFTPSessionDelegate> _delegate;
     
@@ -30,8 +33,6 @@
 // All paths passed to a session are resolved relative to this request's URL. Normally you pass in a URL like ftp://example.com/ so it doesn't really make a difference! But let's say you passed in ftp://example.com/foo/ , a path of @"bar.html" would end up working on the file at ftp://example.com/foo/bar.html (i.e. the path foo/bar.html from the user's home directory)
 - (id)initWithRequest:(NSURLRequest *)request;
 @property(nonatomic, copy) NSURLRequest *baseRequest;   // throws exception if not FTP URL
-
-- (void)useCredential:(NSURLCredential *)credential;
 
 // Path is nil if fails for some reason. Note that it's possible for this method fail with an error of nil, although I don't know what circumstances could cause this
 - (void)findHomeDirectoryWithCompletionHandler:(void (^)(NSString *path, NSError *error))handler;
@@ -79,5 +80,6 @@
 
 
 @protocol CURLFTPSessionDelegate <NSObject>
+- (void)FTPSession:(CURLFTPSession *)session didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
 - (void)FTPSession:(CURLFTPSession *)session didReceiveDebugInfo:(NSString *)info ofType:(curl_infotype)type;
 @end

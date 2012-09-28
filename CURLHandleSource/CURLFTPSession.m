@@ -33,15 +33,9 @@
     [_request release];
     [_credential release];
     [_data release];
+    [_opsAwaitingAuth release];
     
     [super dealloc];
-}
-
-#pragma mark Auth
-
-- (void)useCredential:(NSURLCredential *)credential
-{
-    [_credential release]; _credential = [credential retain];
 }
 
 #pragma mark Requests
@@ -123,21 +117,74 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 - (void)sendRequest:(NSURLRequest *)request completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
 {
-    _data = [[NSMutableData alloc] init];
-
+    // First demand auth
+    if (!_opsAwaitingAuth)
+    {
+        _opsAwaitingAuth = [[NSOperationQueue alloc] init];
+        [_opsAwaitingAuth setSuspended:YES];
+        
+        NSURL *url = [[self baseRequest] URL];
+        NSString *protocol = ([@"ftps" caseInsensitiveCompare:[url scheme]] == NSOrderedSame ? @"ftps" : NSURLProtectionSpaceFTP);
+        
+        NSURLProtectionSpace *space = [[NSURLProtectionSpace alloc] initWithHost:[url host]
+                                                                            port:[[url port] integerValue]
+                                                                        protocol:protocol
+                                                                           realm:nil
+                                                            authenticationMethod:NSURLAuthenticationMethodDefault];
+        
+        NSURLCredential *credential = [[NSURLCredentialStorage sharedCredentialStorage] defaultCredentialForProtectionSpace:space];
+        
+        NSURLAuthenticationChallenge *challenge = [[NSURLAuthenticationChallenge alloc] initWithProtectionSpace:space
+                                                                                             proposedCredential:credential
+                                                                                           previousFailureCount:0
+                                                                                                failureResponse:nil
+                                                                                                          error:nil
+                                                                                                         sender:self];
+        
+        [space release];
+        
+        [[self delegate] FTPSession:self didReceiveAuthenticationChallenge:challenge];
+        [challenge release];
+    }
+    
+    
+    // Will run pretty much immediately once we're authenticated
     request = [request copy];
-    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
-    
-    _connectionFinishedBlock = ^(NSError *error){
+    [_opsAwaitingAuth addOperationWithBlock:^{
         
-        handler(handle, error);
+        _data = [[NSMutableData alloc] init];
         
-        // Clean up
-        [handle release];
-        [request release];  // release late to work around CURLHandle bug
-    };
-    
-    _connectionFinishedBlock = [_connectionFinishedBlock copy];
+        CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
+        
+        _connectionFinishedBlock = ^(NSError *error){
+            
+            handler(handle, error);
+            
+            // Clean up
+            [handle release];
+            [request release];  // release late to work around CURLHandle bug
+        };
+        
+        _connectionFinishedBlock = [_connectionFinishedBlock copy];
+    }];
+}
+
+#pragma mark NSURLAuthenticationChallengeSender
+
+- (void)useCredential:(NSURLCredential *)credential forAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+{
+    _credential = [credential copy];
+    [_opsAwaitingAuth setSuspended:NO];
+}
+
+- (void)continueWithoutCredentialForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+{
+    [_opsAwaitingAuth setSuspended:NO];
+}
+
+- (void)cancelAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
+{
+    [NSException raise:NSInvalidArgumentException format:@"Don't support cancelling FTP session auth yet"];
 }
 
 #pragma mark Home Directory
