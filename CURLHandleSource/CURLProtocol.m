@@ -80,23 +80,13 @@
 
 - (void)startLoadingWithCredential:(NSURLCredential *)credential;
 {
-    CURLMulti* multi = [CURLMulti sharedInstance];
-
-    CURLHandle *handle = [[CURLHandle alloc] init];
-    [handle setDelegate:self];
-
-    // Turn automatic redirects off by default, so can properly report them to delegate
-    curl_easy_setopt([handle curl], CURLOPT_FOLLOWLOCATION, NO);
-    
-    [handle loadRequest:[self request] withMulti:multi credential:credential];
-
+    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self];
     self.handle = handle;
     [handle release];
 }
 
 - (void)stopLoading;
 {
-    self.handle.delegate = nil;
     if (![self.handle hasCompleted])
     {
         CURLMulti* multi = [CURLMulti sharedInstance];

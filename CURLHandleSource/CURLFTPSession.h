@@ -14,7 +14,6 @@
 @interface CURLFTPSession : NSObject <CURLHandleDelegate>
 {
   @private
-    CURLHandle          *_handle;
     NSURLRequest        *_request;
     NSURLCredential     *_credential;
     

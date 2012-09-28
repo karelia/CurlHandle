@@ -23,14 +23,6 @@
             [self release]; return nil;
         }
         _request = [request copy];
-        
-        _handle = [[CURLHandle alloc] init];
-        [_handle setDelegate:self];
-        if (!_handle)
-        {
-            [self release];
-            return nil;
-        }
     }
     
     return self;
@@ -38,9 +30,6 @@
 
 - (void)dealloc
 {
-    [_handle cancel];   // for good measure
-    [_handle setDelegate:nil];
-    [_handle release];
     [_request release];
     [_credential release];
     [_data release];
@@ -53,15 +42,6 @@
 - (void)useCredential:(NSURLCredential *)credential
 {
     [_credential release]; _credential = [credential retain];
-    
-    NSString *user = [credential user];
-    if (user)
-    {
-        [_handle setString:user forKey:CURLOPT_USERNAME];
-        
-        NSString *password = [credential password];
-        if (password) [_handle setString:password forKey:CURLOPT_PASSWORD];
-    }
 }
 
 #pragma mark Requests
@@ -362,7 +342,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 #pragma mark Cancellation
 
-- (void)cancel; { [_handle cancel]; }
+- (void)cancel; { /* FIXME: actually cancel something! */ }
 
 #pragma mark Delegate
 

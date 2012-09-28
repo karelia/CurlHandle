@@ -55,6 +55,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 @property (assign, nonatomic) struct curl_slist* httpHeaders;
 @property (assign, nonatomic) struct curl_slist* postQuoteCommands;
+@property(nonatomic, readonly) id <CURLHandleDelegate> delegate;
 
 @end
 
@@ -155,7 +156,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 {
     if (self = [self init])
     {
-        [self setDelegate:delegate];
+        _delegate = delegate;
         [self loadRequest:request withMulti:[CURLMulti sharedInstance] credential:credential];
     }
     
@@ -613,37 +614,11 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return _executing == NO;
 }
 
-/*" %{Loads the receiver's data in the synchronously.}
-
- 	Actually set up for loading and do the perform.  This happens in either
-	the foreground or background thread.  Before doing the perform, we collect up
-	all the saved-up string-valued options, and set them right before the perform.
-	This is because we create temporary (autoreleased) c-strings.
-"*/
-
-- (BOOL)loadRequest:(NSURLRequest *)request error:(NSError **)error;
-{
-    [self retain];  // so can't be accidentally deallocated mid-operation
-
-    CURLcode code = [self setupRequest:request];
-    if (code == CURLE_OK)
-    {
-        code = curl_easy_perform(_curl);
-    }
-
-    [self completeWithCode:_cancelled ? CURLM_CANCELLED : code];
-    if ((code != CURLE_OK) && error)
-    {
-        *error = [self errorForURL:[request URL] code:code];
-    }
-
-    [self release]; // was retained at start
-
-    return code == CURLE_OK;
-}
-
 - (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti*)multi credential:(NSURLCredential *)credential;
 {
+    // Turn automatic redirects off by default, so can properly report them to delegate
+    curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
+    
     if (credential)
     {
         NSString *username = [credential user];
@@ -695,6 +670,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     }
 
     [self cleanup];
+    _delegate = nil;
 }
 
 - (void)failWithCode:(CURLMcode)code
