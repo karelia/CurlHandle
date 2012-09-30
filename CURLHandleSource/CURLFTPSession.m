@@ -8,6 +8,31 @@
 #import "CURLFTPSession.h"
 #import "NSURLRequest+CURLHandle.h"
 
+
+@interface CURLFTPTransfer : NSObject <CURLHandleDelegate>
+{
+  @private
+    NSURLRequest    *_request;
+    CURLFTPSession  *_session;
+    
+    void    (^_completionHandler)(CURLHandle *handle, NSError *error);
+    void    (^_dataBlock)(NSData *data);
+    void    (^_progressBlock)(NSUInteger bytesWritten);
+}
+
+- (id)initWithRequest:(NSURLRequest *)request
+              session:(CURLFTPSession *)session
+          dataHandler:(void (^)(NSData *data))dataBlock
+    completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
+
+- (id)initWithRequest:(NSURLRequest *)request
+              session:(CURLFTPSession *)session
+        progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock
+    completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
+
+@end
+
+
 @implementation CURLFTPSession
 
 #pragma mark Lifecycle
@@ -32,7 +57,6 @@
 {
     [_request release];
     [_credential release];
-    [_data release];
     [_opsAwaitingAuth release];
     
     [super dealloc];
@@ -108,14 +132,14 @@ createIntermediateDirectories:(BOOL)createIntermediates
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the command twice in my testing
     [request curl_setPostTransferCommands:commands];
     
-    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
-        handler(error);
+    [self sendRequest:request dataHandler:nil completionHandler:^(CURLHandle *handle, NSError *error) {
+            handler(error);
     }];
     
     [request release];
 }
 
-- (void)sendRequest:(NSURLRequest *)request completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
+- (void)doAuthThenPerformBlock:(void (^)(void))block;
 {
     // First demand auth
     if (!_opsAwaitingAuth)
@@ -149,23 +173,28 @@ createIntermediateDirectories:(BOOL)createIntermediates
     
     
     // Will run pretty much immediately once we're authenticated
-    request = [request copy];
-    [_opsAwaitingAuth addOperationWithBlock:^{
-        
-        _data = [[NSMutableData alloc] init];
-        
-        CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request credential:_credential delegate:self];
-        
-        _connectionFinishedBlock = ^(NSError *error){
+    [_opsAwaitingAuth addOperationWithBlock:block];
+}
+
+- (void)sendRequest:(NSURLRequest *)request dataHandler:(void (^)(NSData *data))dataBlock completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
+{
+    [self doAuthThenPerformBlock:^{
+        CURLFTPTransfer *transfer = [[CURLFTPTransfer alloc] initWithRequest:request session:self dataHandler:dataBlock completionHandler:^(CURLHandle *handle, NSError *error) {
             
             handler(handle, error);
+        }];
+        [transfer release];
+    }];
+}
+
+- (void)sendRequest:(NSURLRequest *)request progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock completionHandler:(void (^)(CURLHandle *handle, NSError *error))handler;
+{
+    [self doAuthThenPerformBlock:^{
+        CURLFTPTransfer *transfer = [[CURLFTPTransfer alloc] initWithRequest:request session:self progressBlock:progressBlock completionHandler:^(CURLHandle *handle, NSError *error) {
             
-            // Clean up
-            [handle release];
-            [request release];  // release late to work around CURLHandle bug
-        };
-        
-        _connectionFinishedBlock = [_connectionFinishedBlock copy];
+            handler(handle, error);
+        }];
+        [transfer release];
     }];
 }
 
@@ -196,8 +225,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     [request setURL:[NSURL URLWithString:@"/" relativeToURL:[request URL]]];
     [request setHTTPMethod:@"HEAD"];
     
-    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
-        
+    [self sendRequest:request dataHandler:nil completionHandler:^(CURLHandle *handle, NSError *error) {
         if (error)
         {
             handler(nil, error);
@@ -218,7 +246,11 @@ createIntermediateDirectories:(BOOL)createIntermediates
     if (!path) path = @".";
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
     
-    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
+    NSMutableData *totalData = [[NSMutableData alloc] init];
+    
+    [self sendRequest:request dataHandler:^(NSData *data) {
+        [totalData appendData:data];
+    } completionHandler:^(CURLHandle *handle, NSError *error) {
         
         if (error)
         {
@@ -231,7 +263,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
             {
                 CFDictionaryRef parsedDict = NULL;
                 CFIndex bytesConsumed = CFFTPCreateParsedResourceListing(NULL,
-                                                                         [_data bytes], [_data length],
+                                                                         [totalData bytes], [totalData length],
                                                                          &parsedDict);
                 
                 if (bytesConsumed > 0)
@@ -244,7 +276,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
                         CFRelease(parsedDict);
                     }
                     
-                    [_data replaceBytesInRange:NSMakeRange(0, bytesConsumed) withBytes:NULL length:0];
+                    [totalData replaceBytesInRange:NSMakeRange(0, bytesConsumed) withBytes:NULL length:0];
                 }
                 else if (bytesConsumed < 0)
                 {
@@ -268,7 +300,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
             }
         }
     }];
-    
+
     [request release];
 }
 
@@ -325,14 +357,12 @@ createIntermediateDirectories:(BOOL)createIntermediates
     // Use our own progress block to watch for the file end being reached before passing onto the original requester
     __block BOOL atEnd = NO;
     
-    _progressBlock = ^(NSUInteger bytesWritten){
+    [self sendRequest:request progressBlock:^(NSUInteger bytesWritten) {
+        
         if (bytesWritten == 0) atEnd = YES;
         if (bytesWritten && progressBlock) progressBlock(bytesWritten, nil);
-    };
-    
-    _progressBlock = [_progressBlock copy];
-    
-    [self sendRequest:request completionHandler:^(CURLHandle *handle, NSError *error) {
+        
+    } completionHandler:^(CURLHandle *handle, NSError *error) {
         
         // Long FTP uploads have a tendency to have the control connection cutoff for idling. As a hack, assume that if we reached the end of the body stream, a timeout is likely because of that
         if (error && atEnd && [error code] == NSURLErrorTimedOut && [[error domain] isEqualToString:NSURLErrorDomain])
@@ -341,9 +371,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
         }
         
         progressBlock(0, error);
-        
-        // Clean up
-        [_progressBlock release]; _progressBlock = nil;
     }];
 }
 
@@ -395,38 +422,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 @synthesize delegate = _delegate;
 
-- (void)handle:(CURLHandle *)handle didFailWithError:(NSError *)error;
-{
-    if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
-    _connectionFinishedBlock(error);
-    
-    // Clean up
-    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_data release]; _data = nil;
-}
-
-- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
-{
-    [_data appendData:data];
-}
-
-- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten;
-{
-    if (_progressBlock)
-    {
-        _progressBlock(bytesWritten);
-    }
-}
-
-- (void)handleDidFinish:(CURLHandle *)handle;
-{
-    _connectionFinishedBlock(nil);
-    
-    // Clean up
-    [_connectionFinishedBlock release]; _connectionFinishedBlock = nil;
-    [_data release]; _data = nil;
-}
-
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
 {
     // Don't want to include password in transcripts usually!
@@ -477,6 +472,90 @@ createIntermediateDirectories:(BOOL)createIntermediates
     {
         return [URL path];
     }
+}
+
+@end
+
+
+#pragma mark -
+
+
+@implementation CURLFTPTransfer
+
+- (id)initWithRequest:(NSURLRequest *)request session:(CURLFTPSession *)session completionHandler:(void (^)(CURLHandle *, NSError *))handler;
+{
+    if (self = [self init])
+    {
+        [self retain];  // until finished
+        _session = [session retain];
+        _completionHandler = [handler copy];
+        _request = [request copy];  // hang onto to work around CURLHandle bug
+        
+        CURLHandle *handle = [[CURLHandle alloc] initWithRequest:_request
+                                                      credential:[session valueForKey:@"_credential"]   // dirty secret!
+                                                        delegate:self];
+        
+        [handle release];   // handle retains itself until finished or cancelled
+    }
+    
+    return self;
+}
+
+- (id)initWithRequest:(NSURLRequest *)request session:(CURLFTPSession *)session dataHandler:(void (^)(NSData *))dataBlock completionHandler:(void (^)(CURLHandle *, NSError *))handler
+{
+    if (self = [self initWithRequest:request session:session completionHandler:handler])
+    {
+        _dataBlock = [dataBlock copy];
+    }
+    return self;
+}
+
+- (id)initWithRequest:(NSURLRequest *)request session:(CURLFTPSession *)session progressBlock:(void (^)(NSUInteger))progressBlock completionHandler:(void (^)(CURLHandle *, NSError *))handler
+{
+    if (self = [self initWithRequest:request session:session completionHandler:handler])
+    {
+        _progressBlock = [progressBlock copy];
+    }
+    return self;
+}
+
+- (void)handle:(CURLHandle *)handle didFailWithError:(NSError *)error;
+{
+    if (!error) error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
+    _completionHandler(handle, error);
+    [self release];
+}
+
+- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
+{
+    if (_dataBlock) _dataBlock(data);
+}
+
+- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
+{
+    if (_progressBlock) _progressBlock(bytesWritten);
+}
+
+- (void)handleDidFinish:(CURLHandle *)handle;
+{
+    _completionHandler(handle, nil);
+    [self release];
+}
+
+- (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
+{
+    [[_session delegate] FTPSession:_session didReceiveDebugInfo:string ofType:type];
+}
+
+- (void)dealloc;
+{
+    [_request release];
+    [_session release];
+    [_completionHandler release];
+    [_dataBlock release];
+    [_progressBlock release];
+    
+    [super dealloc];
 }
 
 @end

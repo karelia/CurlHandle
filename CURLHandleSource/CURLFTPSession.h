@@ -11,7 +11,7 @@
 @protocol CURLFTPSessionDelegate;
 
 
-@interface CURLFTPSession : NSObject <CURLHandleDelegate, NSURLAuthenticationChallengeSender>
+@interface CURLFTPSession : NSObject <NSURLAuthenticationChallengeSender>
 {
   @private
     NSURLRequest        *_request;
@@ -21,12 +21,6 @@
     NSOperationQueue    *_opsAwaitingAuth;
     
     id <CURLFTPSessionDelegate> _delegate;
-    
-    void            (^_progressBlock)(NSUInteger bytesWritten);
-    
-    // Directory enumeration
-    NSMutableData   *_data;
-    void            (^_connectionFinishedBlock)(NSError *error);
 }
 
 // Returns nil if not a supported FTP URL
@@ -68,7 +62,8 @@
 
 
 #pragma mark Delegate
-@property(nonatomic, assign) id <CURLFTPSessionDelegate> delegate;
+// Delegate messages are received on arbitrary queues. So changing delegate might mean you still receive message shortly after the change. Not ideal I know!
+@property(assign) id <CURLFTPSessionDelegate> delegate;
 
 
 #pragma mark FTP URLs
