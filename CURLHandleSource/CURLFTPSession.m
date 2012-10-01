@@ -12,7 +12,6 @@
 @interface CURLFTPTransfer : NSObject <CURLHandleDelegate>
 {
   @private
-    NSURLRequest    *_request;
     CURLFTPSession  *_session;
     
     void    (^_completionHandler)(CURLHandle *handle, NSError *error);
@@ -489,9 +488,8 @@ createIntermediateDirectories:(BOOL)createIntermediates
         [self retain];  // until finished
         _session = [session retain];
         _completionHandler = [handler copy];
-        _request = [request copy];  // hang onto to work around CURLHandle bug
         
-        CURLHandle *handle = [[CURLHandle alloc] initWithRequest:_request
+        CURLHandle *handle = [[CURLHandle alloc] initWithRequest:request
                                                       credential:[session valueForKey:@"_credential"]   // dirty secret!
                                                         delegate:self];
         
@@ -549,7 +547,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 - (void)dealloc;
 {
-    [_request release];
     [_session release];
     [_completionHandler release];
     [_dataBlock release];

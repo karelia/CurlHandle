@@ -36,7 +36,7 @@ NSString			*sProxyUserIDAndPassword = nil;
 
 #pragma mark - Callback Prototypes
 
-int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose);
+int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype purpose);
 static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
 static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
 static size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
@@ -156,8 +156,38 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 {
     if (self = [self init])
     {
+        _URL = [[request URL] copy];
+        
         _delegate = delegate;
-        [self loadRequest:request withMulti:[CURLMulti sharedInstance] credential:credential];
+        
+        // Turn automatic redirects off by default, so can properly report them to delegate
+        curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
+        
+        if (credential)
+        {
+            NSString *username = [credential user];
+            [self setString:username forKey:CURLOPT_USERNAME];
+            
+            NSString *password = [credential password];
+            if (password)
+            {
+                [self setString:password forKey:CURLOPT_PASSWORD];
+            }
+            else
+            {
+                NSLog(@"Credential with no password");
+            }
+        }
+        
+        CURLcode code = [self setupRequest:request];
+        if (code == CURLE_OK)
+        {
+            [[CURLMulti sharedInstance] manageHandle:self];
+        }
+        else
+        {
+            [self failWithCode:code];
+        }
     }
     
     return self;
@@ -177,6 +207,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     curl_easy_cleanup(_curl);
     _curl = nil;
 
+    [_URL release];
 	[_headerBuffer release];
 	[_proxies release];
 	[_stringOptions release];
@@ -252,7 +283,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
     // send all data to the C function
     LOAD_REQUEST_SET_OPTION(CURLOPT_SOCKOPTFUNCTION, curlSocketOptFunction);
-    LOAD_REQUEST_SET_OPTION(CURLOPT_SOCKOPTDATA, [request URL]);
+    LOAD_REQUEST_SET_OPTION(CURLOPT_SOCKOPTDATA, self);
 
     LOAD_REQUEST_SET_OPTION(CURLOPT_WRITEFUNCTION, curlBodyFunction);
     LOAD_REQUEST_SET_OPTION(CURLOPT_HEADERFUNCTION, curlHeaderFunction);
@@ -614,40 +645,6 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return _executing == NO;
 }
 
-- (BOOL)loadRequest:(NSURLRequest *)request withMulti:(CURLMulti*)multi credential:(NSURLCredential *)credential;
-{
-    // Turn automatic redirects off by default, so can properly report them to delegate
-    curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
-    
-    if (credential)
-    {
-        NSString *username = [credential user];
-        [self setString:username forKey:CURLOPT_USERNAME];
-        
-        NSString *password = [credential password];
-        if (password)
-        {
-            [self setString:password forKey:CURLOPT_PASSWORD];
-        }
-        else
-        {
-            NSLog(@"Credential with no password");
-        }
-    }
-    
-    CURLcode code = [self setupRequest:request];
-    if (code == CURLE_OK)
-    {
-        [multi manageHandle:self];
-    }
-    else
-    {
-        [self failWithCode:code];
-    }
-
-    return code == CURLE_OK;
-}
-
 - (void)completeWithCode:(CURLMcode)code
 {
     if (code == CURLM_OK)
@@ -802,12 +799,12 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 
 
-int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose)
+int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype purpose)
 {
     if (purpose == CURLSOCKTYPE_IPCXN)
     {
         // FTP control connections should be kept alive. However, I'm fairly sure this is unlikely to have a real effect in practice since OS X's default time before it starts sending keep alive packets is 2 hours :(
-        if ([[URL scheme] isEqualToString:@"ftp"])
+        if ([[[self valueForKey:@"_URL"] scheme] isEqualToString:@"ftp"])
         {
             int keepAlive = 1;
             socklen_t keepAliveLen = sizeof(keepAlive);
