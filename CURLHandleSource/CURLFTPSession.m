@@ -172,6 +172,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     if (!path) path = @".";
     
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
+    [request curl_setCreateIntermediateDirectories:NO];
     
     _data = [[NSMutableData alloc] init];
     BOOL result = [_handle loadRequest:request error:error];
