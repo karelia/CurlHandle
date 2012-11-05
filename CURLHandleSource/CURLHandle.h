@@ -4,8 +4,6 @@
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
 //  This is in the public domain, but please report any improvements back to the author.
 //
-//	The current version of CURLHandle is 1.9.
-//
 
 #import <Foundation/Foundation.h>
 #import <curl/curl.h>
@@ -16,23 +14,6 @@
 extern NSString * const CURLcodeErrorDomain;
 extern NSString * const CURLMcodeErrorDomain;
 extern NSString * const CURLSHcodeErrorDomain;
-
-/*" YES if CURLHandle will allow use of a proxy server "*/
-extern	BOOL				sAllowsProxy;
-
-/*" Proxy User ID:Password combo for all uses of CURL. "*/
-extern NSString				*sProxyUserIDAndPassword;
-
-/*"	Callbacks from reading a chunk of data.  Since we pass "self" in as the "data pointer",
-	we can use that to get back into Objective C and do the work with the class.
-"*/
-
-@class CURLHandle;
-int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose);
-extern size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
-extern size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
-extern size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
-extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *handle);
 
 @interface CURLHandle : NSObject
 {
@@ -86,11 +67,6 @@ extern int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 - (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
-
-/*" Support Methods "*/
-
-- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
-- (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @end
 

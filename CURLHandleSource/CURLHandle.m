@@ -4,8 +4,6 @@
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
 //  This is in the public domain, but please report any improvements back to the author.
 //
-//	The current version of CURLHandle is 2.0
-//
 
 #import "CURLHandle.h"
 #define NSS(s) (NSString *)(s)
@@ -22,9 +20,9 @@ NSString * const CURLcodeErrorDomain = @"se.haxx.curl.libcurl.CURLcode";
 NSString * const CURLMcodeErrorDomain = @"se.haxx.curl.libcurl.CURLMcode";
 NSString * const CURLSHcodeErrorDomain = @"se.haxx.curl.libcurl.CURLSHcode";
 
-BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
+static BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
 SCDynamicStoreRef	sSCDSRef = NULL;
-NSString			*sProxyUserIDAndPassword = nil;
+static NSString			*sProxyUserIDAndPassword = nil;
 
 
 @interface CURLResponse : NSHTTPURLResponse
@@ -52,7 +50,7 @@ NSString			*sProxyUserIDAndPassword = nil;
 @end
 
 
-int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose)
+static int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose)
 {
     if (purpose == CURLSOCKTYPE_IPCXN)
     {
@@ -78,7 +76,7 @@ int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose
 	we can use that to get back into Objective C and do the work with the class.
 "*/
 
-size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 {
 	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:NO];
 }
@@ -87,7 +85,7 @@ size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 	we can use that to get back into Objective C and do the work with the class.
 "*/
 
-size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
 {
 	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:YES];
 }
@@ -96,12 +94,12 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
  we can use that to get back into Objective C and do the work with the class.
  "*/
 
-size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
+static size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
     return [self curlReadPtr:ptr size:size number:nmemb];
 }
 
-int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
+static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
 {
     if (infoType != CURLINFO_HEADER_IN && infoType != CURLINFO_HEADER_OUT) return 0;
     if (![[self delegate] respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)]) return 0;
