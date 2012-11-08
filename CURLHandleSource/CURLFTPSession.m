@@ -82,9 +82,11 @@
     return ([@"ftp" caseInsensitiveCompare:scheme] == NSOrderedSame || [@"ftps" caseInsensitiveCompare:scheme] == NSOrderedSame);
 }
 
-- (NSMutableURLRequest *)newMutableRequestWithPath:(NSString *)path isDirectory:(BOOL)isDirectory;
+- (NSMutableURLRequest *)newMutableRequestWithPath:(NSString *)path isDirectory:(BOOL)isDirectory createIntermediateDirectories:(BOOL)createIntermediates;
 {
     NSMutableURLRequest *request = [_request mutableCopy];
+    [request curl_setCreateIntermediateDirectories:createIntermediates];
+    
     if ([path length])  // nil/empty paths should only occur when trying to CWD to the home directory
     {
         // Special case: Root directory when _request is a pathless URL (e.g. ftp://example.com ) needs a second slash to tell Curl it's absolute
@@ -127,9 +129,8 @@ createIntermediateDirectories:(BOOL)createIntermediates
     // Navigate to the directory
     // @"HEAD" => CURLOPT_NOBODY, which stops libcurl from trying to list the directory's contents
     // If the connection is already at that directory then curl wisely does nothing
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:directory isDirectory:YES];
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:directory isDirectory:YES createIntermediateDirectories:createIntermediates];
     [request setHTTPMethod:@"HEAD"];
-    [request curl_setCreateIntermediateDirectories:createIntermediates];
     
     // Custom commands once we're in the correct directory
     // CURLOPT_PREQUOTE does much the same thing, but sometimes runs the command twice in my testing
@@ -171,8 +172,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
 {
     if (!path) path = @".";
     
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
-    [request curl_setCreateIntermediateDirectories:NO];
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES createIntermediateDirectories:NO];
     
     _data = [[NSMutableData alloc] init];
     BOOL result = [_handle loadRequest:request error:error];
@@ -229,9 +229,8 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 - (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 {
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO];
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO createIntermediateDirectories:createIntermediates];
     [request setHTTPBody:data];
-    [request curl_setCreateIntermediateDirectories:createIntermediates];
     
     BOOL result = [self createFileWithRequest:request error:error progressBlock:nil];
     [request release];
@@ -241,7 +240,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
 
 - (BOOL)createFileAtPath:(NSString *)path withContentsOfURL:(NSURL *)url withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock;
 {
-    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO];
+    NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:NO createIntermediateDirectories:createIntermediates];
     
     // Read the data using an input stream if possible
     NSInputStream *stream = [[NSInputStream alloc] initWithURL:url];
@@ -264,8 +263,6 @@ createIntermediateDirectories:(BOOL)createIntermediates
             return NO;
         }
     }
-    
-    [request curl_setCreateIntermediateDirectories:createIntermediates];
     
     BOOL result = [self createFileWithRequest:request error:error progressBlock:progressBlock];
     [request release];
