@@ -241,26 +241,16 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     int count;
     while ((message = curl_multi_info_read(self.multi, &count)) != NULL)
     {
-        CURLHandleLog(@"got multi message %d", message->msg);
         if (message->msg == CURLMSG_DONE)
         {
+            CURLHandleLog(@"got done msg result %d", message->data.result);
             CURL* easy = message->easy_handle;
             CURLHandle* handle = [self findHandleWithEasyHandle:easy];
             if (handle)
             {
                 [handle retain];
-                [self removeHandleInternal:handle];
-
-#if 0
-                long responseCode;
-                CURLcode result = curl_easy_getinfo(easy, CURLINFO_RESPONSE_CODE, &responseCode);
-                if (result == CURLE_OK)
-                {
-                    result = responseCode;
-                }
-#endif
-
                 [handle completeWithCode:message->data.result];
+                [self removeHandleInternal:handle];
                 [handle release];
             }
             else
@@ -270,6 +260,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 CURLMcode result = curl_multi_remove_handle(self.multi, message->easy_handle);
                 NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
             }
+        }
+        else
+        {
+            CURLHandleLog(@"got unexpected multi message %d", message->msg);
         }
     }
 }

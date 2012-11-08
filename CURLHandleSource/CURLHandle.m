@@ -651,6 +651,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     {
         if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
         {
+            CURLHandleLog(@"handle %@ finished", self);
             [self.delegate handleDidFinish:self];
         }
     }
@@ -658,6 +659,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     {
         if ([[self delegate] respondsToSelector:@selector(handleWasCancelled:)])
         {
+            CURLHandleLog(@"handle %@ cancelled", self);
             [self.delegate handleWasCancelled:self];
         }
     }
@@ -675,6 +677,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     NSError* error = [self errorForURL:nil code:code];
     if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
     {
+        CURLHandleLog(@"handle %@ failed with error %@", self, error);
         [self.delegate handle:self didFailWithError:error];
     }
 }
