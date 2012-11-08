@@ -244,12 +244,23 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         CURLHandleLog(@"got multi message %d", message->msg);
         if (message->msg == CURLMSG_DONE)
         {
-            CURLHandle* handle = [self findHandleWithEasyHandle:message->easy_handle];
+            CURL* easy = message->easy_handle;
+            CURLHandle* handle = [self findHandleWithEasyHandle:easy];
             if (handle)
             {
                 [handle retain];
                 [self removeHandleInternal:handle];
-                [handle completeWithCode:CURLM_OK];
+
+#if 0
+                long responseCode;
+                CURLcode result = curl_easy_getinfo(easy, CURLINFO_RESPONSE_CODE, &responseCode);
+                if (result == CURLE_OK)
+                {
+                    result = responseCode;
+                }
+#endif
+
+                [handle completeWithCode:message->data.result];
                 [handle release];
             }
             else
