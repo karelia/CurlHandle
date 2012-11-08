@@ -58,7 +58,11 @@
 
 - (BOOL)removeDirectoryAtPath:(NSString *)path error:(NSError **)error;
 
-- (BOOL)renameItem:(NSString *)fromPath toPath:(NSString *)toPath error:(NSError **)error;
+// For toPath:
+//  If absolute, we rely on the server to interpret that properly
+//  For purely filenames, there should be no problem
+//  For other relative paths, it's kinda up to the server how it handles that, so beware!
+- (BOOL)moveItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath error:(NSError **)error;
 
 #pragma mark Setting Attributes
 // Only NSFilePosixPermissions is recognised at present. Note that some servers don't support this so will return an error (code 500)

@@ -346,10 +346,10 @@ createIntermediateDirectories:(BOOL)createIntermediates
                                  error:error];
 }
 
-- (BOOL)renameItem:(NSString *)fromPath toPath:(NSString *)toPath error:(NSError **)error
+- (BOOL)moveItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath error:(NSError **)error
 {
     NSString *from = [NSString stringWithFormat:@"RNFR %@", [fromPath lastPathComponent]];
-    NSString *to = [NSString stringWithFormat:@"RNTO %@", [toPath lastPathComponent]];
+    NSString *to = [NSString stringWithFormat:@"RNTO %@", toPath];
     return [self executeCustomCommands:@[from, to]
                            inDirectory:[fromPath stringByDeletingLastPathComponent]
          createIntermediateDirectories:NO
