@@ -915,7 +915,7 @@
 				809AE05316029FD7001D02E1 /* Sources */,
 				809AE05416029FD7001D02E1 /* Frameworks */,
 				809AE05516029FD7001D02E1 /* Headers */,
-				809AE13B1602A52B001D02E1 /* Run Script - copy dylib to srcroot */,
+				809AE13B1602A52B001D02E1 /* Run Script - copy dylib & dSYM to srcroot */,
 			);
 			buildRules = (
 			);
@@ -935,7 +935,7 @@
 				809AE1471602BC38001D02E1 /* Sources */,
 				809AE1B11602BC38001D02E1 /* Frameworks */,
 				809AE1B61602BC38001D02E1 /* Headers */,
-				809AE1B71602BC38001D02E1 /* Run Script - copy dylib to srcroot */,
+				809AE1B71602BC38001D02E1 /* Run Script - copy dylib &dSYM to srcroot */,
 			);
 			buildRules = (
 			);
@@ -1034,21 +1034,23 @@
 			shellPath = /bin/bash;
 			shellScript = "export PATH=$PATH:/opt/local/bin:/usr/local/bin\ncd $SRCROOT/../curl\n./configure CC=\"clang\" CFLAGS=\"-isysroot $SDKROOT -arch i386\" --with-darwinssl --without-libidn\nexit 0\n";
 		};
-		809AE13B1602A52B001D02E1 /* Run Script - copy dylib to srcroot */ = {
+		809AE13B1602A52B001D02E1 /* Run Script - copy dylib & dSYM to srcroot */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 				"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib",
+				"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib.dSYM",
 			);
-			name = "Run Script - copy dylib to srcroot";
+			name = "Run Script - copy dylib & dSYM to srcroot";
 			outputPaths = (
 				"${SRCROOT}/${PRODUCT_NAME}.dylib",
+				"${SRCROOT}/${PRODUCT_NAME}.dylib.dSYM",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "cp \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib\" \"${SRCROOT}/${PRODUCT_NAME}.dylib\"\nexit 0\n";
+			shellScript = "cp -v \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib\" \"${SRCROOT}\"\ncp -v -R \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib.dSYM\" \"${SRCROOT}\"\nexit 0\n";
 		};
 		809AE1451602BC38001D02E1 /* Run Script - buildconf */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1078,21 +1080,23 @@
 			shellPath = /bin/bash;
 			shellScript = "export PATH=$PATH:/opt/local/bin:/usr/local/bin\ncd $SRCROOT/../curl\n./configure CC=\"clang\" CFLAGS=\"-isysroot $SDKROOT -arch x86_64\" --with-darwinssl --without-libidn\nexit 0\n";
 		};
-		809AE1B71602BC38001D02E1 /* Run Script - copy dylib to srcroot */ = {
+		809AE1B71602BC38001D02E1 /* Run Script - copy dylib &dSYM to srcroot */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 				"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib",
+				"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib.dSYM",
 			);
-			name = "Run Script - copy dylib to srcroot";
+			name = "Run Script - copy dylib &dSYM to srcroot";
 			outputPaths = (
 				"${SRCROOT}/${PRODUCT_NAME}.dylib",
+				"${SRCROOT}/${PRODUCT_NAME}.dylib.dSYM",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "cp \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib\" \"${SRCROOT}/${PRODUCT_NAME}.dylib\"\nexit 0\n";
+			shellScript = "cp -v \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib\" \"${SRCROOT}\"\ncp -v -R \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.dylib.dSYM\" \"${SRCROOT}\"\nexit 0\n";
 		};
 		809AE1BC1602BE6C001D02E1 /* Run Script - lipo multi-arch dylib */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1123,7 +1127,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "rm -f \"${SRCROOT}/libcurl-i386.dylib\"\nrm -f \"${SRCROOT}/libcurl-x86_64.dylib\"\nrm -f \"${SRCROOT}/libcurl.dylib\"\n";
+			shellScript = "rm -f \"${SRCROOT}/libcurl-i386.dylib\"\nrm -rf \"${SRCROOT}/libcurl-i386.dylib.dSYM\"\nrm -f \"${SRCROOT}/libcurl-x86_64.dylib\"\nrm -rf \"${SRCROOT}/libcurl-x86_64.dylib.dSYM\"\nrm -f \"${SRCROOT}/libcurl.dylib\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1388,7 +1392,6 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
@@ -1416,11 +1419,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = CURLHandle_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
@@ -1443,6 +1444,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1454,6 +1456,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = macosx;
@@ -1513,7 +1516,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/../curl/lib/curl_config.h";
@@ -1566,7 +1568,6 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/../curl/lib/curl_config.h";
