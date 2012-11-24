@@ -490,7 +490,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         
         // SSL
         LOAD_REQUEST_SET_OPTION(CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]);
-        LOAD_REQUEST_SET_OPTION(CURLOPT_CERTINFO, 1L);
+        //LOAD_REQUEST_SET_OPTION(CURLOPT_CERTINFO, 1L);    // isn't supported by Darwin-SSL backend yet
         LOAD_REQUEST_SET_OPTION(CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]);
         
         // Intermediate directories
