@@ -1,4 +1,14 @@
 
+Version 3.1, November 24, 2012
+
+Well look at that, we're back to building our own libcurl again. Partly because it's nice to have control, but mostly because OS X v10.7 Lion's built-in libcurl crashes when checking certificates for FTPS. libcurl 7.28.0 is included pre-built as a dylib.
+
+Michael Robinson added FTP support for deleting directories, and moving items.
+
+Version 3.0
+
+For explicit SSL/TLS, specify NSURLRequest.curl_shouldVerifySSLCertificate. For implicit FTPS, use the ftps: URL scheme
+
 Version 2.0, December 10, 2008
 
 Yes, I know it's been 4 years.  But I figured I'd collect the various intel-compatible modifications out there and bring them "home."
