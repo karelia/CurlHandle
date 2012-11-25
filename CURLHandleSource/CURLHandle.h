@@ -16,6 +16,10 @@
 
 @protocol CURLHandleDelegate;
 
+extern NSString * const CURLcodeErrorDomain;
+extern NSString * const CURLMcodeErrorDomain;
+extern NSString * const CURLSHcodeErrorDomain;
+
 enum { CURLM_CANCELLED = -2 };
 
 /*" YES if CURLHandle will allow use of a proxy server "*/
