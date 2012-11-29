@@ -50,6 +50,12 @@ static NSString			*sProxyUserIDAndPassword = nil;
 @end
 
 
+@interface CURLHandle ()
+- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
+- (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
+@end
+
+
 static int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype purpose)
 {
     if (purpose == CURLSOCKTYPE_IPCXN)
