@@ -76,18 +76,18 @@ static int curlSocketOptFunction(NSURL *URL, curl_socket_t curlfd, curlsocktype 
 	we can use that to get back into Objective C and do the work with the class.
 "*/
 
-static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:NO];
+	return [self curlWritePtr:ptr size:size number:nmemb isHeader:NO];
 }
 
 /*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
 	we can use that to get back into Objective C and do the work with the class.
 "*/
 
-static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:YES];
+	return [self curlWritePtr:ptr size:size number:nmemb isHeader:YES];
 }
 
 /*"	Callback to provide a chunk of data for sending.  Since we pass "self" in as the "data pointer",
