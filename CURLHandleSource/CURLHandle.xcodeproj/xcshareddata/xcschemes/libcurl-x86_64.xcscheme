@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0440"
+   LastUpgradeVersion = "0460"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "NO"
@@ -14,8 +14,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "809AE1441602BC38001D02E1"
-               BuildableName = "libcurl-x86_64.dylib"
+               BlueprintIdentifier = "8008030E16696292004D39F5"
+               BuildableName = "libcurl-x86_64"
                BlueprintName = "libcurl-x86_64"
                ReferencedContainer = "container:CURLHandle.xcodeproj">
             </BuildableReference>
