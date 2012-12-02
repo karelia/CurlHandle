@@ -12,3 +12,12 @@ How to build libcurl:
 After updating/rebuilding libcurl, you should update/rebuild any libraries, frameworks, or apps that depend on it, such as CURLHandle.framework.
 
 Building CURLHandle.framework (the CURLHandle target) uses the current build of libcurl.dylib -- it does not rebuild it. That's a decision we made for performance during CURLHandle builds.
+
+Dependencies:
+libcurl depends on 
+    libcares
+    libssh2
+
+libcares is built automatically by building the libcurl target,
+libssh2 is buit separately in another project.
+
