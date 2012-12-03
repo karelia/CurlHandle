@@ -118,8 +118,10 @@
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 79B96CBB0A6360F90060AC12 /* CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
-		809AE1C81602C7DD001D02E1 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
-		809AE1CA1602C89D001D02E1 /* libcurl.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
+		8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
+		8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
+		8008037E166C5BF4004D39F5 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
+		8008037F166C5BF9004D39F5 /* libcares.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -181,7 +183,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				809AE1CA1602C89D001D02E1 /* libcurl.dylib in Copy Files - Frameworks */,
+				8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Files - Frameworks */,
+				8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Files - Frameworks */,
 			);
 			name = "Copy Files - Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -207,6 +210,7 @@
 		8008031816696329004D39F5 /* curl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = curl; path = ../curl; sourceTree = "<group>"; };
 		8008031D166A93C4004D39F5 /* libcares-README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "libcares-README.txt"; sourceTree = "<group>"; };
 		8008031E166A93DD004D39F5 /* c-ares */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "c-ares"; path = "../c-ares"; sourceTree = "<group>"; };
+		80080379166C5B40004D39F5 /* libcares.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcares.dylib; sourceTree = "<group>"; };
 		809AE1C71602C7DD001D02E1 /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcurl.dylib; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* CURLHandle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CURLHandle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -217,7 +221,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				809AE1C81602C7DD001D02E1 /* libcurl.dylib in Frameworks */,
+				8008037E166C5BF4004D39F5 /* libcurl.dylib in Frameworks */,
+				8008037F166C5BF9004D39F5 /* libcares.dylib in Frameworks */,
 				277D77E01603804900906915 /* Foundation.framework in Frameworks */,
 				277D77E2160380AF00906915 /* CFNetwork.framework in Frameworks */,
 				79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */,
@@ -244,19 +249,20 @@
 				8008031816696329004D39F5 /* curl */,
 				08FB77AEFE84172EC02AAC07 /* CURLHandle */,
 				089C1665FE841158C02AAC07 /* Resources */,
-				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
-				809AE1C71602C7DD001D02E1 /* libcurl.dylib */,
+				0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
 			name = CURLHandle;
 			sourceTree = "<group>";
 		};
-		0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */ = {
+		0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				809AE1C71602C7DD001D02E1 /* libcurl.dylib */,
+				80080379166C5B40004D39F5 /* libcares.dylib */,
 				1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */,
 			);
-			name = "External Frameworks and Libraries";
+			name = "Libraries & Frameworks";
 			sourceTree = "<group>";
 		};
 		089C1665FE841158C02AAC07 /* Resources */ = {
@@ -858,6 +864,7 @@
 				8008030D16696287004D39F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8008030F16696292004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-x86_64" */ = {
 			isa = XCConfigurationList;
@@ -866,6 +873,7 @@
 				8008031116696292004D39F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		80080320166A9514004D39F5 /* Build configuration list for PBXAggregateTarget "libcares" */ = {
 			isa = XCConfigurationList;
@@ -874,6 +882,7 @@
 				80080322166A9514004D39F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		80080324166A951E004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-clean" */ = {
 			isa = XCConfigurationList;
@@ -882,6 +891,7 @@
 				80080326166A951E004D39F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		80080328166A952A004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-i386" */ = {
 			isa = XCConfigurationList;
@@ -890,6 +900,7 @@
 				8008032A166A952A004D39F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8008032C166A9535004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-x86_64" */ = {
 			isa = XCConfigurationList;
@@ -898,6 +909,7 @@
 				8008032E166A9535004D39F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		809ADE7916029C38001D02E1 /* Build configuration list for PBXAggregateTarget "libcurl" */ = {
 			isa = XCConfigurationList;
