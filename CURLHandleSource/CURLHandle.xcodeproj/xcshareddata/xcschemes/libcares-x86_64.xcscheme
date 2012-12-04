@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "809ADE7816029C38001D02E1"
-               BuildableName = "libcurl"
-               BlueprintName = "libcurl"
+               BlueprintIdentifier = "8008032B166A9535004D39F5"
+               BuildableName = "libcares-x86_64"
+               BlueprintName = "libcares-x86_64"
                ReferencedContainer = "container:CURLHandle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
