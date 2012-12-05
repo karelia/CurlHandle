@@ -1,5 +1,6 @@
 //
 //  CURLFTPSession.h
+//  CURLHandle
 //
 //  Created by Mike Abdullah on 04/03/2012.
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
@@ -11,16 +12,17 @@
 @protocol CURLFTPSessionDelegate;
 
 
-@interface CURLFTPSession : NSObject <NSURLAuthenticationChallengeSender>
+@interface CURLFTPSession : NSObject <CURLHandleDelegate>
 {
   @private
+    CURLHandle          *_handle;
     NSURLRequest        *_request;
-    
-    // Auth
     NSURLCredential     *_credential;
-    NSOperationQueue    *_opsAwaitingAuth;
     
     id <CURLFTPSessionDelegate> _delegate;
+    
+    NSMutableData   *_data;
+    void            (^_progressBlock)(NSUInteger bytesWritten);
 }
 
 // Returns nil if not a supported FTP URL
@@ -28,32 +30,44 @@
 - (id)initWithRequest:(NSURLRequest *)request;
 @property(nonatomic, copy) NSURLRequest *baseRequest;   // throws exception if not FTP URL
 
-// Path is nil if fails for some reason. Note that it's possible for this method fail with an error of nil, although I don't know what circumstances could cause this
-- (void)findHomeDirectoryWithCompletionHandler:(void (^)(NSString *path, NSError *error))handler;
+- (void)useCredential:(NSURLCredential *)credential;
+
+// Note that it's possible for this method to return nil with an error of nil, although I don't know what circumstances could cause this
+- (NSString *)homeDirectoryPath:(NSError **)error;
 
 
 #pragma mark Discovering Directory Contents
 
-// Potentially, directory listings arrive in pieces. As the listing is received & parsed, each resource is passed to the block as dictionary with keys such as kCFFTPResourceName. When the listing finishes, the block is invoked with a parsedResourceListing of nil. The same happens upon failure with an error object supplied too
-- (void)enumerateContentsOfDirectoryAtPath:(NSString *)path usingBlock:(void (^)(NSDictionary *parsedResourceListing, NSError *error))block;
+// Potentially, directory listings arrive in pieces. As the listing is parsed, each resource is passed to the block as dictionary with keys such as kCFFTPResourceName
+- (BOOL)enumerateContentsOfDirectoryAtPath:(NSString *)path
+                                     error:(NSError **)error
+                                usingBlock:(void (^)(NSDictionary *parsedResourceListing))block;
 
 
 #pragma mark Creating and Deleting Items
 
-// 0 bytesWritten indicates writing has ended. This might be because of a failure; if so, error will be filled in
-- (void)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates progressBlock:(void (^)(NSUInteger bytesWritten, NSError *error))progressBlock;
+- (BOOL)createFileAtPath:(NSString *)path contents:(NSData *)data withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 
-- (void)createFileAtPath:(NSString *)path withContentsOfURL:(NSURL *)url withIntermediateDirectories:(BOOL)createIntermediates progressBlock:(void (^)(NSUInteger bytesWritten, NSError *error))progressBlock;
+#if NS_BLOCKS_AVAILABLE
+- (BOOL)createFileAtPath:(NSString *)path withContentsOfURL:(NSURL *)url withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error progressBlock:(void (^)(NSUInteger bytesWritten))progressBlock;
+#endif
 
-- (void)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates completionHandler:(void (^)(NSError *error))handler;
+- (BOOL)createDirectoryAtPath:(NSString *)path withIntermediateDirectories:(BOOL)createIntermediates error:(NSError **)error;
 
-- (void)removeFileAtPath:(NSString *)path completionHandler:(void (^)(NSError *error))handler;
+- (BOOL)removeFileAtPath:(NSString *)path error:(NSError **)error;
 
+- (BOOL)removeDirectoryAtPath:(NSString *)path error:(NSError **)error;
+
+// For toPath:
+//  If absolute, we rely on the server to interpret that properly
+//  For purely filenames, there should be no problem
+//  For other relative paths, it's kinda up to the server how it handles that, so beware!
+- (BOOL)moveItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath error:(NSError **)error;
 
 #pragma mark Setting Attributes
 // Only NSFilePosixPermissions is recognised at present. Note that some servers don't support this so will return an error (code 500)
 // All other attributes are ignored
-- (void)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path completionHandler:(void (^)(NSError *error))handler;
+- (BOOL)setAttributes:(NSDictionary *)attributes ofItemAtPath:(NSString *)path error:(NSError **)error;
 
 
 #pragma mark Cancellation
@@ -62,8 +76,7 @@
 
 
 #pragma mark Delegate
-// Delegate messages are received on arbitrary queues. So changing delegate might mean you still receive message shortly after the change. Not ideal I know!
-@property(assign) id <CURLFTPSessionDelegate> delegate;
+@property(nonatomic, assign) id <CURLFTPSessionDelegate> delegate;
 
 
 #pragma mark FTP URLs
@@ -75,6 +88,5 @@
 
 
 @protocol CURLFTPSessionDelegate <NSObject>
-- (void)FTPSession:(CURLFTPSession *)session didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
 - (void)FTPSession:(CURLFTPSession *)session didReceiveDebugInfo:(NSString *)info ofType:(curl_infotype)type;
 @end

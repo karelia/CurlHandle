@@ -22,12 +22,6 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 enum { CURLM_CANCELLED = -2 };
 
-/*" YES if CURLHandle will allow use of a proxy server "*/
-extern	BOOL				sAllowsProxy;
-
-/*" Proxy User ID:Password combo for all uses of CURL. "*/
-extern NSString				*sProxyUserIDAndPassword;
-
 @interface CURLHandle : NSObject
 {
 	BOOL                    _cancelled;                     /*" A flag that is set by the foreground thread and read by the background thread; it's an indicator that the user has cancelled. "*/

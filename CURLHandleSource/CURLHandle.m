@@ -4,8 +4,6 @@
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
 //  This is in the public domain, but please report any improvements back to the author.
 //
-//	The current version of CURLHandle is 2.0
-//
 
 #import "CURLHandle.h"
 #import "CURLMulti.h"
@@ -37,8 +35,8 @@ NSString			*sProxyUserIDAndPassword = nil;
 #pragma mark - Callback Prototypes
 
 int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype purpose);
-static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
-static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf);
+static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self);
+static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self);
 static size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
 static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *handle);
 
@@ -466,7 +464,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
     // SSL
     LOAD_REQUEST_SET_OPTION(CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]);
-    LOAD_REQUEST_SET_OPTION(CURLOPT_CERTINFO, 1L);
+    //LOAD_REQUEST_SET_OPTION(CURLOPT_CERTINFO, 1L);    // isn't supported by Darwin-SSL backend yet
     LOAD_REQUEST_SET_OPTION(CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]);
 
     // Intermediate directories
@@ -828,18 +826,18 @@ int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype p
  we can use that to get back into Objective C and do the work with the class.
  "*/
 
-size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:NO];
+	return [self curlWritePtr:ptr size:size number:nmemb isHeader:NO];
 }
 
 /*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
  we can use that to get back into Objective C and do the work with the class.
  "*/
 
-size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, void *inSelf)
+size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
-	return [(CURLHandle *)inSelf curlWritePtr:ptr size:size number:nmemb isHeader:YES];
+	return [self curlWritePtr:ptr size:size number:nmemb isHeader:YES];
 }
 
 /*"	Callback to provide a chunk of data for sending.  Since we pass "self" in as the "data pointer",
