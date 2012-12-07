@@ -441,7 +441,15 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
     // Intermediate directories
     LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories]);
-
+    
+    
+    // Permissions
+    NSNumber *permissions = [request curl_newFilePermissions];
+    if (permissions) LOAD_REQUEST_SET_OPTION(CURLOPT_NEW_FILE_PERMS, [permissions longValue]);
+    
+    permissions = [request curl_newDirectoryPermissions];
+    if (permissions) LOAD_REQUEST_SET_OPTION(CURLOPT_NEW_DIRECTORY_PERMS, [permissions longValue]);
+    
 
     // Post-quote
     for (NSString *aCommand in [request curl_postTransferCommands])
