@@ -135,11 +135,6 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 	return _curl;
 }
 
-- (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption
-{
-	[_stringOptions setObject:inString forKey:[NSNumber numberWithInt:inCurlOption]];
-}
-
 + (NSString *) curlVersion
 {
 	return [NSString stringWithCString: curl_version() encoding:NSASCIIStringEncoding];
@@ -160,24 +155,8 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         
         // Turn automatic redirects off by default, so can properly report them to delegate
         curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
-        
-        if (credential)
-        {
-            NSString *username = [credential user];
-            [self setString:username forKey:CURLOPT_USERNAME];
-            
-            NSString *password = [credential password];
-            if (password)
-            {
-                [self setString:password forKey:CURLOPT_PASSWORD];
-            }
-            else
-            {
-                NSLog(@"Credential with no password");
-            }
-        }
-        
-        CURLcode code = [self setupRequest:request];
+                
+        CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
             [[CURLMulti sharedInstance] manageHandle:self];
@@ -208,7 +187,6 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     [_URL release];
 	[_headerBuffer release];
 	[_proxies release];
-	[_stringOptions release];
     [_uploadStream release];
 
 	[super dealloc];
@@ -234,7 +212,6 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         
         _errorBuffer[0] = 0;	// initialize the error buffer to empty
 		_headerBuffer = [[NSMutableData alloc] init];
-		_stringOptions = [[NSMutableDictionary alloc] init];
 	}
 	return self;
 }
@@ -258,7 +235,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 #define LOAD_REQUEST_SET_OPTION(option, parameter) if ((code = curl_easy_setopt(_curl, option, parameter)) != CURLE_OK) return code;
 
-- (CURLcode)setupRequest:(NSURLRequest *)request
+- (CURLcode)setupRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential
 {
     NSAssert(_executing == NO, @"CURLHandle instances may not be accessed on multiple threads at once, or re-entrantly");
     _executing = YES;
@@ -317,26 +294,16 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 
 
 
-    // Set the options
-    NSEnumerator *theEnum = [_stringOptions keyEnumerator];
-    NSString *theKey;
-    while (nil != (theKey = [theEnum nextObject]) )
+    // Set the credential
+    if (credential)
     {
-        id theObject = [_stringOptions objectForKey:theKey];
-
-        if ([theObject isKindOfClass:[NSNumber class]])
-        {
-            LOAD_REQUEST_SET_OPTION([theKey intValue], [theObject intValue]);
-        }
-        else if ([theObject respondsToSelector:@selector(cString)])
-        {
-            LOAD_REQUEST_SET_OPTION([theKey intValue], [theObject UTF8String]);
-        }
-        else
-        {
-            NSLog(@"Ignoring CURL option of type %@ for key %@", [theObject class], theKey);
-        }
+        NSString *username = [credential user];
+        LOAD_REQUEST_SET_OPTION(CURLOPT_USERNAME, [username UTF8String]);
+        
+        NSString *password = [credential password];
+        LOAD_REQUEST_SET_OPTION(CURLOPT_PASSWORD, [password UTF8String]);
     }
+    
 
     // Set the proxy info.  Ignore errors -- just don't do proxy if errors.
     if (sAllowsProxy)	// normally this is YES.

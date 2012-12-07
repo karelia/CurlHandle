@@ -34,7 +34,6 @@ enum { CURLM_CANCELLED = -2 };
     struct curl_slist       *_httpHeaders;
     struct curl_slist       *_postQuoteCommands;
 	NSDictionary            *_proxies;                      /*" Dictionary of proxy information; it's released when the handle is deallocated since it's needed for the transfer."*/
-	NSMutableDictionary     *_stringOptions;                /*" Dictionary of keys(ints) & values (NSStrings) for performing curl_easy_setopt.  We store the options in a dictionary and then invoke #curl_easy_setopt on each option right before the #curl_easy_perform so that we can retain their memory until it is needed."*/
     NSInputStream           *_uploadStream;
 }
 
@@ -74,7 +73,6 @@ enum { CURLM_CANCELLED = -2 };
 
 @interface CURLHandle(OldAPI)
 - (CURL *) curl;
-- (void) setString:(NSString *)inString forKey:(CURLoption) inCurlOption;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
 @end
