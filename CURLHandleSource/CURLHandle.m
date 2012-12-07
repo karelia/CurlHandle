@@ -302,6 +302,11 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         
         NSString *password = [credential password];
         LOAD_REQUEST_SET_OPTION(CURLOPT_PASSWORD, [password UTF8String]);
+        
+        BOOL publicKey = ([credential respondsToSelector:@selector(ck2_isPublicKeyCredential)] &&
+                          [[credential valueForKey:@"ck2_isPublicKeyCredential"] boolValue]);
+        
+        LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_AUTH_TYPES, (publicKey ? CURLSSH_AUTH_PUBLICKEY : CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD));
     }
     
 
