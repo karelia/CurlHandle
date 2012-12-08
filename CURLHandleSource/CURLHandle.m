@@ -301,11 +301,23 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         NSString *username = [credential user];
         LOAD_REQUEST_SET_OPTION(CURLOPT_USERNAME, [username UTF8String]);
         
-        NSString *password = [credential password];
-        LOAD_REQUEST_SET_OPTION(CURLOPT_PASSWORD, [password UTF8String]);
+        NSURL *privateKey = [credential ck2_privateKeyURL];
+        LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_PUBLIC_KEYFILE, [[privateKey path] UTF8String]);
         
-        BOOL publicKey = [credential ck2_isPublicKeyCredential];
-        LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_AUTH_TYPES, (publicKey ? CURLSSH_AUTH_PUBLICKEY : CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD));
+        NSURL *publicKey = [credential ck2_publicKeyURL];
+        LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_PUBLIC_KEYFILE, [[publicKey path] UTF8String]);
+        
+        NSString *password = [credential password];
+        if (privateKey)
+        {
+            LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_KEYPASSWD, [password UTF8String]);
+        }
+        else
+        {
+            LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
+            LOAD_REQUEST_SET_OPTION(CURLOPT_PASSWORD, [password UTF8String]);
+        }
     }
     
 
