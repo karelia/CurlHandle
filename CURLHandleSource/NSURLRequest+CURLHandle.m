@@ -35,6 +35,8 @@ static NSString *const UseCurlHandleKey = @"useCurlHandle";
 - (NSNumber *)curl_newFilePermissions; { return [NSURLProtocol propertyForKey:@"curl_newFilePermissions" inRequest:self]; }
 - (NSNumber *)curl_newDirectoryPermissions; { return [NSURLProtocol propertyForKey:@"curl_newDirectoryPermissions" inRequest:self]; }
 
+- (NSURL *)curl_SSHKnownHostsFileURL; { return [NSURLProtocol propertyForKey:@"curl_SSHKnownHostsFileURL" inRequest:self]; }
+
 @end
 
 @implementation NSMutableURLRequest (CURLOptionsFTP)
@@ -76,6 +78,18 @@ static NSString *const UseCurlHandleKey = @"useCurlHandle";
 - (void)curl_setNewDirectoryPermissions:(NSNumber *)permissions;
 {
     [NSURLProtocol setProperty:permissions forKey:@"curl_newDirectoryPermissions" inRequest:self];
+}
+
+- (void)curl_setSSHKnownHostsFileURL:(NSURL *)url;
+{
+    if (url)
+    {
+        [NSURLProtocol setProperty:url forKey:@"curl_SSHKnownHostsFileURL" inRequest:self];
+    }
+    else
+    {
+        [NSURLProtocol removePropertyForKey:@"curl_SSHKnownHostsFileURL" inRequest:self];
+    }
 }
 
 @end

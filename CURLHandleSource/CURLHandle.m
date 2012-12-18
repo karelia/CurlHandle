@@ -293,7 +293,10 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     // It seems that on OS X 10.6, this behaves as the maximum time a transfer can take, likely killing the connection for large files, so don't want it. Not supporting EPSV at present anyhow
     //LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_RESPONSE_TIMEOUT, 0.5 * timeout);
 
-
+    
+    // SSH Known Hosts
+    LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_KNOWNHOSTS, [[[request curl_SSHKnownHostsFileURL] path] UTF8String]);
+    
 
     // Set the credential
     if (credential)

@@ -27,6 +27,9 @@
 @property(nonatomic, readonly) NSNumber *curl_newFilePermissions;
 @property(nonatomic, readonly) NSNumber *curl_newDirectoryPermissions;
 
+// Default is nil, which means no checking
+@property(nonatomic, readonly) NSURL *curl_SSHKnownHostsFileURL;
+
 @end
 
 @interface NSMutableURLRequest (CURLOptionsFTP)
@@ -38,6 +41,8 @@
 
 - (void)curl_setNewFilePermissions:(NSNumber *)permissions;
 - (void)curl_setNewDirectoryPermissions:(NSNumber *)permissions;
+
+- (void)curl_setSSHKnownHostsFileURL:(NSURL *)url;
 
 @end
 
