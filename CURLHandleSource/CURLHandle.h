@@ -93,6 +93,11 @@ enum { CURLM_CANCELLED = -2 };
 // At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError*)error;
 
+// Reply to tell CURLHandle/libcurl how to handle the fingerprint
+// If not implemented, only matching keys are accepted; all else is rejected
+// I've found that CURLKHSTAT_FINE_ADD_TO_FILE only bothers appending to the file if not already present
+- (enum curl_khstat)handle:(CURLHandle *)handle didFindHostFingerprint:(const struct curl_khkey *)foundKey knownFingerprint:(const struct curl_khkey *)knownkey match:(enum curl_khmatch)match;
+
 // When sending data to the server, this reports just before it goes out on the wire. Reports a length of 0 when the end of the data is written so you can get a nice heads up that an upload is about to complete
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten;
 

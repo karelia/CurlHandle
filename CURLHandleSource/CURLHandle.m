@@ -41,6 +41,11 @@ static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandl
 static size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
 static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *handle);
 
+static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
+                                  const struct curl_khkey *knownkey, /* known */
+                                  const struct curl_khkey *foundkey, /* found */
+                                  enum curl_khmatch, /* libcurl's view on the keys */
+                                  CURLHandle *self); /* custom pointer passed from app */
 
 @interface CURLHandle()
 
@@ -296,6 +301,8 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     
     // SSH Known Hosts
     LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_KNOWNHOSTS, [[[request curl_SSHKnownHostsFileURL] path] UTF8String]);
+    LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_KEYDATA, self);
+    LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_KEYFUNCTION, curlKnownHostsFunction);
     
 
     // Set the credential
@@ -786,6 +793,18 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     return result;
 }
 
+- (enum curl_khstat)didFindHostFingerprint:(const struct curl_khkey *)foundKey knownFingerprint:(const struct curl_khkey *)knownkey match:(enum curl_khmatch)match;
+{
+    if ([_delegate respondsToSelector:@selector(handle:didFindHostFingerprint:knownFingerprint:match:)])
+    {
+        return [_delegate handle:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
+    }
+    else
+    {
+        return (match == CURLKHMATCH_OK ? CURLKHSTAT_FINE : CURLKHSTAT_REJECT);
+    }
+}
+
 @synthesize delegate = _delegate;
 
 @end
@@ -873,4 +892,13 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
     [string release];
 
     return 0;
+}
+
+int curlKnownHostsFunction(CURL *easy,     /* easy handle */
+                           const struct curl_khkey *knownkey, /* known */
+                           const struct curl_khkey *foundkey, /* found */
+                           enum curl_khmatch match, /* libcurl's view on the keys */
+                           CURLHandle *self) /* custom pointer passed from app */
+{
+    return [self didFindHostFingerprint:foundkey knownFingerprint:knownkey match:match];
 }
