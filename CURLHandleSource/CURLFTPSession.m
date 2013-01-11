@@ -171,10 +171,22 @@ createIntermediateDirectories:(BOOL)createIntermediates
 {
     if (!path) path = @".";
     
+    
+    // Command Windows servers not to use MSDOS-style directory listings. Might fail, don't really care if it does!
+    // FIXME: The command is a toggle, so must only do it the once. If the session goes unused long enough for a request to require a reconnection, that setting will be reset and we have no way of knowing that. So fingers crossed there are no disconnects before directory listings!
+    if (!_doneDirectoryListing)
+    {
+        [self executeCustomCommands:@[@"SITE DIRSTYLE"] inDirectory:path createIntermediateDirectories:NO error:NULL];
+        _doneDirectoryListing = YES;
+    }
+    
+    
+    // Get the directory listing
     NSMutableURLRequest *request = [self newMutableRequestWithPath:path isDirectory:YES];
     
     _data = [[NSMutableData alloc] init];
     BOOL result = [_handle loadRequest:request error:error];
+    
     
     // Process the data to make a directory listing
     while (result)
