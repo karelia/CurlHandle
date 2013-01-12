@@ -23,6 +23,8 @@
     
     NSMutableData   *_data;
     void            (^_progressBlock)(NSUInteger bytesWritten);
+    
+    BOOL    _doneDirectoryListing;
 }
 
 // Returns nil if not a supported FTP URL
