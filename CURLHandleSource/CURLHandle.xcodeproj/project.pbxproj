@@ -118,7 +118,6 @@
 		223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */; };
 		223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 223FD0B1160B63F800BE1C80 /* DevNotes.txt */; };
 		226B358D16ADAA6D004780A7 /* CURLHandle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; };
-		226B35C616ADB0CF004780A7 /* CURLHandle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; };
 		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4A5161090AB009B6F98 /* CURLResponse.h */; };
 		2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A6161090AB009B6F98 /* CURLResponse.m */; };
@@ -131,14 +130,8 @@
 		229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */; };
 		22BCCE2E16ADD61F00DFFE8D /* libssh2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
 		22BCCE3016ADD63500DFFE8D /* libssh2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
-		22BCCE3216ADD66400DFFE8D /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3116ADD66400DFFE8D /* libz.dylib */; };
 		22BCCE3316ADD66900DFFE8D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
-		22BCCE3516ADD66F00DFFE8D /* SecurityInterface.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3416ADD66F00DFFE8D /* SecurityInterface.framework */; };
-		22BCCE3716ADD67500DFFE8D /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3616ADD67500DFFE8D /* CoreFoundation.framework */; };
-		22BCCE3916ADD68500DFFE8D /* libsasl2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3816ADD68500DFFE8D /* libsasl2.dylib */; };
-		22BCCE3B16ADD72E00DFFE8D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3A16ADD72E00DFFE8D /* Foundation.framework */; };
 		22BCCE3C16ADD73400DFFE8D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277D77E1160380AF00906915 /* CFNetwork.framework */; };
-		22BCCE3E16ADD73F00DFFE8D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3D16ADD73F00DFFE8D /* SystemConfiguration.framework */; };
 		22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
 		22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -216,16 +209,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		226B35C316ADB0C0004780A7 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				226B35C616ADB0CF004780A7 /* CURLHandle.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		22BCCE2F16ADD63000DFFE8D /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -283,12 +266,6 @@
 		229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleBasedTest.m; sourceTree = "<group>"; };
 		22BCCE2716ADD53000DFFE8D /* libssh2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssh2.dylib; path = ../SFTP/libssh2.dylib; sourceTree = "<group>"; };
 		22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = ../SFTP/libcrypto.dylib; sourceTree = "<group>"; };
-		22BCCE3116ADD66400DFFE8D /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		22BCCE3416ADD66F00DFFE8D /* SecurityInterface.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SecurityInterface.framework; path = System/Library/Frameworks/SecurityInterface.framework; sourceTree = SDKROOT; };
-		22BCCE3616ADD67500DFFE8D /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		22BCCE3816ADD68500DFFE8D /* libsasl2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsasl2.dylib; path = usr/lib/libsasl2.dylib; sourceTree = SDKROOT; };
-		22BCCE3A16ADD72E00DFFE8D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		22BCCE3D16ADD73F00DFFE8D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		22BCCE4516ADE52700DFFE8D /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = ../SFTP/libssl.dylib; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
@@ -319,14 +296,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22BCCE3E16ADD73F00DFFE8D /* SystemConfiguration.framework in Frameworks */,
 				22BCCE3C16ADD73400DFFE8D /* CFNetwork.framework in Frameworks */,
-				22BCCE3B16ADD72E00DFFE8D /* Foundation.framework in Frameworks */,
-				22BCCE3916ADD68500DFFE8D /* libsasl2.dylib in Frameworks */,
-				22BCCE3716ADD67500DFFE8D /* CoreFoundation.framework in Frameworks */,
-				22BCCE3516ADD66F00DFFE8D /* SecurityInterface.framework in Frameworks */,
 				22BCCE3316ADD66900DFFE8D /* Security.framework in Frameworks */,
-				22BCCE3216ADD66400DFFE8D /* libz.dylib in Frameworks */,
 				223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */,
 				22BCCE2E16ADD61F00DFFE8D /* libssh2.dylib in Frameworks */,
 				226B358D16ADAA6D004780A7 /* CURLHandle.framework in Frameworks */,
@@ -361,12 +332,6 @@
 		0867D691FE84028FC02AAC07 /* CURLHandle */ = {
 			isa = PBXGroup;
 			children = (
-				22BCCE3D16ADD73F00DFFE8D /* SystemConfiguration.framework */,
-				22BCCE3A16ADD72E00DFFE8D /* Foundation.framework */,
-				22BCCE3816ADD68500DFFE8D /* libsasl2.dylib */,
-				22BCCE3616ADD67500DFFE8D /* CoreFoundation.framework */,
-				22BCCE3416ADD66F00DFFE8D /* SecurityInterface.framework */,
-				22BCCE3116ADD66400DFFE8D /* libz.dylib */,
 				8008031D166A93C4004D39F5 /* libcares-README.txt */,
 				8008031E166A93DD004D39F5 /* c-ares */,
 				80080316166962C7004D39F5 /* libcurl-README.txt */,
@@ -516,7 +481,6 @@
 				223FD08D160B523700BE1C80 /* Sources */,
 				223FD08E160B523700BE1C80 /* Frameworks */,
 				223FD08F160B523700BE1C80 /* Resources */,
-				226B35C316ADB0C0004780A7 /* CopyFiles */,
 				22BCCE2F16ADD63000DFFE8D /* CopyFiles */,
 				223FD090160B523700BE1C80 /* ShellScript */,
 			);
