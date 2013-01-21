@@ -4,7 +4,7 @@
 
 base=`dirname $0`
 echo "$base"
-pushd "$base/.." > /dev/null
+pushd "$base/../.." > /dev/null
 build="$PWD/test-build"
 ocunit2junit="$base/OCUnit2JUnit/bin/ocunit2junit"
 popd > /dev/null
@@ -18,6 +18,6 @@ testerr="$build/error.log"
 rm -rf "$build"
 mkdir -p "$build"
 
-xcodebuild -workspace "CUrlHandle.xcworkspace" -scheme "CURLHandle" -sdk "macosx" -config "Debug" test OBJROOT="$obj" SYMROOT="$sym" > "$testout" 2> "$testerr"
+xcodebuild -workspace "CURLHandle.xcworkspace" -scheme "CURLHandle" -sdk "macosx" -config "Debug" test OBJROOT="$obj" SYMROOT="$sym" > "$testout" 2> "$testerr"
 cd "$build"
 "../$ocunit2junit" < "$testout"
