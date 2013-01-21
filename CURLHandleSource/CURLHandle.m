@@ -151,7 +151,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark ----- NSURLHANDLE OVERRIDES
 // -----------------------------------------------------------------------------
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi
 {
     if (self = [self init])
     {
@@ -165,7 +165,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
-            [[CURLMulti sharedInstance] manageHandle:self];
+            [multi manageHandle:self];
         }
         else
         {
@@ -175,6 +175,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     
     return self;
 }
+
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+{
+    return [self initWithRequest:request credential:credential delegate:delegate multi:[CURLMulti sharedInstance]];
+}
+
 
 - (void) dealloc
 {
