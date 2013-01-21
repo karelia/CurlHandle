@@ -882,9 +882,13 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
         {
             string = [@"<NULL> debug info" retain];
         }
-        else
+        else if (infoLength < 100000)
         {
             string = [[NSString alloc] initWithFormat:@"Invalid debug info: %@", [NSData dataWithBytes:info length:infoLength]];
+        }
+        else
+        {
+            string = [[NSString alloc] initWithFormat:@"Invalid debug info - info length seems to be too big: %ld", infoLength];
         }
     }
 
