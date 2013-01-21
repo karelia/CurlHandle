@@ -293,12 +293,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
     dispatch_source_set_event_handler(self.timer, ^{
-        if (self.multi)
-        {
-            int running;
-            curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
-            [self processMulti];
-        }
+        dispatch_queue_t queue = self.queue;
+        dispatch_async(queue, ^{
+            if (self.multi)
+            {
+                int running;
+                curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
+                [self processMulti];
+            }
+        });
     });
 
     dispatch_source_set_cancel_handler(self.timer, ^{
@@ -381,7 +384,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 {
                     int running;
                     curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
-                    [self processMulti];
+                    dispatch_queue_t queue = self.queue;
+                    dispatch_async(queue, ^{
+                        [self processMulti];
+                    });
                 }
             });
             dispatch_source_set_cancel_handler(source, ^{
