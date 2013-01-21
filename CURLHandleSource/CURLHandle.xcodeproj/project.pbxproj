@@ -139,12 +139,6 @@
 		22BCCE3B16ADD72E00DFFE8D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3A16ADD72E00DFFE8D /* Foundation.framework */; };
 		22BCCE3C16ADD73400DFFE8D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277D77E1160380AF00906915 /* CFNetwork.framework */; };
 		22BCCE3E16ADD73F00DFFE8D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE3D16ADD73F00DFFE8D /* SystemConfiguration.framework */; };
-		22BCCE4116ADE43E00DFFE8D /* libssh2.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
-		22BCCE4216ADE44100DFFE8D /* libssh2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
-		22BCCE4316ADE50200DFFE8D /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
-		22BCCE4416ADE50700DFFE8D /* libcrypto.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
-		22BCCE4616ADE52700DFFE8D /* libssl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
-		22BCCE4716ADE52B00DFFE8D /* libssl.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
 		22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
 		22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -252,9 +246,6 @@
 			files = (
 				8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Files - Frameworks */,
 				8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Files - Frameworks */,
-				22BCCE4116ADE43E00DFFE8D /* libssh2.dylib in Copy Files - Frameworks */,
-				22BCCE4416ADE50700DFFE8D /* libcrypto.dylib in Copy Files - Frameworks */,
-				22BCCE4716ADE52B00DFFE8D /* libssl.dylib in Copy Files - Frameworks */,
 			);
 			name = "Copy Files - Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -348,13 +339,10 @@
 			files = (
 				8008037E166C5BF4004D39F5 /* libcurl.dylib in Frameworks */,
 				8008037F166C5BF9004D39F5 /* libcares.dylib in Frameworks */,
-				22BCCE4216ADE44100DFFE8D /* libssh2.dylib in Frameworks */,
-				22BCCE4316ADE50200DFFE8D /* libcrypto.dylib in Frameworks */,
 				277D77E01603804900906915 /* Foundation.framework in Frameworks */,
 				277D77E2160380AF00906915 /* CFNetwork.framework in Frameworks */,
 				79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */,
 				27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */,
-				22BCCE4616ADE52700DFFE8D /* libssl.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
