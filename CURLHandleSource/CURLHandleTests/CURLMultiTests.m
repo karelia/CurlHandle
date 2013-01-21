@@ -10,6 +10,13 @@
 
 #import "NSURLRequest+CURLHandle.h"
 
+@interface CURLHandle(TestOnly)
+
+// this is a private method but we need it for testing
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
+
+@end
+
 @interface CURLMultiTests : CURLHandleBasedTest
 
 @end
@@ -33,13 +40,8 @@
 
     [multi startup];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
-
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
-
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [self runUntilDone];
 
@@ -62,13 +64,8 @@
     NSURL* ftpRoot = [self ftpTestServer];
     NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
-
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [self runUntilDone];
 
@@ -94,16 +91,11 @@
     NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
     NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
-
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
     request.shouldUseCurlHandle = YES;
     [request curl_setCreateIntermediateDirectories:1];
     [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
-
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [self runUntilDone];
     
@@ -126,13 +118,8 @@
 
     [multi startup];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
-
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
-
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [multi cancelHandle:handle];
 
