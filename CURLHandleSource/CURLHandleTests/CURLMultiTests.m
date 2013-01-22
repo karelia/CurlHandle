@@ -9,6 +9,14 @@
 #import "CURLHandleBasedTest.h"
 
 #import "NSURLRequest+CURLHandle.h"
+#import "KMSServer.h"
+
+@interface CURLHandle(TestOnly)
+
+// this is a private method but we need it for testing
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
+
+@end
 
 @interface CURLMultiTests : CURLHandleBasedTest
 
@@ -33,15 +41,10 @@
 
     [multi startup];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
-
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
-
-    [self runUntilDone];
+    [self runUntilPaused];
 
     [self checkDownloadedBufferWasCorrect];
 
@@ -60,23 +63,23 @@
     [multi startup];
     
     NSURL* ftpRoot = [self ftpTestServer];
-    NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+    if (ftpRoot)
+    {
+        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
+        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
+        [self runUntilPaused];
 
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
-
-    [self runUntilDone];
-
-    [self checkDownloadedBufferWasCorrect];
-
-    [handle release];
+        [self checkDownloadedBufferWasCorrect];
+        
+        [handle release];
+    }
 
     [multi shutdown];
+
+    //    [self stopServer];
 
     [multi release];
 }
@@ -88,31 +91,29 @@
     [multi startup];
     
     NSURL* ftpRoot = [self ftpTestServer];
-    NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
+    if (ftpRoot)
+    {
+        NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
-    NSError* error = nil;
-    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+        NSError* error = nil;
+        NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+        NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
+        request.shouldUseCurlHandle = YES;
+        [request curl_setCreateIntermediateDirectories:1];
+        [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
-    request.shouldUseCurlHandle = YES;
-    [request curl_setCreateIntermediateDirectories:1];
-    [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+        [self runUntilPaused];
 
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
-
-    [self runUntilDone];
-    
-    STAssertTrue(self.sending, @"should have set sending flag");
-    STAssertNil(self.error, @"got error %@", self.error);
-    STAssertNil(self.response, @"got unexpected response %@", self.response);
-    STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
-
-    [handle release];
+        STAssertTrue(self.sending, @"should have set sending flag");
+        STAssertNil(self.error, @"got error %@", self.error);
+        STAssertNil(self.response, @"got unexpected response %@", self.response);
+        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+        
+        [handle release];
+    }
 
     [multi shutdown];
 
@@ -126,17 +127,12 @@
 
     [multi startup];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
-
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
-
-    BOOL ok = [handle loadRequest:request withMulti:multi];
-    STAssertTrue(ok, @"failed to load request");
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [multi cancelHandle:handle];
 
-    [self runUntilDone];
+    [self runUntilPaused];
 
     STAssertTrue(self.cancelled, @"should have been cancelled");
     STAssertNil(self.response, @"should have no response");

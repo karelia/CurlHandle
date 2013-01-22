@@ -110,41 +110,47 @@
 
 /* Begin PBXBuildFile section */
 		22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22002EDC161097EC00464D33 /* CURLProtocolTests.m */; };
-		22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		221EAD11160B167900E4F270 /* CURLMulti.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMulti.h */; };
 		221EAD12160B167900E4F270 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
-		222FCC24161311BA00AB477F /* CURLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22731037161305FF00D6D49E /* CURLSocket.m */; };
 		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
-		223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD096160B523700BE1C80 /* Cocoa.framework */; };
 		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
 		223FD0A4160B523700BE1C80 /* CURLMultiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLMultiTests.m */; };
-		223FD0A9160B55C200BE1C80 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
-		223FD0AA160B564800BE1C80 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */; };
-		223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
-		223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 223FD0B1160B63F800BE1C80 /* DevNotes.txt */; };
+		226B358D16ADAA6D004780A7 /* CURLHandle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; };
 		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
-		2270F4A316108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
 		2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4A5161090AB009B6F98 /* CURLResponse.h */; };
 		2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A6161090AB009B6F98 /* CURLResponse.m */; };
-		2270F4A9161090AB009B6F98 /* CURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A6161090AB009B6F98 /* CURLResponse.m */; };
 		2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */; };
 		2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */; };
-		2270F4AE16109133009B6F98 /* NSString+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */; };
 		22731038161305FF00D6D49E /* CURLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 22731036161305FF00D6D49E /* CURLSocket.h */; };
 		22731039161305FF00D6D49E /* CURLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22731037161305FF00D6D49E /* CURLSocket.m */; };
 		22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */; };
 		22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
-		22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
 		229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */; };
+		22BCCE3016ADD63500DFFE8D /* libssh2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
+		22BCCE3316ADD66900DFFE8D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
+		22BCCE3C16ADD73400DFFE8D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277D77E1160380AF00906915 /* CFNetwork.framework */; };
+		22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
+		22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
+		22BF085516AEAA76009BE5A3 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
+		22BF085616AEAA7A009BE5A3 /* CK2SSHCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 27D77E121672BBB50091EF91 /* CK2SSHCredential.m */; };
+		22BF089C16AEECEC009BE5A3 /* KMSConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086316AEECEC009BE5A3 /* KMSConnection.m */; };
+		22BF089D16AEECEC009BE5A3 /* KMSListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086516AEECEC009BE5A3 /* KMSListener.m */; };
+		22BF089E16AEECEC009BE5A3 /* KMSRegExResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086716AEECEC009BE5A3 /* KMSRegExResponder.m */; };
+		22BF089F16AEECEC009BE5A3 /* KMSResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086916AEECEC009BE5A3 /* KMSResponder.m */; };
+		22BF08A016AEECEC009BE5A3 /* KMSResponseCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086B16AEECEC009BE5A3 /* KMSResponseCollection.m */; };
+		22BF08A116AEECEC009BE5A3 /* KMSServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086D16AEECEC009BE5A3 /* KMSServer.m */; };
+		22BF08A216AEECEC009BE5A3 /* KMSTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF087016AEECEC009BE5A3 /* KMSTestCase.m */; };
+		22BF08C116AEEDA9009BE5A3 /* KMSTranscriptEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF08C016AEEDA9009BE5A3 /* KMSTranscriptEntry.m */; };
+		22BF08E216AEEDD9009BE5A3 /* ftp.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08C316AEEDD8009BE5A3 /* ftp.json */; };
+		22BF08E316AEEDD9009BE5A3 /* http.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08C416AEEDD8009BE5A3 /* http.json */; };
+		22BF08F316AEEDD9009BE5A3 /* webdav.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08E116AEEDD9009BE5A3 /* webdav.json */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		277D77E2160380AF00906915 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277D77E1160380AF00906915 /* CFNetwork.framework */; };
 		27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D77E111672BBB50091EF91 /* CK2SSHCredential.h */; };
-		27D77E141672BBB50091EF91 /* CK2SSHCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 27D77E121672BBB50091EF91 /* CK2SSHCredential.m */; };
 		27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 79B96CBB0A6360F90060AC12 /* CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -156,6 +162,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		22BCCE2B16ADD57700DFFE8D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = CURLHandle;
+		};
 		80080312166962A7004D39F5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -208,6 +221,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		22BCCE2F16ADD63000DFFE8D /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				22BCCE3016ADD63500DFFE8D /* libssh2.dylib in CopyFiles */,
+				22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */,
+				22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		809AE1C91602C881001D02E1 /* Copy Files - Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -229,10 +254,6 @@
 		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
 		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		223FD094160B523700BE1C80 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		223FD096160B523700BE1C80 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		223FD099160B523700BE1C80 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		223FD09A160B523700BE1C80 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		223FD09B160B523700BE1C80 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
 		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		223FD0A3160B523700BE1C80 /* CURLMultiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLMultiTests.m; sourceTree = "<group>"; };
@@ -251,6 +272,29 @@
 		22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+CURLHandle.m"; sourceTree = "<group>"; };
 		229748FA1610C1AE0042A51A /* CURLHandleBasedTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLHandleBasedTest.h; sourceTree = "<group>"; };
 		229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleBasedTest.m; sourceTree = "<group>"; };
+		22BCCE2716ADD53000DFFE8D /* libssh2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssh2.dylib; path = ../SFTP/libssh2.dylib; sourceTree = "<group>"; };
+		22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = ../SFTP/libcrypto.dylib; sourceTree = "<group>"; };
+		22BCCE4516ADE52700DFFE8D /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = ../SFTP/libssl.dylib; sourceTree = "<group>"; };
+		22BF086216AEECEC009BE5A3 /* KMSConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSConnection.h; sourceTree = "<group>"; };
+		22BF086316AEECEC009BE5A3 /* KMSConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSConnection.m; sourceTree = "<group>"; };
+		22BF086416AEECEC009BE5A3 /* KMSListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSListener.h; sourceTree = "<group>"; };
+		22BF086516AEECEC009BE5A3 /* KMSListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSListener.m; sourceTree = "<group>"; };
+		22BF086616AEECEC009BE5A3 /* KMSRegExResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSRegExResponder.h; sourceTree = "<group>"; };
+		22BF086716AEECEC009BE5A3 /* KMSRegExResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSRegExResponder.m; sourceTree = "<group>"; };
+		22BF086816AEECEC009BE5A3 /* KMSResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSResponder.h; sourceTree = "<group>"; };
+		22BF086916AEECEC009BE5A3 /* KMSResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSResponder.m; sourceTree = "<group>"; };
+		22BF086A16AEECEC009BE5A3 /* KMSResponseCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSResponseCollection.h; sourceTree = "<group>"; };
+		22BF086B16AEECEC009BE5A3 /* KMSResponseCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSResponseCollection.m; sourceTree = "<group>"; };
+		22BF086C16AEECEC009BE5A3 /* KMSServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSServer.h; sourceTree = "<group>"; };
+		22BF086D16AEECEC009BE5A3 /* KMSServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSServer.m; sourceTree = "<group>"; };
+		22BF086E16AEECEC009BE5A3 /* KMSState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSState.h; sourceTree = "<group>"; };
+		22BF086F16AEECEC009BE5A3 /* KMSTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSTestCase.h; sourceTree = "<group>"; };
+		22BF087016AEECEC009BE5A3 /* KMSTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSTestCase.m; sourceTree = "<group>"; };
+		22BF08BF16AEEDA9009BE5A3 /* KMSTranscriptEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSTranscriptEntry.h; sourceTree = "<group>"; };
+		22BF08C016AEEDA9009BE5A3 /* KMSTranscriptEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSTranscriptEntry.m; sourceTree = "<group>"; };
+		22BF08C316AEEDD8009BE5A3 /* ftp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ftp.json; sourceTree = "<group>"; };
+		22BF08C416AEEDD8009BE5A3 /* http.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = http.json; sourceTree = "<group>"; };
+		22BF08E116AEEDD9009BE5A3 /* webdav.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = webdav.json; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
 		277D77E1160380AF00906915 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -280,10 +324,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22BCCE3C16ADD73400DFFE8D /* CFNetwork.framework in Frameworks */,
+				22BCCE3316ADD66900DFFE8D /* Security.framework in Frameworks */,
 				223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */,
-				223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */,
-				223FD0AA160B564800BE1C80 /* (null) in Frameworks */,
-				223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */,
+				226B358D16ADAA6D004780A7 /* CURLHandle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,15 +359,11 @@
 		0867D691FE84028FC02AAC07 /* CURLHandle */ = {
 			isa = PBXGroup;
 			children = (
-				8008031D166A93C4004D39F5 /* libcares-README.txt */,
-				8008031E166A93DD004D39F5 /* c-ares */,
-				80080316166962C7004D39F5 /* libcurl-README.txt */,
-				8008031816696329004D39F5 /* curl */,
-				08FB77AEFE84172EC02AAC07 /* CURLHandle */,
+				08FB77AEFE84172EC02AAC07 /* Source */,
 				089C1665FE841158C02AAC07 /* Resources */,
+				223FD09C160B523700BE1C80 /* Tests */,
+				22BF08FA16AF09B2009BE5A3 /* Modules */,
 				0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */,
-				223FD09C160B523700BE1C80 /* CURLHandleTests */,
-				223FD093160B523700BE1C80 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
 			name = CURLHandle;
@@ -332,9 +372,13 @@
 		0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22BCCE4516ADE52700DFFE8D /* libssl.dylib */,
 				809AE1C71602C7DD001D02E1 /* libcurl.dylib */,
+				22BCCE2716ADD53000DFFE8D /* libssh2.dylib */,
+				22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */,
 				80080379166C5B40004D39F5 /* libcares.dylib */,
 				1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */,
+				223FD094160B523700BE1C80 /* SenTestingKit.framework */,
 			);
 			name = "Libraries & Frameworks";
 			sourceTree = "<group>";
@@ -347,7 +391,7 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		08FB77AEFE84172EC02AAC07 /* CURLHandle */ = {
+		08FB77AEFE84172EC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
@@ -374,7 +418,7 @@
 				27D77E111672BBB50091EF91 /* CK2SSHCredential.h */,
 				27D77E121672BBB50091EF91 /* CK2SSHCredential.m */,
 			);
-			name = CURLHandle;
+			name = Source;
 			sourceTree = "<group>";
 		};
 		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
@@ -388,27 +432,7 @@
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
 		};
-		223FD093160B523700BE1C80 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				223FD094160B523700BE1C80 /* SenTestingKit.framework */,
-				223FD096160B523700BE1C80 /* Cocoa.framework */,
-				223FD098160B523700BE1C80 /* Other Frameworks */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		223FD098160B523700BE1C80 /* Other Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				223FD099160B523700BE1C80 /* AppKit.framework */,
-				223FD09A160B523700BE1C80 /* CoreData.framework */,
-				223FD09B160B523700BE1C80 /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
-			sourceTree = "<group>";
-		};
-		223FD09C160B523700BE1C80 /* CURLHandleTests */ = {
+		223FD09C160B523700BE1C80 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				229748FA1610C1AE0042A51A /* CURLHandleBasedTest.h */,
@@ -416,8 +440,10 @@
 				223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */,
 				22002EDC161097EC00464D33 /* CURLProtocolTests.m */,
 				223FD0A3160B523700BE1C80 /* CURLMultiTests.m */,
+				22BF085916AEECEC009BE5A3 /* MockServer */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
+			name = Tests;
 			path = CURLHandleTests;
 			sourceTree = "<group>";
 		};
@@ -430,6 +456,52 @@
 				223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		22BF085916AEECEC009BE5A3 /* MockServer */ = {
+			isa = PBXGroup;
+			children = (
+				22BF08C216AEEDD8009BE5A3 /* UnitTests */,
+				22BF086216AEECEC009BE5A3 /* KMSConnection.h */,
+				22BF086316AEECEC009BE5A3 /* KMSConnection.m */,
+				22BF086416AEECEC009BE5A3 /* KMSListener.h */,
+				22BF086516AEECEC009BE5A3 /* KMSListener.m */,
+				22BF086616AEECEC009BE5A3 /* KMSRegExResponder.h */,
+				22BF086716AEECEC009BE5A3 /* KMSRegExResponder.m */,
+				22BF086816AEECEC009BE5A3 /* KMSResponder.h */,
+				22BF086916AEECEC009BE5A3 /* KMSResponder.m */,
+				22BF086A16AEECEC009BE5A3 /* KMSResponseCollection.h */,
+				22BF086B16AEECEC009BE5A3 /* KMSResponseCollection.m */,
+				22BF086C16AEECEC009BE5A3 /* KMSServer.h */,
+				22BF086D16AEECEC009BE5A3 /* KMSServer.m */,
+				22BF086E16AEECEC009BE5A3 /* KMSState.h */,
+				22BF086F16AEECEC009BE5A3 /* KMSTestCase.h */,
+				22BF087016AEECEC009BE5A3 /* KMSTestCase.m */,
+				22BF08BF16AEEDA9009BE5A3 /* KMSTranscriptEntry.h */,
+				22BF08C016AEEDA9009BE5A3 /* KMSTranscriptEntry.m */,
+			);
+			path = MockServer;
+			sourceTree = "<group>";
+		};
+		22BF08C216AEEDD8009BE5A3 /* UnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				22BF08C316AEEDD8009BE5A3 /* ftp.json */,
+				22BF08C416AEEDD8009BE5A3 /* http.json */,
+				22BF08E116AEEDD9009BE5A3 /* webdav.json */,
+			);
+			path = UnitTests;
+			sourceTree = "<group>";
+		};
+		22BF08FA16AF09B2009BE5A3 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				8008031D166A93C4004D39F5 /* libcares-README.txt */,
+				8008031E166A93DD004D39F5 /* c-ares */,
+				80080316166962C7004D39F5 /* libcurl-README.txt */,
+				8008031816696329004D39F5 /* curl */,
+			);
+			name = Modules;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -461,11 +533,13 @@
 				223FD08D160B523700BE1C80 /* Sources */,
 				223FD08E160B523700BE1C80 /* Frameworks */,
 				223FD08F160B523700BE1C80 /* Resources */,
+				22BCCE2F16ADD63000DFFE8D /* CopyFiles */,
 				223FD090160B523700BE1C80 /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				22BCCE2C16ADD57700DFFE8D /* PBXTargetDependency */,
 			);
 			name = CURLHandleTests;
 			productName = CURLHandleTests;
@@ -479,8 +553,8 @@
 				8DC2EF500486A6940098B216 /* Headers */,
 				8DC2EF520486A6940098B216 /* Resources */,
 				8DC2EF540486A6940098B216 /* Sources */,
-				809AE1C91602C881001D02E1 /* Copy Files - Frameworks */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
+				809AE1C91602C881001D02E1 /* Copy Files - Frameworks */,
 			);
 			buildRules = (
 			);
@@ -534,6 +608,9 @@
 			files = (
 				223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */,
 				223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */,
+				22BF08E216AEEDD9009BE5A3 /* ftp.json in Resources */,
+				22BF08E316AEEDD9009BE5A3 /* http.json in Resources */,
+				22BF08F316AEEDD9009BE5A3 /* webdav.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -559,6 +636,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+			showEnvVarsInLog = 0;
 		};
 		800803191669665D004D39F5 /* Run Script - Configure + make */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -754,17 +832,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				223FD0A4160B523700BE1C80 /* CURLMultiTests.m in Sources */,
-				223FD0A9160B55C200BE1C80 /* CURLMulti.m in Sources */,
 				223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */,
-				223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */,
-				22767EDB161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
-				2270F4A316108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
-				2270F4A9161090AB009B6F98 /* CURLResponse.m in Sources */,
-				2270F4AE16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
 				22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */,
-				22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */,
 				229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */,
-				222FCC24161311BA00AB477F /* CURLSocket.m in Sources */,
+				22BF089C16AEECEC009BE5A3 /* KMSConnection.m in Sources */,
+				22BF089D16AEECEC009BE5A3 /* KMSListener.m in Sources */,
+				22BF089E16AEECEC009BE5A3 /* KMSRegExResponder.m in Sources */,
+				22BF089F16AEECEC009BE5A3 /* KMSResponder.m in Sources */,
+				22BF08A016AEECEC009BE5A3 /* KMSResponseCollection.m in Sources */,
+				22BF08A116AEECEC009BE5A3 /* KMSServer.m in Sources */,
+				22BF08A216AEECEC009BE5A3 /* KMSTestCase.m in Sources */,
+				22BF08C116AEEDA9009BE5A3 /* KMSTranscriptEntry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -776,17 +854,22 @@
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
 				221EAD12160B167900E4F270 /* CURLMulti.m in Sources */,
 				22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
-				2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
 				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,
 				2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
 				22731039161305FF00D6D49E /* CURLSocket.m in Sources */,
-				27D77E141672BBB50091EF91 /* CK2SSHCredential.m in Sources */,
+				22BF085516AEAA76009BE5A3 /* NSURLRequest+CURLHandle.m in Sources */,
+				22BF085616AEAA7A009BE5A3 /* CK2SSHCredential.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		22BCCE2C16ADD57700DFFE8D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* CURLHandle */;
+			targetProxy = 22BCCE2B16ADD57700DFFE8D /* PBXContainerItemProxy */;
+		};
 		80080313166962A7004D39F5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8008030A16696287004D39F5 /* libcurl-i386 */;
@@ -839,26 +922,19 @@
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = CURLHandle_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../SFTP\"",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
 				PRODUCT_NAME = CURLHandle;
-				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -866,23 +942,19 @@
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = CURLHandle_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../SFTP\"",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
 				PRODUCT_NAME = CURLHandle;
-				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
@@ -891,11 +963,22 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -904,10 +987,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -915,34 +1006,15 @@
 		223FD0A7160B523700BE1C80 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_PREFIX_HEADER = "CURLHandleTests/CURLHandleTests-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
 			};
@@ -951,28 +1023,10 @@
 		223FD0A8160B523700BE1C80 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_PREFIX_HEADER = "CURLHandleTests/CURLHandleTests-Prefix.pch";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)\"",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
 			};

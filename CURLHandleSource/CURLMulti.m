@@ -135,14 +135,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     NSAssert(self.queue, @"need queue");
 
+    [handle cancel];
+    [handle completeWithCode:CURLM_CANCELLED];
     dispatch_async(self.queue, ^{
         if ([self.handles containsObject:handle])
         {
-            [handle retain];
             [self removeHandleInternal:handle];
-            [handle cancel];
-            [handle completeWithCode:CURLM_CANCELLED];
-            [handle release];
         }
     });
 
@@ -177,19 +175,17 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeAllHandles
 {
-    NSArray* handles = [self.handles copy];
     dispatch_sync(self.queue, ^{
+        NSArray* handles = [self.handles copy];
         for (CURLHandle* handle in handles)
         {
             [self removeHandleInternal:handle];
         }
-
+        // we may be the last thing holding on to the handles
+        // curl should be finished with them by now, but for safety's sake we autorelease our
+        // array copy
+        [handles autorelease];
     });
-
-    // we may be the last thing holding on to the handles
-    // curl should be finished with them by now, but for safety's sake we autorelease our
-    // array copy
-    [handles autorelease];
 }
 
 #pragma mark - Multi Handle Management
@@ -279,12 +275,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)releaseQueue
 {
     dispatch_queue_t queue = self.queue;
-    dispatch_sync(queue, ^{
+    self.queue = nil;
+    dispatch_async(queue, ^{
         [self releaseMulti];
+        dispatch_release(queue);
     });
 
-    self.queue = nil;
-    dispatch_release(queue);
 }
 
 #pragma mark - Timer Management
@@ -293,12 +289,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
     dispatch_source_set_event_handler(self.timer, ^{
-        if (self.multi)
-        {
-            int running;
-            curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
-            [self processMulti];
-        }
+        dispatch_queue_t queue = self.queue;
+        dispatch_async(queue, ^{
+            if (self.multi)
+            {
+                int running;
+                curl_multi_socket_action(self.multi, CURL_SOCKET_TIMEOUT, 0, &running);
+                [self processMulti];
+            }
+        });
     });
 
     dispatch_source_set_cancel_handler(self.timer, ^{
@@ -381,7 +380,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 {
                     int running;
                     curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
-                    [self processMulti];
+                    dispatch_queue_t queue = self.queue;
+                    dispatch_async(queue, ^{
+                        [self processMulti];
+                    });
                 }
             });
             dispatch_source_set_cancel_handler(source, ^{

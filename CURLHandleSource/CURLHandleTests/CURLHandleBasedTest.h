@@ -5,11 +5,11 @@
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import "KMSTestCase.h"
 
 #import "CURLHandle.h"
 
-@interface CURLHandleBasedTest : SenTestCase<CURLHandleDelegate>
+@interface CURLHandleBasedTest : KMSTestCase<CURLHandleDelegate>
 
 @property (strong, nonatomic) NSMutableData* buffer;
 @property (assign, nonatomic) BOOL cancelled;
@@ -20,7 +20,8 @@
 @property (assign, nonatomic) BOOL sending;
 
 - (void)checkDownloadedBufferWasCorrect;
-- (void)runUntilDone;
+- (void)runUntilPaused;
+- (void)stopServer;
 
 - (NSURL*)ftpTestServer;
 

@@ -13,12 +13,13 @@
 @interface CURLProtocol()
 
 @property (strong, nonatomic) CURLHandle* handle;
-
+@property (assign, nonatomic) BOOL uploaded;
 @end
 
 @implementation CURLProtocol
 
 @synthesize handle = _handle;
+@synthesize uploaded = _uploaded;
 
 #pragma mark - Object Lifecycle
 
@@ -87,13 +88,15 @@
 
 - (void)stopLoading;
 {
-    if (![self.handle hasCompleted])
+    if (![self.handle hasCompleted] && !self.uploaded)
     {
         CURLMulti* multi = [CURLMulti sharedInstance];
         [multi cancelHandle:self.handle];
     }
-
-    self.handle = nil;
+    else
+    {
+        self.handle = nil;
+    }
 }
 
 #pragma mark - Utilities
@@ -121,9 +124,23 @@
     [[self client] URLProtocolDidFinishLoading:self];
 }
 
+- (void)handleWasCancelled:(CURLHandle *)handle
+{
+    self.handle = nil;
+}
+
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
 {
-// TODO: need to pass this info on to the client
+    // TODO: improve this if we're ever given acess
+    // ideally we'd be able to generate a connection:didSendBodyData:totalBytesWritten:totalBytesExpectedToWrite: call here
+    // but NSURLProtocol doesn't give us a way to do it
+
+    // is the upload finished?
+    if (bytesWritten == 0)
+    {
+        // set a flag so that when stopLoading is called, we don't cancel incorrectly 
+        self.uploaded = YES;
+    }
 }
 
 #pragma mark NSURLAuthenticationChallengeSender

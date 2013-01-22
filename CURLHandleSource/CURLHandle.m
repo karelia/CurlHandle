@@ -151,7 +151,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark ----- NSURLHANDLE OVERRIDES
 // -----------------------------------------------------------------------------
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi
 {
     if (self = [self init])
     {
@@ -165,7 +165,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
-            [[CURLMulti sharedInstance] manageHandle:self];
+            [multi manageHandle:self];
         }
         else
         {
@@ -175,6 +175,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     
     return self;
 }
+
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+{
+    return [self initWithRequest:request credential:credential delegate:delegate multi:[CURLMulti sharedInstance]];
+}
+
 
 - (void) dealloc
 {
@@ -788,6 +794,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (result >= 0 && [[self delegate] respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
     {
         [[self delegate] handle:self willSendBodyDataOfLength:result];
+        if (_uploadStream.streamStatus == NSStreamStatusAtEnd)
+        {
+            [[self delegate] handle:self willSendBodyDataOfLength:0];
+        }
     }
     
     return result;
@@ -882,9 +892,13 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
         {
             string = [@"<NULL> debug info" retain];
         }
-        else
+        else if (infoLength < 100000)
         {
             string = [[NSString alloc] initWithFormat:@"Invalid debug info: %@", [NSData dataWithBytes:info length:infoLength]];
+        }
+        else
+        {
+            string = [[NSString alloc] initWithFormat:@"Invalid debug info - info length seems to be too big: %ld", infoLength];
         }
     }
 

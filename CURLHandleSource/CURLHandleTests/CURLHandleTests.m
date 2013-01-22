@@ -21,14 +21,10 @@
 
 - (void)testHTTPDownload
 {
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
-
-    NSError* error = nil;
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
 
-    BOOL ok = [handle loadRequest:request error:&error];
-    STAssertTrue(ok, @"failed to load request, with error %@", error);
+    [self runUntilPaused];
 
     [self checkDownloadedBufferWasCorrect];
 
@@ -39,46 +35,47 @@
 - (void)testFTPDownload
 {
     NSURL* ftpRoot = [self ftpTestServer];
-    NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+    if (ftpRoot)
+    {
+        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
+        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
 
-    NSError* error = nil;
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-
-    BOOL ok = [handle loadRequest:request error:&error];
-    STAssertTrue(ok, @"failed to load request, with error %@", error);
-
-    [self checkDownloadedBufferWasCorrect];
-
-    [handle release];
+        [self runUntilPaused];
+        
+        [self checkDownloadedBufferWasCorrect];
+        
+        [handle release];
+    }
 }
 
 - (void)testFTPUpload
 {
     NSURL* ftpRoot = [self ftpTestServer];
-    NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
+    if (ftpRoot)
+    {
+        NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
-    NSError* error = nil;
-    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+        NSError* error = nil;
+        NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+        NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
 
-    CURLHandle* handle = [[CURLHandle alloc] init];
-    handle.delegate = self;
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
+        request.shouldUseCurlHandle = YES;
+        [request curl_setCreateIntermediateDirectories:1];
+        [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
 
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
-    request.shouldUseCurlHandle = YES;
-    [request curl_setCreateIntermediateDirectories:1];
-    [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+        [self runUntilPaused];
 
-    BOOL ok = [handle loadRequest:request error:&error];
-    STAssertTrue(ok, @"failed to load request, with error %@", error);
-
-    STAssertTrue(self.sending, @"should have set sending flag");
-    STAssertNil(self.error, @"got error %@", self.error);
-    STAssertNil(self.response, @"got unexpected response %@", self.response);
-    STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+        STAssertTrue(self.sending, @"should have set sending flag");
+        STAssertNil(self.error, @"got error %@", self.error);
+        STAssertNil(self.response, @"got unexpected response %@", self.response);
+        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+        
+        [handle release];
+    }
 }
 
 @end
