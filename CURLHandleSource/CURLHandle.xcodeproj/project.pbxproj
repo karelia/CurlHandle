@@ -133,6 +133,8 @@
 		22BCCE3C16ADD73400DFFE8D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277D77E1160380AF00906915 /* CFNetwork.framework */; };
 		22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
 		22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
+		22BF085516AEAA76009BE5A3 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
+		22BF085616AEAA7A009BE5A3 /* CK2SSHCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 27D77E121672BBB50091EF91 /* CK2SSHCredential.m */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -791,6 +793,8 @@
 				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,
 				2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
 				22731039161305FF00D6D49E /* CURLSocket.m in Sources */,
+				22BF085516AEAA76009BE5A3 /* NSURLRequest+CURLHandle.m in Sources */,
+				22BF085616AEAA7A009BE5A3 /* CK2SSHCredential.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
