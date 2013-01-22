@@ -88,10 +88,17 @@
 
 - (NSURL*)ftpTestServer
 {
+    NSURL* result = nil;
     NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleFTPTestURL"];
-    STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleFTPTestURL \"ftp://user:password@ftp.test.com\"");
-
-    NSURL* result = [NSURL URLWithString:ftpTest];
+    if ([ftpTest isEqualToString:@"MockServer"])
+    {
+        // TODO: implement MockServer version
+    }
+    else
+    {
+        STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleFTPTestURL \"ftp://user:password@ftp.test.com\"");
+        result = [NSURL URLWithString:ftpTest];
+    }
 
     return result;
 }
