@@ -9,7 +9,7 @@
 
 
 #ifndef CURLHandleLog
-#define CURLHandleLog NSLog
+#define CURLHandleLog(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLHandleLog NSLog
 #endif
 
 @class CURLMulti;
