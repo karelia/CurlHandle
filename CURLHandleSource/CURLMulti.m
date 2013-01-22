@@ -177,19 +177,17 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeAllHandles
 {
-    NSArray* handles = [self.handles copy];
     dispatch_sync(self.queue, ^{
+        NSArray* handles = [self.handles copy];
         for (CURLHandle* handle in handles)
         {
             [self removeHandleInternal:handle];
         }
-
+        // we may be the last thing holding on to the handles
+        // curl should be finished with them by now, but for safety's sake we autorelease our
+        // array copy
+        [handles autorelease];
     });
-
-    // we may be the last thing holding on to the handles
-    // curl should be finished with them by now, but for safety's sake we autorelease our
-    // array copy
-    [handles autorelease];
 }
 
 #pragma mark - Multi Handle Management
