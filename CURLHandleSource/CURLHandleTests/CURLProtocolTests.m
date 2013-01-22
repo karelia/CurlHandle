@@ -72,21 +72,21 @@
 
 - (void)testFTPDownload
 {
-    NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleFTPTestURL"];
-    STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleFTPTestURL \"ftp://user:password@ftp.test.com\"");
+    NSURL* ftpRoot = [self ftpTestServer];
+    if (ftpRoot)
+    {
+        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
 
-    NSURL* ftpRoot = [NSURL URLWithString:ftpTest];
-    NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
+        request.shouldUseCurlHandle = YES;
 
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-    request.shouldUseCurlHandle = YES;
+        NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
+        STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
-    NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    STAssertNotNil(connection, @"failed to get connection for request %@", request);
-
-    [self runUntilDone];
-
-    [self checkDownloadedBufferWasCorrect];
+        [self runUntilDone];
+        
+        [self checkDownloadedBufferWasCorrect];
+    }
 }
 
 - (void)testFTPUpload
