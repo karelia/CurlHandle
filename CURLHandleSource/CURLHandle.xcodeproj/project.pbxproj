@@ -135,6 +135,13 @@
 		22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
 		22BF085516AEAA76009BE5A3 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
 		22BF085616AEAA7A009BE5A3 /* CK2SSHCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 27D77E121672BBB50091EF91 /* CK2SSHCredential.m */; };
+		22BF089C16AEECEC009BE5A3 /* KMSConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086316AEECEC009BE5A3 /* KMSConnection.m */; };
+		22BF089D16AEECEC009BE5A3 /* KMSListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086516AEECEC009BE5A3 /* KMSListener.m */; };
+		22BF089E16AEECEC009BE5A3 /* KMSRegExResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086716AEECEC009BE5A3 /* KMSRegExResponder.m */; };
+		22BF089F16AEECEC009BE5A3 /* KMSResponder.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086916AEECEC009BE5A3 /* KMSResponder.m */; };
+		22BF08A016AEECEC009BE5A3 /* KMSResponseCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086B16AEECEC009BE5A3 /* KMSResponseCollection.m */; };
+		22BF08A116AEECEC009BE5A3 /* KMSServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086D16AEECEC009BE5A3 /* KMSServer.m */; };
+		22BF08A216AEECEC009BE5A3 /* KMSTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF087016AEECEC009BE5A3 /* KMSTestCase.m */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -268,6 +275,21 @@
 		22BCCE2716ADD53000DFFE8D /* libssh2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssh2.dylib; path = ../SFTP/libssh2.dylib; sourceTree = "<group>"; };
 		22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = ../SFTP/libcrypto.dylib; sourceTree = "<group>"; };
 		22BCCE4516ADE52700DFFE8D /* libssl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.dylib; path = ../SFTP/libssl.dylib; sourceTree = "<group>"; };
+		22BF086216AEECEC009BE5A3 /* KMSConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSConnection.h; sourceTree = "<group>"; };
+		22BF086316AEECEC009BE5A3 /* KMSConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSConnection.m; sourceTree = "<group>"; };
+		22BF086416AEECEC009BE5A3 /* KMSListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSListener.h; sourceTree = "<group>"; };
+		22BF086516AEECEC009BE5A3 /* KMSListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSListener.m; sourceTree = "<group>"; };
+		22BF086616AEECEC009BE5A3 /* KMSRegExResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSRegExResponder.h; sourceTree = "<group>"; };
+		22BF086716AEECEC009BE5A3 /* KMSRegExResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSRegExResponder.m; sourceTree = "<group>"; };
+		22BF086816AEECEC009BE5A3 /* KMSResponder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSResponder.h; sourceTree = "<group>"; };
+		22BF086916AEECEC009BE5A3 /* KMSResponder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSResponder.m; sourceTree = "<group>"; };
+		22BF086A16AEECEC009BE5A3 /* KMSResponseCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSResponseCollection.h; sourceTree = "<group>"; };
+		22BF086B16AEECEC009BE5A3 /* KMSResponseCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSResponseCollection.m; sourceTree = "<group>"; };
+		22BF086C16AEECEC009BE5A3 /* KMSServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSServer.h; sourceTree = "<group>"; };
+		22BF086D16AEECEC009BE5A3 /* KMSServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSServer.m; sourceTree = "<group>"; };
+		22BF086E16AEECEC009BE5A3 /* KMSState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSState.h; sourceTree = "<group>"; };
+		22BF086F16AEECEC009BE5A3 /* KMSTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSTestCase.h; sourceTree = "<group>"; };
+		22BF087016AEECEC009BE5A3 /* KMSTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSTestCase.m; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
 		277D77E1160380AF00906915 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -436,6 +458,7 @@
 				223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */,
 				22002EDC161097EC00464D33 /* CURLProtocolTests.m */,
 				223FD0A3160B523700BE1C80 /* CURLMultiTests.m */,
+				22BF085916AEECEC009BE5A3 /* MockServer */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
 			path = CURLHandleTests;
@@ -450,6 +473,28 @@
 				223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		22BF085916AEECEC009BE5A3 /* MockServer */ = {
+			isa = PBXGroup;
+			children = (
+				22BF086216AEECEC009BE5A3 /* KMSConnection.h */,
+				22BF086316AEECEC009BE5A3 /* KMSConnection.m */,
+				22BF086416AEECEC009BE5A3 /* KMSListener.h */,
+				22BF086516AEECEC009BE5A3 /* KMSListener.m */,
+				22BF086616AEECEC009BE5A3 /* KMSRegExResponder.h */,
+				22BF086716AEECEC009BE5A3 /* KMSRegExResponder.m */,
+				22BF086816AEECEC009BE5A3 /* KMSResponder.h */,
+				22BF086916AEECEC009BE5A3 /* KMSResponder.m */,
+				22BF086A16AEECEC009BE5A3 /* KMSResponseCollection.h */,
+				22BF086B16AEECEC009BE5A3 /* KMSResponseCollection.m */,
+				22BF086C16AEECEC009BE5A3 /* KMSServer.h */,
+				22BF086D16AEECEC009BE5A3 /* KMSServer.m */,
+				22BF086E16AEECEC009BE5A3 /* KMSState.h */,
+				22BF086F16AEECEC009BE5A3 /* KMSTestCase.h */,
+				22BF087016AEECEC009BE5A3 /* KMSTestCase.m */,
+			);
+			path = MockServer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -780,6 +825,13 @@
 				223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */,
 				22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */,
 				229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */,
+				22BF089C16AEECEC009BE5A3 /* KMSConnection.m in Sources */,
+				22BF089D16AEECEC009BE5A3 /* KMSListener.m in Sources */,
+				22BF089E16AEECEC009BE5A3 /* KMSRegExResponder.m in Sources */,
+				22BF089F16AEECEC009BE5A3 /* KMSResponder.m in Sources */,
+				22BF08A016AEECEC009BE5A3 /* KMSResponseCollection.m in Sources */,
+				22BF08A116AEECEC009BE5A3 /* KMSServer.m in Sources */,
+				22BF08A216AEECEC009BE5A3 /* KMSTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
