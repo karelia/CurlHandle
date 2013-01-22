@@ -6,6 +6,108 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		8008030A16696287004D39F5 /* libcurl-i386 */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8008030B16696287004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-i386" */;
+			buildPhases = (
+				800803191669665D004D39F5 /* Run Script - Configure + make */,
+				8008031A1669665F004D39F5 /* Run Script - Rename + Install Name */,
+			);
+			dependencies = (
+			);
+			name = "libcurl-i386";
+			productName = "libcurl-i386";
+		};
+		8008030E16696292004D39F5 /* libcurl-x86_64 */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8008030F16696292004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-x86_64" */;
+			buildPhases = (
+				8008031B16696675004D39F5 /* Run Script - Configure + make */,
+				8008031C16696677004D39F5 /* Run Script - Rename + Install Name */,
+			);
+			dependencies = (
+			);
+			name = "libcurl-x86_64";
+			productName = "libcurl-x86_64";
+		};
+		8008031F166A9514004D39F5 /* libcares */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 80080320166A9514004D39F5 /* Build configuration list for PBXAggregateTarget "libcares" */;
+			buildPhases = (
+				80080337166A9651004D39F5 /* Run Script - lipo multi-arch dylib */,
+			);
+			dependencies = (
+				80080330166A9557004D39F5 /* PBXTargetDependency */,
+				80080332166A9557004D39F5 /* PBXTargetDependency */,
+				80080334166A9557004D39F5 /* PBXTargetDependency */,
+			);
+			name = libcares;
+			productName = libcares;
+		};
+		80080323166A951E004D39F5 /* libcares-clean */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 80080324166A951E004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-clean" */;
+			buildPhases = (
+				80080338166A9661004D39F5 /* Run Script - remove previous product dylibs */,
+			);
+			dependencies = (
+			);
+			name = "libcares-clean";
+			productName = "libcares-clean";
+		};
+		80080327166A952A004D39F5 /* libcares-i386 */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 80080328166A952A004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-i386" */;
+			buildPhases = (
+				80080339166A966D004D39F5 /* Run Script - Configure + make */,
+				8008033A166A9678004D39F5 /* Run Script - Rename + Install Name */,
+			);
+			dependencies = (
+			);
+			name = "libcares-i386";
+			productName = "libcares-i386";
+		};
+		8008032B166A9535004D39F5 /* libcares-x86_64 */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8008032C166A9535004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-x86_64" */;
+			buildPhases = (
+				8008033B166A9682004D39F5 /* Run Script - Configure + make */,
+				8008033C166A9684004D39F5 /* Run Script - Rename + Install Name */,
+			);
+			dependencies = (
+			);
+			name = "libcares-x86_64";
+			productName = "libcares-x86_64";
+		};
+		809ADE7816029C38001D02E1 /* libcurl */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 809ADE7916029C38001D02E1 /* Build configuration list for PBXAggregateTarget "libcurl" */;
+			buildPhases = (
+				809AE1BC1602BE6C001D02E1 /* Run Script - lipo multi-arch dylib */,
+			);
+			dependencies = (
+				80080336166A9569004D39F5 /* PBXTargetDependency */,
+				809AE1C51602BF8A001D02E1 /* PBXTargetDependency */,
+				80080313166962A7004D39F5 /* PBXTargetDependency */,
+				80080315166962A7004D39F5 /* PBXTargetDependency */,
+			);
+			name = libcurl;
+			productName = libcurl;
+		};
+		809AE1BF1602BEF1001D02E1 /* libcurl-clean */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 809AE1C01602BEF1001D02E1 /* Build configuration list for PBXAggregateTarget "libcurl-clean" */;
+			buildPhases = (
+				809AE1C31602BEF5001D02E1 /* Run Script - remove previous product dylibs */,
+			);
+			dependencies = (
+			);
+			name = "libcurl-clean";
+			productName = "libcurl-clean";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22002EDC161097EC00464D33 /* CURLProtocolTests.m */; };
 		22002EDF16109A6B00464D33 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
@@ -17,12 +119,12 @@
 		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
 		223FD0A4160B523700BE1C80 /* CURLMultiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLMultiTests.m */; };
 		223FD0A9160B55C200BE1C80 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
-		223FD0AA160B564800BE1C80 /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C5DA93115AFD699006F518F /* libcurl.4.dylib */; };
+		223FD0AA160B564800BE1C80 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */; };
 		223FD0AD160B60A600BE1C80 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
 		223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 223FD0B1160B63F800BE1C80 /* DevNotes.txt */; };
-		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; };
+		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
 		2270F4A316108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */; };
 		2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4A5161090AB009B6F98 /* CURLResponse.h */; };
@@ -39,19 +141,89 @@
 		229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
-		275707691503E21D00363512 /* CURLFTPSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 275707671503E21C00363512 /* CURLFTPSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 275707681503E21C00363512 /* CURLFTPSession.m */; };
-		3C5DA93215AFD699006F518F /* libcurl.4.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C5DA93115AFD699006F518F /* libcurl.4.dylib */; };
+		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		277D77E2160380AF00906915 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277D77E1160380AF00906915 /* CFNetwork.framework */; };
+		27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D77E111672BBB50091EF91 /* CK2SSHCredential.h */; };
+		27D77E141672BBB50091EF91 /* CK2SSHCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 27D77E121672BBB50091EF91 /* CK2SSHCredential.m */; };
+		27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 79B96CBB0A6360F90060AC12 /* CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLHandle.m */; };
-		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
+		8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
+		8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
+		8008037E166C5BF4004D39F5 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
+		8008037F166C5BF9004D39F5 /* libcares.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		80080312166962A7004D39F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8008030A16696287004D39F5;
+			remoteInfo = "libcurl-i386";
+		};
+		80080314166962A7004D39F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8008030E16696292004D39F5;
+			remoteInfo = "libcurl-x86_64";
+		};
+		8008032F166A9557004D39F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 80080323166A951E004D39F5;
+			remoteInfo = "libcares-clean";
+		};
+		80080331166A9557004D39F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 80080327166A952A004D39F5;
+			remoteInfo = "libcares-i386";
+		};
+		80080333166A9557004D39F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8008032B166A9535004D39F5;
+			remoteInfo = "libcares-x86_64";
+		};
+		80080335166A9569004D39F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8008031F166A9514004D39F5;
+			remoteInfo = libcares;
+		};
+		809AE1C41602BF8A001D02E1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 809AE1BF1602BEF1001D02E1;
+			remoteInfo = "libcurl-clean";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		809AE1C91602C881001D02E1 /* Copy Files - Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Files - Frameworks */,
+				8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Files - Frameworks */,
+			);
+			name = "Copy Files - Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
-		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		22002EDC161097EC00464D33 /* CURLProtocolTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocolTests.m; sourceTree = "<group>"; };
 		221EAD0F160B167900E4F270 /* CURLMulti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMulti.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
@@ -81,10 +253,11 @@
 		229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleBasedTest.m; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
-		275707671503E21C00363512 /* CURLFTPSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLFTPSession.h; sourceTree = "<group>"; };
-		275707681503E21C00363512 /* CURLFTPSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLFTPSession.m; sourceTree = "<group>"; };
+		277D77E1160380AF00906915 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		27D77E111672BBB50091EF91 /* CK2SSHCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CK2SSHCredential.h; path = ../SFTP/CK2SSHCredential.h; sourceTree = "<group>"; };
+		27D77E121672BBB50091EF91 /* CK2SSHCredential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CK2SSHCredential.m; path = ../SFTP/CK2SSHCredential.m; sourceTree = "<group>"; };
+		27D77E151672BD9B0091EF91 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLHandle_Prefix.pch; sourceTree = "<group>"; };
-		3C5DA93115AFD699006F518F /* libcurl.4.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcurl.4.dylib; sourceTree = "<group>"; };
 		795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResumableHTTPUploader.h; sourceTree = "<group>"; };
 		7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResumableHTTPUploader.m; sourceTree = "<group>"; };
 		79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
@@ -92,9 +265,14 @@
 		79B96CBC0A6360F90060AC12 /* CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CURLHandle.m; sourceTree = "<group>"; };
 		79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+extras.h"; sourceTree = "<group>"; };
 		79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = "CURLHandle+extras.m"; sourceTree = "<group>"; };
+		80080316166962C7004D39F5 /* libcurl-README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "libcurl-README.txt"; sourceTree = "<group>"; };
+		8008031816696329004D39F5 /* curl */ = {isa = PBXFileReference; lastKnownFileType = folder; name = curl; path = ../curl; sourceTree = "<group>"; };
+		8008031D166A93C4004D39F5 /* libcares-README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "libcares-README.txt"; sourceTree = "<group>"; };
+		8008031E166A93DD004D39F5 /* c-ares */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "c-ares"; path = "../c-ares"; sourceTree = "<group>"; };
+		80080379166C5B40004D39F5 /* libcares.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcares.dylib; sourceTree = "<group>"; };
+		809AE1C71602C7DD001D02E1 /* libcurl.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcurl.dylib; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* CURLHandle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CURLHandle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,7 +282,7 @@
 			files = (
 				223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */,
 				223FD097160B523700BE1C80 /* Cocoa.framework in Frameworks */,
-				223FD0AA160B564800BE1C80 /* libcurl.4.dylib in Frameworks */,
+				223FD0AA160B564800BE1C80 /* (null) in Frameworks */,
 				223FD0B0160B615A00BE1C80 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -113,9 +291,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3C5DA93215AFD699006F518F /* libcurl.4.dylib in Frameworks */,
-				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
+				8008037E166C5BF4004D39F5 /* libcurl.dylib in Frameworks */,
+				8008037F166C5BF9004D39F5 /* libcares.dylib in Frameworks */,
+				277D77E01603804900906915 /* Foundation.framework in Frameworks */,
+				277D77E2160380AF00906915 /* CFNetwork.framework in Frameworks */,
 				79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */,
+				27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,10 +315,13 @@
 		0867D691FE84028FC02AAC07 /* CURLHandle */ = {
 			isa = PBXGroup;
 			children = (
-				08FB77AEFE84172EC02AAC07 /* Classes */,
-				32C88DFF0371C24200C91783 /* Other Sources */,
+				8008031D166A93C4004D39F5 /* libcares-README.txt */,
+				8008031E166A93DD004D39F5 /* c-ares */,
+				80080316166962C7004D39F5 /* libcurl-README.txt */,
+				8008031816696329004D39F5 /* curl */,
+				08FB77AEFE84172EC02AAC07 /* CURLHandle */,
 				089C1665FE841158C02AAC07 /* Resources */,
-				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
+				0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */,
 				223FD09C160B523700BE1C80 /* CURLHandleTests */,
 				223FD093160B523700BE1C80 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
@@ -145,13 +329,14 @@
 			name = CURLHandle;
 			sourceTree = "<group>";
 		};
-		0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */ = {
+		0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				809AE1C71602C7DD001D02E1 /* libcurl.dylib */,
+				80080379166C5B40004D39F5 /* libcares.dylib */,
 				1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */,
-				1058C7B2FEA5585E11CA2CBB /* Other Frameworks */,
 			);
-			name = "External Frameworks and Libraries";
+			name = "Libraries & Frameworks";
 			sourceTree = "<group>";
 		};
 		089C1665FE841158C02AAC07 /* Resources */ = {
@@ -162,7 +347,7 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		08FB77AEFE84172EC02AAC07 /* Classes */ = {
+		08FB77AEFE84172EC02AAC07 /* CURLHandle */ = {
 			isa = PBXGroup;
 			children = (
 				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
@@ -179,36 +364,28 @@
 				2270F4A6161090AB009B6F98 /* CURLResponse.m */,
 				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
 				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
-				275707671503E21C00363512 /* CURLFTPSession.h */,
-				275707681503E21C00363512 /* CURLFTPSession.m */,
+				32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */,
 				22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */,
 				22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */,
 				2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */,
 				2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */,
 				2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */,
 				2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */,
+				27D77E111672BBB50091EF91 /* CK2SSHCredential.h */,
+				27D77E121672BBB50091EF91 /* CK2SSHCredential.m */,
 			);
-			name = Classes;
+			name = CURLHandle;
 			sourceTree = "<group>";
 		};
 		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3C5DA93115AFD699006F518F /* libcurl.4.dylib */,
 				79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */,
-				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
+				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
+				277D77E1160380AF00906915 /* CFNetwork.framework */,
+				27D77E151672BD9B0091EF91 /* Security.framework */,
 			);
 			name = "Linked Frameworks";
-			sourceTree = "<group>";
-		};
-		1058C7B2FEA5585E11CA2CBB /* Other Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
-				D2F7E79907B2D74100F64583 /* CoreData.framework */,
-				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
 		223FD093160B523700BE1C80 /* Frameworks */ = {
@@ -255,14 +432,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		32C88DFF0371C24200C91783 /* Other Sources */ = {
-			isa = PBXGroup;
-			children = (
-				32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */,
-			);
-			name = "Other Sources";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -272,13 +441,13 @@
 			files = (
 				79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */,
 				27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */,
-				275707691503E21D00363512 /* CURLFTPSession.h in Headers */,
 				221EAD11160B167900E4F270 /* CURLMulti.h in Headers */,
 				22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */,
 				2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */,
 				2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */,
 				2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */,
 				22731038161305FF00D6D49E /* CURLSocket.h in Headers */,
+				27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,6 +479,7 @@
 				8DC2EF500486A6940098B216 /* Headers */,
 				8DC2EF520486A6940098B216 /* Resources */,
 				8DC2EF540486A6940098B216 /* Sources */,
+				809AE1C91602C881001D02E1 /* Copy Files - Frameworks */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
 			);
 			buildRules = (
@@ -328,7 +498,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Karelia Software";
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "CURLHandle" */;
@@ -344,6 +514,14 @@
 			projectRoot = "";
 			targets = (
 				8DC2EF4F0486A6940098B216 /* CURLHandle */,
+				809ADE7816029C38001D02E1 /* libcurl */,
+				809AE1BF1602BEF1001D02E1 /* libcurl-clean */,
+				8008030A16696287004D39F5 /* libcurl-i386 */,
+				8008030E16696292004D39F5 /* libcurl-x86_64 */,
+				8008031F166A9514004D39F5 /* libcares */,
+				80080323166A951E004D39F5 /* libcares-clean */,
+				80080327166A952A004D39F5 /* libcares-i386 */,
+				8008032B166A9535004D39F5 /* libcares-x86_64 */,
 				223FD091160B523700BE1C80 /* CURLHandleTests */,
 			);
 		};
@@ -382,6 +560,192 @@
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
+		800803191669665D004D39F5 /* Run Script - Configure + make */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Configure + make";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Copy source to a new location to build.\ncd \"${SRCROOT}/..\"\nmkdir -p \"${OBJROOT}\"\ncp -af curl \"${OBJROOT}/curl-i386\"\n\n# Copy libssh2 (we depend on it) headers & dylibs.\ncd \"${SRCROOT}/../../SFTP\"\nmkdir -p \"${OBJROOT}/libssh2/lib\"\ncp -af libssh2/include \"${OBJROOT}/libssh2\"\ncp -f  libssh2.dylib \"${OBJROOT}/libssh2/lib\"\n\n# Freaking unbelievably, we also have to copy the libs that libssh2 depends on to the proper relative runtime location, so that the ./configure script can load libssh2 at *configure* time.\ncd \"${SRCROOT}/../../SFTP\"\nmkdir -p \"${OBJROOT}/libssh2/Frameworks\"\ncp -f libcrypto.dylib \"${OBJROOT}/libssh2/Frameworks\"\ncp -f libssl.dylib \"${OBJROOT}/libssh2/Frameworks\"\n\n# Copy libcares (we depend on it) headers & dylibs.\ncd \"${SRCROOT}\"\nmkdir -p \"${OBJROOT}/c-ares-i386/include\"\nmkdir -p \"${OBJROOT}/c-ares-i386/lib\"\ncp -f ../c-ares/ares*.h \"${OBJROOT}/c-ares-i386/include\"\n# Overwrite generic ares_build.h with the one from our actual build.\ncp -f ares_build-i386.h \"${OBJROOT}/c-ares-i386/include/ares_build.h\"\ncp -f libcares.dylib \"${OBJROOT}/c-ares-i386/lib\"\n\n# Buildconf\ncd \"${OBJROOT}/curl-i386\"\necho \"Please ignore any messages about \\\"No rule to make target distclean.\\\" That just means the build dir is already clean.\"\nmake distclean\necho \"***\"\necho \"***\"\necho \"*** NOTE: Error messages about installing files are not errors. Please ignore. ***\"\necho \"***\"\necho \"***\"\n./buildconf\n\n# Configure\n./configure \\\nCC=\"clang\" \\\n  CFLAGS=\"-isysroot ${SDKROOT} -arch i386 -g -w -mmacosx-version-min=10.6\" \\\n  --host=i386-apple-darwin10 \\\n  --with-sysroot=\"${SDKROOT}\" \\\n  --with-darwinssl \\\n  --with-libssh2=\"${OBJROOT}/libssh2\" \\\n  --enable-ares=\"${OBJROOT}/c-ares-i386\" \\\n  --without-libidn \\\n  --enable-debug \\\n  --enable-optimize \\\n  --disable-warnings \\\n  --disable-werror \\\n  --disable-curldebug \\\n  --disable-symbol-hiding \\\n  --enable-shared \\\n  --disable-static \\\n  --enable-proxy\n##--enable-threaded-resolver [either this or c-ares, this is heavy-uses a thread for every resolve call]\n\n# Make\nmake\n";
+			showEnvVarsInLog = 0;
+		};
+		8008031A1669665F004D39F5 /* Run Script - Rename + Install Name */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Rename + Install Name";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Correct the load commands of the dylibs.\ncd \"${OBJROOT}/curl-i386/lib/.libs\"\n# Get the full filenames of the dylibs from the symlinks.\n# E.g.: dylib:\"libcrypto.1.0.0.dylib\" symlink:\"libcrypto.dylib\"\nLONG_DYLIB=`readlink -n libcurl.dylib`\n# Fix ID.\ninstall_name_tool -id @rpath/libcurl.dylib ${LONG_DYLIB}\n# Correct load path of libs that we load (libssh2).\n# [already correct] install_name_tool -change /usr/local/lib/${LONG_DYLIB} @rpath/libcurl.dylib ${LONG_DYLIB}\n# Add rpath search paths.\ninstall_name_tool -add_rpath @loader_path/../Frameworks ${LONG_DYLIB}\n\n# Copy dylibs to have arch in name.\ncp -f ${LONG_DYLIB} libcurl-i386.dylib\n";
+			showEnvVarsInLog = 0;
+		};
+		8008031B16696675004D39F5 /* Run Script - Configure + make */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Configure + make";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Copy source to a new location to build.\ncd \"${SRCROOT}/..\"\nmkdir -p \"${OBJROOT}\"\ncp -af curl \"${OBJROOT}/curl-x86_64\"\n\n# Copy libssh2 (we depend on it) headers & dylibs.\ncd \"${SRCROOT}/../../SFTP\"\nmkdir -p \"${OBJROOT}/libssh2/lib\"\ncp -af libssh2/include \"${OBJROOT}/libssh2\"\ncp -f  libssh2.dylib \"${OBJROOT}/libssh2/lib\"\n\n# Freaking unbelievably, we also have to copy the libs that libssh2 depends on to the proper relative runtime location, so that the ./configure script can load libssh2 at *configure* time.\ncd \"${SRCROOT}/../../SFTP\"\nmkdir -p \"${OBJROOT}/libssh2/Frameworks\"\ncp -f libcrypto.dylib \"${OBJROOT}/libssh2/Frameworks\"\ncp -f libssl.dylib \"${OBJROOT}/libssh2/Frameworks\"\n\n# Copy libcares (we depend on it) headers & dylibs.\ncd \"${SRCROOT}\"\nmkdir -p \"${OBJROOT}/c-ares-x86_64/include\"\nmkdir -p \"${OBJROOT}/c-ares-x86_64/lib\"\ncp -f ../c-ares/ares*.h \"${OBJROOT}/c-ares-x86_64/include\"\n# Overwrite generic ares_build.h with the one from our actual build.\ncp -f ares_build-x86_64.h \"${OBJROOT}/c-ares-x86_64/include/ares_build.h\"\ncp -f libcares.dylib \"${OBJROOT}/c-ares-x86_64/lib\"\n\n# Buildconf\ncd \"${OBJROOT}/curl-x86_64\"\necho \"Please ignore any messages about \\\"No rule to make target distclean.\\\" That just means the build dir is already clean.\"\nmake distclean\necho \"***\"\necho \"***\"\necho \"*** NOTE: Error messages about installing files are not errors. Please ignore. ***\"\necho \"***\"\necho \"***\"\n./buildconf\n\n# Configure\n./configure \\\n  CC=\"clang\" \\\n  CFLAGS=\"-isysroot ${SDKROOT} -arch x86_64 -g -w -mmacosx-version-min=10.6\" \\\n  --host=x86_64-apple-darwin10 \\\n  --with-sysroot=\"${SDKROOT}\" \\\n  --with-darwinssl \\\n  --with-libssh2=\"${OBJROOT}/libssh2\" \\\n  --enable-ares=\"${OBJROOT}/c-ares-x86_64\" \\\n  --without-libidn \\\n  --enable-debug \\\n  --enable-optimize \\\n  --disable-warnings \\\n  --disable-werror \\\n  --disable-curldebug \\\n  --disable-symbol-hiding \\\n  --enable-shared \\\n  --disable-static \\\n  --enable-proxy\n##--enable-threaded-resolver [either this or c-ares, this is heavy-uses a thread for every resolve call]\n\n# Make\nmake\n";
+			showEnvVarsInLog = 0;
+		};
+		8008031C16696677004D39F5 /* Run Script - Rename + Install Name */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Rename + Install Name";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Correct the load commands of the dylibs.\ncd \"${OBJROOT}/curl-x86_64/lib/.libs\"\n# Get the full filenames of the dylibs from the symlinks.\n# E.g.: dylib:\"libcrypto.1.0.0.dylib\" symlink:\"libcrypto.dylib\"\nLONG_DYLIB=`readlink -n libcurl.dylib`\n# Fix ID.\ninstall_name_tool -id @rpath/libcurl.dylib ${LONG_DYLIB}\n# Correct load path of libs that we load (libssh2).\n# [already correct] install_name_tool -change /usr/local/lib/${LONG_DYLIB} @rpath/libcurl.dylib ${LONG_DYLIB}\n# Add rpath search paths.\ninstall_name_tool -add_rpath @loader_path/../Frameworks ${LONG_DYLIB}\n\n# Copy dylibs to have arch in name.\ncp -f ${LONG_DYLIB} libcurl-x86_64.dylib\n";
+			showEnvVarsInLog = 0;
+		};
+		80080337166A9651004D39F5 /* Run Script - lipo multi-arch dylib */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - lipo multi-arch dylib";
+			outputPaths = (
+				"${SRCROOT}/libcares.dylib",
+				"${SRCROOT}/libcares.dylib.dSYM",
+				"${SRCROOT}/ares_build-i386.h",
+				"${SRCROOT}/ares_build-x86_64.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Create final dylibs.\ncd \"${OBJROOT}\"\nlipo -create -arch i386 cares-i386/.libs/libcares-i386.dylib  -arch x86_64 cares-x86_64/.libs/libcares-x86_64.dylib  -output libcares.dylib\n\n# Create dSYMs\ndsymutil libcares.dylib\n\n# Strip dylibs\nstrip -x libcares.dylib\n\n# Final output to project dir, not build dir.\ncp -f  libcares.dylib      \"${SRCROOT}\"\ncp -Rf libcares.dylib.dSYM \"${SRCROOT}\"\ncp -f cares-i386/ares_build-i386.h \"${SRCROOT}\"\ncp -f cares-x86_64/ares_build-x86_64.h \"${SRCROOT}\"\n\n# Remove build dirs.\nrm -Rf \"${OBJROOT}/cares-i386\"\nrm -Rf \"${OBJROOT}/cares-x86_64\"\n\n# Display results.\nlipo -detailed_info \"${SRCROOT}/libcares.dylib\"\nexit 0\n";
+			showEnvVarsInLog = 0;
+		};
+		80080338166A9661004D39F5 /* Run Script - remove previous product dylibs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - remove previous product dylibs";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Clean original source dir, just in case.\ncd \"${SRCROOT}/../c-ares\"\necho \"Please ignore any messages about \\\"No rule to make target distclean.\\\" That just means the build dir is already clean.\"\nmake distclean\n\n# Remove final output files from previous run.\ncd \"${SRCROOT}\"\nrm -f  \"libcares.dylib\"\nrm -Rf \"libcares.dylib.dSYM\"\n\n# Remove intermediate output files from previous run.\nrm -f  \"${OBJROOT}/libcares.dylib\"\nrm -Rf \"${OBJROOT}/libcares.dylib.dSYM\"\n\n# Remove build dirs from previous run.\nrm -Rf \"${OBJROOT}/libcares-i386\"\nrm -Rf \"${OBJROOT}/libcares-x86_64\"\n";
+			showEnvVarsInLog = 0;
+		};
+		80080339166A966D004D39F5 /* Run Script - Configure + make */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Configure + make";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Copy source to a new location to build.\ncd \"${SRCROOT}/..\"\nmkdir -p \"${OBJROOT}\"\ncp -af c-ares \"${OBJROOT}/cares-i386\"\n\n# Buildconf\ncd \"${OBJROOT}/cares-i386\"\necho \"Please ignore any messages about \\\"No rule to make target distclean.\\\" That just means the build dir is already clean.\"\nmake distclean\necho \"***\"\necho \"***\"\necho \"*** NOTE: Error messages about installing files are not errors. Please ignore. ***\"\necho \"***\"\necho \"***\"\n./buildconf\n\n# Configure\n./configure \\\nCC=\"clang\" \\\nCFLAGS=\"-isysroot ${SDKROOT} -arch i386 -g -w -mmacosx-version-min=10.6\" \\\n--host=i386-apple-darwin10 \\\n--with-sysroot=\"${SDKROOT}\" \\\n--enable-debug \\\n--enable-optimize \\\n--disable-warnings \\\n--disable-werror \\\n--disable-curldebug \\\n--disable-symbol-hiding \\\n--enable-nonblocking \\\n--enable-shared \\\n--disable-static\n\n# Make\nmake\n";
+			showEnvVarsInLog = 0;
+		};
+		8008033A166A9678004D39F5 /* Run Script - Rename + Install Name */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Rename + Install Name";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Correct the load commands of the dylibs.\ncd \"${OBJROOT}/cares-i386/.libs\"\n# Get the full filenames of the dylibs from the symlinks.\n# E.g.: dylib:\"libcrypto.1.0.0.dylib\" symlink:\"libcrypto.dylib\"\nLONG_DYLIB=`readlink -n libcares.dylib`\n# Fix ID.\ninstall_name_tool -id @rpath/libcares.dylib ${LONG_DYLIB}\n# Correct load path of libs that we load (libssh2).\n# [already correct] install_name_tool -change /usr/local/lib/${LONG_DYLIB} @rpath/libcurl.dylib ${LONG_DYLIB}\n# Add rpath search paths.\n#install_name_tool -add_rpath @loader_path/../Frameworks ${LONG_DYLIB}\n\n# Copy dylibs to have arch in name.\ncp -f ${LONG_DYLIB} libcares-i386.dylib\n\n# Copy ares_build.h for use by libcurl compile.\ncd \"${OBJROOT}/cares-i386\"\ncp -f ares_build.h ares_build-i386.h\n";
+			showEnvVarsInLog = 0;
+		};
+		8008033B166A9682004D39F5 /* Run Script - Configure + make */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Configure + make";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Copy source to a new location to build.\ncd \"${SRCROOT}/..\"\nmkdir -p \"${OBJROOT}\"\ncp -af c-ares \"${OBJROOT}/cares-x86_64\"\n\n# Buildconf\ncd \"${OBJROOT}/cares-x86_64\"\necho \"Please ignore any messages about \\\"No rule to make target distclean.\\\" That just means the build dir is already clean.\"\nmake distclean\necho \"***\"\necho \"***\"\necho \"*** NOTE: Error messages about installing files are not errors. Please ignore. ***\"\necho \"***\"\necho \"***\"\n./buildconf\n\n# Configure\n./configure \\\n  CC=\"clang\" \\\n  CFLAGS=\"-isysroot ${SDKROOT} -arch x86_64 -g -w -mmacosx-version-min=10.6\" \\\n  --host=x86_64-apple-darwin10 \\\n  --with-sysroot=\"${SDKROOT}\" \\\n  --enable-debug \\\n  --enable-optimize \\\n  --disable-warnings \\\n  --disable-werror \\\n  --disable-curldebug \\\n  --disable-symbol-hiding \\\n  --enable-nonblocking \\\n  --enable-shared \\\n  --disable-static\n\n# Make\nmake\n";
+			showEnvVarsInLog = 0;
+		};
+		8008033C166A9684004D39F5 /* Run Script - Rename + Install Name */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - Rename + Install Name";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Correct the load commands of the dylibs.\ncd \"${OBJROOT}/cares-x86_64/.libs\"\n# Get the full filenames of the dylibs from the symlinks.\n# E.g.: dylib:\"libcrypto.1.0.0.dylib\" symlink:\"libcrypto.dylib\"\nLONG_DYLIB=`readlink -n libcares.dylib`\n# Fix ID.\ninstall_name_tool -id @rpath/libcares.dylib ${LONG_DYLIB}\n# Correct load path of libs that we load (libssh2).\n# [already correct] install_name_tool -change /usr/local/lib/${LONG_DYLIB} @rpath/libcurl.dylib ${LONG_DYLIB}\n# Add rpath search paths.\n#install_name_tool -add_rpath @loader_path/../Frameworks ${LONG_DYLIB}\n\n# Copy dylibs to have arch in name.\ncp -f ${LONG_DYLIB} libcares-x86_64.dylib\n\n# Copy ares_build.h for use by libcurl compile.\ncd \"${OBJROOT}/cares-x86_64\"\ncp -f ares_build.h ares_build-x86_64.h\n";
+			showEnvVarsInLog = 0;
+		};
+		809AE1BC1602BE6C001D02E1 /* Run Script - lipo multi-arch dylib */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - lipo multi-arch dylib";
+			outputPaths = (
+				"${SRCROOT}/libcurl.dylib",
+				"${SRCROOT}/libcurl.dylib.dSYM",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Create final dylibs.\ncd \"${OBJROOT}\"\nlipo -create -arch i386 curl-i386/lib/.libs/libcurl-i386.dylib  -arch x86_64 curl-x86_64/lib/.libs/libcurl-x86_64.dylib  -output libcurl.dylib\n\n# Create dSYMs\ndsymutil libcurl.dylib\n\n# Strip dylibs\nstrip -x libcurl.dylib\n\n# Final output to project dir, not source/build dir.\ncp -f  libcurl.dylib      \"${SRCROOT}\"\ncp -Rf libcurl.dylib.dSYM \"${SRCROOT}\"\n\n# Remove build dirs.\nrm -Rf \"${OBJROOT}/curl-i386\"\nrm -Rf \"${OBJROOT}/curl-x86_64\"\nrm -Rf \"${OBJROOT}/libssh2\"\nrm -Rf \"${OBJROOT}/c-ares-i386\"\nrm -Rf \"${OBJROOT}/c-ares-x86_64\"\n\n# Display results.\nlipo -detailed_info \"${SRCROOT}/libcurl.dylib\"\nexit 0\n";
+			showEnvVarsInLog = 0;
+		};
+		809AE1C31602BEF5001D02E1 /* Run Script - remove previous product dylibs */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - remove previous product dylibs";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Clean original source dir, just in case.\ncd \"${SRCROOT}/../curl\"\necho \"Please ignore any messages about \\\"No rule to make target distclean.\\\" That just means the build dir is already clean.\"\nmake distclean\n\n# Remove final output files from previous run.\ncd \"${SRCROOT}\"\nrm -f  \"libcurl.dylib\"\nrm -Rf \"libcurl.dylib.dSYM\"\n\n# Remove intermediate output files from previous run.\nrm -f  \"${OBJROOT}/libcurl.dylib\"\nrm -Rf \"${OBJROOT}/libcurl.dylib.dSYM\"\n\n# Remove build dirs from previous run.\nrm -Rf \"${OBJROOT}/curl-i386\"\nrm -Rf \"${OBJROOT}/curl-x86_64\"\nrm -Rf \"${OBJROOT}/libssh2\"\nrm -Rf \"${OBJROOT}/c-ares-i386\"\nrm -Rf \"${OBJROOT}/c-ares-x86_64\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -410,17 +774,55 @@
 			files = (
 				79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */,
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
-				2757076A1503E21D00363512 /* CURLFTPSession.m in Sources */,
 				221EAD12160B167900E4F270 /* CURLMulti.m in Sources */,
 				22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 				2270F4A216108D44009B6F98 /* NSURLRequest+CURLHandle.m in Sources */,
 				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,
 				2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
 				22731039161305FF00D6D49E /* CURLSocket.m in Sources */,
+				27D77E141672BBB50091EF91 /* CK2SSHCredential.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		80080313166962A7004D39F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8008030A16696287004D39F5 /* libcurl-i386 */;
+			targetProxy = 80080312166962A7004D39F5 /* PBXContainerItemProxy */;
+		};
+		80080315166962A7004D39F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8008030E16696292004D39F5 /* libcurl-x86_64 */;
+			targetProxy = 80080314166962A7004D39F5 /* PBXContainerItemProxy */;
+		};
+		80080330166A9557004D39F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 80080323166A951E004D39F5 /* libcares-clean */;
+			targetProxy = 8008032F166A9557004D39F5 /* PBXContainerItemProxy */;
+		};
+		80080332166A9557004D39F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 80080327166A952A004D39F5 /* libcares-i386 */;
+			targetProxy = 80080331166A9557004D39F5 /* PBXContainerItemProxy */;
+		};
+		80080334166A9557004D39F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8008032B166A9535004D39F5 /* libcares-x86_64 */;
+			targetProxy = 80080333166A9557004D39F5 /* PBXContainerItemProxy */;
+		};
+		80080336166A9569004D39F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8008031F166A9514004D39F5 /* libcares */;
+			targetProxy = 80080335166A9569004D39F5 /* PBXContainerItemProxy */;
+		};
+		809AE1C51602BF8A001D02E1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 809AE1BF1602BEF1001D02E1 /* libcurl-clean */;
+			targetProxy = 809AE1C41602BF8A001D02E1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		223FD09F160B523700BE1C80 /* InfoPlist.strings */ = {
@@ -439,7 +841,6 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
@@ -448,13 +849,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = CURLHandle_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "@executable_path/../Frameworks";
+				INSTALL_PATH = "@rpath";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"\"$(SRCROOT)\"",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = CURLHandle;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = framework;
@@ -465,21 +867,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = CURLHandle_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
-				INSTALL_PATH = "@executable_path/../Frameworks";
+				INSTALL_PATH = "@rpath";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"\"$(SRCROOT)\"",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = CURLHandle;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = framework;
@@ -490,9 +891,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -505,6 +907,7 @@
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -575,6 +978,161 @@
 			};
 			name = Release;
 		};
+		8008030C16696287004D39F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		8008030D16696287004D39F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+		8008031016696292004D39F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
+			};
+			name = Debug;
+		};
+		8008031116696292004D39F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		80080321166A9514004D39F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		80080322166A9514004D39F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		80080325166A951E004D39F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		80080326166A951E004D39F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		80080329166A952A004D39F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		8008032A166A952A004D39F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+		8008032D166A9535004D39F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
+			};
+			name = Debug;
+		};
+		8008032E166A9535004D39F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		809ADE7A16029C38001D02E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		809ADE7B16029C38001D02E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		809AE1C11602BEF1001D02E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		809AE1C21602BEF1001D02E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -601,6 +1159,78 @@
 			buildConfigurations = (
 				223FD0A7160B523700BE1C80 /* Debug */,
 				223FD0A8160B523700BE1C80 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8008030B16696287004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-i386" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8008030C16696287004D39F5 /* Debug */,
+				8008030D16696287004D39F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8008030F16696292004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-x86_64" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8008031016696292004D39F5 /* Debug */,
+				8008031116696292004D39F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80080320166A9514004D39F5 /* Build configuration list for PBXAggregateTarget "libcares" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80080321166A9514004D39F5 /* Debug */,
+				80080322166A9514004D39F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80080324166A951E004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-clean" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80080325166A951E004D39F5 /* Debug */,
+				80080326166A951E004D39F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		80080328166A952A004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-i386" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				80080329166A952A004D39F5 /* Debug */,
+				8008032A166A952A004D39F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8008032C166A9535004D39F5 /* Build configuration list for PBXAggregateTarget "libcares-x86_64" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8008032D166A9535004D39F5 /* Debug */,
+				8008032E166A9535004D39F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		809ADE7916029C38001D02E1 /* Build configuration list for PBXAggregateTarget "libcurl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				809ADE7A16029C38001D02E1 /* Debug */,
+				809ADE7B16029C38001D02E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		809AE1C01602BEF1001D02E1 /* Build configuration list for PBXAggregateTarget "libcurl-clean" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				809AE1C11602BEF1001D02E1 /* Debug */,
+				809AE1C21602BEF1001D02E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -22,6 +22,14 @@
 // See CURLOPT_FTP_CREATE_MISSING_DIRS docs for full details
 @property(nonatomic, readonly) NSUInteger curl_createIntermediateDirectories;
 
+// Default is nil, which tells libcurl in turn to use its own defaults, which are currently documented to be 0644 and 0755 respectively
+// Only supported by SFTP, SCP and file protocols at present apparently
+@property(nonatomic, readonly) NSNumber *curl_newFilePermissions;
+@property(nonatomic, readonly) NSNumber *curl_newDirectoryPermissions;
+
+// Default is nil, which means no checking
+@property(nonatomic, readonly) NSURL *curl_SSHKnownHostsFileURL;
+
 @end
 
 @interface NSMutableURLRequest (CURLOptionsFTP)
@@ -30,6 +38,11 @@
 - (void)curl_setShouldVerifySSLCertificate:(BOOL)verify;
 - (void)curl_setPostTransferCommands:(NSArray *)postTransferCommands;
 - (void)curl_setCreateIntermediateDirectories:(NSUInteger)createIntermediateDirectories;
+
+- (void)curl_setNewFilePermissions:(NSNumber *)permissions;
+- (void)curl_setNewDirectoryPermissions:(NSNumber *)permissions;
+
+- (void)curl_setSSHKnownHostsFileURL:(NSURL *)url;
 
 @end
 
