@@ -24,12 +24,19 @@
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response
 {
     self.response = response;
-    self.expected = response.expectedContentLength;
+    if (response.expectedContentLength > 0)
+    {
+        self.expected = response.expectedContentLength;
+    }
 }
 
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
 {
     self.sending = YES;
+    if (bytesWritten == 0)
+    {
+        self.exitRunLoop = YES;
+    }
 }
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type
@@ -58,11 +65,11 @@
 
 - (void)runUntilDone
 {
-    self.exitRunLoop = NO;
     while (!self.exitRunLoop)
     {
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
     }
+    self.exitRunLoop = NO;
 }
 
 - (void)checkDownloadedBufferWasCorrect

@@ -794,6 +794,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (result >= 0 && [[self delegate] respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
     {
         [[self delegate] handle:self willSendBodyDataOfLength:result];
+        if (_uploadStream.streamStatus == NSStreamStatusAtEnd)
+        {
+            [[self delegate] handle:self willSendBodyDataOfLength:0];
+        }
     }
     
     return result;
