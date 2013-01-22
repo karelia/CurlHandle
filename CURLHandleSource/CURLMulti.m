@@ -135,14 +135,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     NSAssert(self.queue, @"need queue");
 
+    [handle cancel];
+    [handle completeWithCode:CURLM_CANCELLED];
     dispatch_async(self.queue, ^{
         if ([self.handles containsObject:handle])
         {
-            [handle retain];
             [self removeHandleInternal:handle];
-            [handle cancel];
-            [handle completeWithCode:CURLM_CANCELLED];
-            [handle release];
         }
     });
 

@@ -92,8 +92,10 @@
         CURLMulti* multi = [CURLMulti sharedInstance];
         [multi cancelHandle:self.handle];
     }
-
-    self.handle = nil;
+    else
+    {
+        self.handle = nil;
+    }
 }
 
 #pragma mark - Utilities
@@ -119,6 +121,11 @@
 - (void)handleDidFinish:(CURLHandle *)handle
 {
     [[self client] URLProtocolDidFinishLoading:self];
+}
+
+- (void)handleWasCancelled:(CURLHandle *)handle
+{
+    self.handle = nil;
 }
 
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten

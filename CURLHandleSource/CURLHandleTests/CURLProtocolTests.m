@@ -65,6 +65,9 @@
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
     [connection cancel];
+
+    // we don't get any delegate message to say that we've been cancelled, so we just have to finish
+    // the test here without checking anything else
 }
 
 - (void)testFTPDownload
