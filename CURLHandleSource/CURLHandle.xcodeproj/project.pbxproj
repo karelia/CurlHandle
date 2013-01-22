@@ -254,10 +254,6 @@
 		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
 		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		223FD094160B523700BE1C80 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		223FD096160B523700BE1C80 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		223FD099160B523700BE1C80 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		223FD09A160B523700BE1C80 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		223FD09B160B523700BE1C80 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
 		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		223FD0A3160B523700BE1C80 /* CURLMultiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLMultiTests.m; sourceTree = "<group>"; };
@@ -363,15 +359,11 @@
 		0867D691FE84028FC02AAC07 /* CURLHandle */ = {
 			isa = PBXGroup;
 			children = (
-				8008031D166A93C4004D39F5 /* libcares-README.txt */,
-				8008031E166A93DD004D39F5 /* c-ares */,
-				80080316166962C7004D39F5 /* libcurl-README.txt */,
-				8008031816696329004D39F5 /* curl */,
-				08FB77AEFE84172EC02AAC07 /* CURLHandle */,
+				08FB77AEFE84172EC02AAC07 /* Source */,
 				089C1665FE841158C02AAC07 /* Resources */,
+				223FD09C160B523700BE1C80 /* Tests */,
+				22BF08FA16AF09B2009BE5A3 /* Modules */,
 				0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */,
-				223FD09C160B523700BE1C80 /* CURLHandleTests */,
-				223FD093160B523700BE1C80 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
 			name = CURLHandle;
@@ -386,6 +378,7 @@
 				22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */,
 				80080379166C5B40004D39F5 /* libcares.dylib */,
 				1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */,
+				223FD094160B523700BE1C80 /* SenTestingKit.framework */,
 			);
 			name = "Libraries & Frameworks";
 			sourceTree = "<group>";
@@ -398,7 +391,7 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		08FB77AEFE84172EC02AAC07 /* CURLHandle */ = {
+		08FB77AEFE84172EC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
@@ -425,7 +418,7 @@
 				27D77E111672BBB50091EF91 /* CK2SSHCredential.h */,
 				27D77E121672BBB50091EF91 /* CK2SSHCredential.m */,
 			);
-			name = CURLHandle;
+			name = Source;
 			sourceTree = "<group>";
 		};
 		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
@@ -439,27 +432,7 @@
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
 		};
-		223FD093160B523700BE1C80 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				223FD094160B523700BE1C80 /* SenTestingKit.framework */,
-				223FD096160B523700BE1C80 /* Cocoa.framework */,
-				223FD098160B523700BE1C80 /* Other Frameworks */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		223FD098160B523700BE1C80 /* Other Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				223FD099160B523700BE1C80 /* AppKit.framework */,
-				223FD09A160B523700BE1C80 /* CoreData.framework */,
-				223FD09B160B523700BE1C80 /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
-			sourceTree = "<group>";
-		};
-		223FD09C160B523700BE1C80 /* CURLHandleTests */ = {
+		223FD09C160B523700BE1C80 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				229748FA1610C1AE0042A51A /* CURLHandleBasedTest.h */,
@@ -470,6 +443,7 @@
 				22BF085916AEECEC009BE5A3 /* MockServer */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
+			name = Tests;
 			path = CURLHandleTests;
 			sourceTree = "<group>";
 		};
@@ -517,6 +491,17 @@
 				22BF08E116AEEDD9009BE5A3 /* webdav.json */,
 			);
 			path = UnitTests;
+			sourceTree = "<group>";
+		};
+		22BF08FA16AF09B2009BE5A3 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				8008031D166A93C4004D39F5 /* libcares-README.txt */,
+				8008031E166A93DD004D39F5 /* c-ares */,
+				80080316166962C7004D39F5 /* libcurl-README.txt */,
+				8008031816696329004D39F5 /* curl */,
+			);
+			name = Modules;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
