@@ -24,7 +24,7 @@
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
     CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
 
-    [self runUntilDone];
+    [self runUntilPaused];
 
     [self checkDownloadedBufferWasCorrect];
 
@@ -42,7 +42,7 @@
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
         CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
 
-        [self runUntilDone];
+        [self runUntilPaused];
         
         [self checkDownloadedBufferWasCorrect];
         
@@ -67,7 +67,7 @@
         [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
         CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
 
-        [self runUntilDone];
+        [self runUntilPaused];
 
         STAssertTrue(self.sending, @"should have set sending flag");
         STAssertNil(self.error, @"got error %@", self.error);

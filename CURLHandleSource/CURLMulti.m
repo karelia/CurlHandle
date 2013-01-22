@@ -275,12 +275,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)releaseQueue
 {
     dispatch_queue_t queue = self.queue;
-    dispatch_sync(queue, ^{
+    self.queue = nil;
+    dispatch_async(queue, ^{
         [self releaseMulti];
+        dispatch_release(queue);
     });
 
-    self.queue = nil;
-    dispatch_release(queue);
 }
 
 #pragma mark - Timer Management

@@ -9,6 +9,7 @@
 #import "CURLHandleBasedTest.h"
 
 #import "NSURLRequest+CURLHandle.h"
+#import "KMSServer.h"
 
 @interface CURLHandle(TestOnly)
 
@@ -43,7 +44,7 @@
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
     CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
-    [self runUntilDone];
+    [self runUntilPaused];
 
     [self checkDownloadedBufferWasCorrect];
 
@@ -69,7 +70,7 @@
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
         CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
-        [self runUntilDone];
+        [self runUntilPaused];
 
         [self checkDownloadedBufferWasCorrect];
         
@@ -77,6 +78,8 @@
     }
 
     [multi shutdown];
+
+    //    [self stopServer];
 
     [multi release];
 }
@@ -102,7 +105,7 @@
         [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
         CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
-        [self runUntilDone];
+        [self runUntilPaused];
 
         STAssertTrue(self.sending, @"should have set sending flag");
         STAssertNil(self.error, @"got error %@", self.error);
@@ -129,7 +132,7 @@
 
     [multi cancelHandle:handle];
 
-    [self runUntilDone];
+    [self runUntilPaused];
 
     STAssertTrue(self.cancelled, @"should have been cancelled");
     STAssertNil(self.response, @"should have no response");

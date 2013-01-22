@@ -18,7 +18,7 @@
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     self.error = error;
-    self.exitRunLoop = YES;
+    [self pause];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
@@ -34,7 +34,7 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    self.exitRunLoop = YES;
+    [self pause];
 }
 
 - (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite;
@@ -51,7 +51,7 @@
     
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
-    [self runUntilDone];
+    [self runUntilPaused];
 
     [self checkDownloadedBufferWasCorrect];
 }
@@ -83,7 +83,7 @@
         NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
         STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
-        [self runUntilDone];
+        [self runUntilPaused];
         
         [self checkDownloadedBufferWasCorrect];
     }
@@ -108,7 +108,7 @@
         NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
         STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
-        [self runUntilDone];
+        [self runUntilPaused];
 
         STAssertNil(self.error, @"got error %@", self.error);
         STAssertNil(self.response, @"got unexpected response %@", self.response);

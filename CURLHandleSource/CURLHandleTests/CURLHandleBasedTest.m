@@ -6,6 +6,7 @@
 //
 
 #import "CURLHandleBasedTest.h"
+#import "KMSServer.h"
 
 @implementation CURLHandleBasedTest
 
@@ -35,7 +36,7 @@
     self.sending = YES;
     if (bytesWritten == 0)
     {
-        self.exitRunLoop = YES;
+        [self pause];
     }
 }
 
@@ -47,29 +48,60 @@
 - (void)handleDidFinish:(CURLHandle *)handle
 {
     CURLHandleLog(@"handle finished");
-    self.exitRunLoop = YES;
+    [self pause];
 }
 
 - (void)handleWasCancelled:(CURLHandle *)handle
 {
     self.cancelled = YES;
-    self.exitRunLoop = YES;
+    [self pause];
 }
 
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
 {
     CURLHandleLog(@"handle failed with error %@", error);
     self.error = error;
-    self.exitRunLoop = YES;
+    [self pause];
 }
 
-- (void)runUntilDone
+- (void)pause
 {
-    while (!self.exitRunLoop)
+    if (self.server)
     {
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
+        [self.server pause];
     }
-    self.exitRunLoop = NO;
+    else
+    {
+        self.exitRunLoop = YES;
+    }
+}
+
+- (void)runUntilPaused
+{
+    if (self.server)
+    {
+        [self.server runUntilPaused];
+    }
+    else
+    {
+        while (!self.exitRunLoop)
+        {
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
+        }
+        self.exitRunLoop = NO;
+    }
+}
+
+- (void)stopServer
+{
+    if (self.server)
+    {
+        [self.server stop];
+        while (self.server.state != KMSStopped)
+        {
+            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
+        }
+    }
 }
 
 - (void)checkDownloadedBufferWasCorrect
@@ -92,7 +124,12 @@
     NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleFTPTestURL"];
     if ([ftpTest isEqualToString:@"MockServer"])
     {
-        // TODO: implement MockServer version
+        [self setupServerWithScheme:@"ftp" responses:@"ftp"];
+
+        NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+        self.server.data = [NSData dataWithContentsOfURL:devNotesURL];
+
+        result = [self URLForPath:@"/"];
     }
     else
     {
