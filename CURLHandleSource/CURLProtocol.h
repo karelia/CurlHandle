@@ -11,6 +11,7 @@
 @interface CURLProtocol : NSURLProtocol <CURLHandleDelegate, NSURLAuthenticationChallengeSender>
 {
     CURLHandle* _handle;
+    BOOL _uploaded;
 }
 
 @end

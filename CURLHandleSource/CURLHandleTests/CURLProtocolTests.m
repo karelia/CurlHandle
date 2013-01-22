@@ -91,29 +91,29 @@
 
 - (void)testFTPUpload
 {
-    NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleTestsFTPServer"];
-    STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleTestsFTPServer \"ftp://user:password@ftp.test.com\"");
+    NSURL* ftpRoot = [self ftpTestServer];
+    if (ftpRoot)
+    {
+        NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
-    NSURL* ftpRoot = [NSURL URLWithString:ftpTest];
-    NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
+        NSError* error = nil;
+        NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+        NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
 
-    NSError* error = nil;
-    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
+        request.shouldUseCurlHandle = YES;
+        [request curl_setCreateIntermediateDirectories:1];
+        [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
 
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
-    request.shouldUseCurlHandle = YES;
-    [request curl_setCreateIntermediateDirectories:1];
-    [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+        NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
+        STAssertNotNil(connection, @"failed to get connection for request %@", request);
 
-    NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    STAssertNotNil(connection, @"failed to get connection for request %@", request);
+        [self runUntilDone];
 
-    [self runUntilDone];
-
-    STAssertNil(self.error, @"got error %@", self.error);
-    STAssertNil(self.response, @"got unexpected response %@", self.response);
-    STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+        STAssertNil(self.error, @"got error %@", self.error);
+        STAssertNil(self.response, @"got unexpected response %@", self.response);
+        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+    }
 }
 
 @end
