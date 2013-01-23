@@ -21,7 +21,7 @@
 
 - (void)updateTimeout:(NSInteger)timeout;
 - (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what;
-- (void)processMulti:(int)action;
+- (void)processMultiActionForSocket:(int)socket action:(int)action;
 
 @end
 
@@ -116,7 +116,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     NSAssert(self.queue, @"need queue");
     NSAssert(self.handles, @"need handles");
-    NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
 
     dispatch_async(self.queue, ^{
         [self addHandleToMulti:handle];
@@ -236,13 +235,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 }
 
 
-- (void)processMulti:(int)action
+- (void)processMultiActionForSocket:(int)socket action:(int)action
 {
     CURLMulti* multi = self.multi;
     if (multi)
     {
         int running;
-        curl_multi_socket_action(multi, action, 0, &running);
+        curl_multi_socket_action(multi, socket, action, &running);
         CURLMsg* message;
         int count;
         while ((message = curl_multi_info_read(multi, &count)) != NULL)
@@ -278,6 +277,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)addHandleToMulti:(CURLHandle*)handle
 {
+    NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
     CURLMulti* multi = self.multi;
     if (multi)
     {
@@ -322,7 +322,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     dispatch_source_set_event_handler(self.timer, ^{
         dispatch_queue_t queue = self.queue;
         dispatch_async(queue, ^{
-            [self processMulti:CURL_SOCKET_TIMEOUT];
+            [self processMultiActionForSocket:0 action:CURL_SOCKET_TIMEOUT];
         });
     });
 
@@ -407,10 +407,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             source = dispatch_source_create(type, socket, 0, self.queue);
             dispatch_source_set_event_handler(source, ^{
                 dispatch_queue_t queue = self.queue;
-                dispatch_async(queue, ^{
-                    int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
-                    [self processMulti:action];
-                });
+                if (queue)
+                {
+                    dispatch_async(queue, ^{
+                        int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
+                        [self processMultiActionForSocket:socket action:action];
+                    });
+                }
             });
             dispatch_source_set_cancel_handler(source, ^{
                 CURLHandleLog(@"%@ removed for socket %d", [self nameForType:type], socket);
