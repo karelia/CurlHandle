@@ -378,10 +378,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             dispatch_source_set_event_handler(source, ^{
                 if (self.multi)
                 {
-                    int running;
-                    curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
                     dispatch_queue_t queue = self.queue;
                     dispatch_async(queue, ^{
+                        int running;
+                        curl_multi_socket_action(self.multi, socket, (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT, &running);
                         [self processMulti];
                     });
                 }
