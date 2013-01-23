@@ -546,6 +546,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         case CURLE_COULDNT_CONNECT:
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost underlyingError:result];
             break;
+            
+        case CURLE_REMOTE_ACCESS_DENIED:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorNoPermissionsToReadFile underlyingError:result];
+            break;
 
         case CURLE_WRITE_ERROR:
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotWriteToFile underlyingError:result];
