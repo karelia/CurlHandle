@@ -699,7 +699,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     _delegate = nil;
 }
 
-- (void)failWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
+- (void)failWithCode:(int)code isMulti:(BOOL)isMultiCode;
 {
     if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
     {
