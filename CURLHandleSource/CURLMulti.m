@@ -127,7 +127,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert(self.queue, @"need queue");
 
     [handle cancel];
-    [handle completeWithCode:CURLM_CANCELLED];
+    [handle completeWithMultiCode:CURLM_CANCELLED];
     dispatch_async(self.queue, ^{
         if ([self.handles containsObject:handle])
         {
@@ -290,7 +290,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         else
         {
             CURLHandleLog(@"failed to add handle %@ (%p) to multi %@", handle, [handle curl], self);
-            [handle completeWithCode:result];
+            [handle completeWithMultiCode:result];
         }
     }
 
