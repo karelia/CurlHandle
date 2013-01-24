@@ -5,6 +5,20 @@
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
+/**
+ As mentioned in the header, the intention is that all access to the multi
+ is controlled via our internal serial queue.
+ 
+ The CURL multi handle is stored in the property self.multi.
+ 
+ The only methods that access this should all start with the word multi.
+ 
+ In each case they access it via the getter, which includes an assertion to check
+ that it's being called from the our internal queue.
+
+ */
+
+
 #import "CURLMulti.h"
 
 #import "CURLHandle.h"
@@ -20,8 +34,8 @@
 @property (assign, nonatomic) dispatch_source_t timer;
 
 - (void)updateTimeout:(NSInteger)timeout;
-- (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what;
-- (void)processMultiActionForSocket:(int)socket action:(int)action;
+- (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what;
+- (void)multiProcessAction:(int)action forSocket:(int)socket;
 
 @end
 
@@ -60,7 +74,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     if ((self = [super init]) != nil)
     {
-        if ([self createMulti] == CURLM_OK)
+        if ([self multiCreate] == CURLM_OK)
         {
             self.handles = [NSMutableArray array];
             [self createQueue];
@@ -92,20 +106,16 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLHandleLog(@"started monitoring");
     dispatch_resume(self.timer);
-    //[self monitorMulti];
 }
 
 
 - (void)shutdown
 {
     [self releaseTimer];
-    if (_multi)
-    {
-        [self removeAllHandles];
-        [self releaseQueue];
+    [self removeAllHandles];
+    [self releaseQueue];
 
-        CURLHandleLog(@"shutdown");
-    }
+    CURLHandleLog(@"shutdown");
 }
 
 #pragma mark - Easy Handle Management
@@ -116,7 +126,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert(self.handles, @"need handles");
 
     dispatch_async(self.queue, ^{
-        [self addHandleToMulti:handle];
+        [self multiAddHandle:handle];
     });
 }
 
@@ -167,20 +177,26 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeAllHandles
 {
-    dispatch_sync(self.queue, ^{
-        NSArray* handles = [self.handles copy];
-        for (CURLHandle* handle in handles)
-        {
-            [self removeHandleInternal:handle];
-        }
-        // we may be the last thing holding on to the handles
-        // curl should be finished with them by now, but for safety's sake we autorelease our
-        // array copy
-        [handles autorelease];
-    });
+    // if the queue is gone, we've already been shut down and are probably being disposed
+    if (self.queue)
+    {
+        dispatch_sync(self.queue, ^{
+            NSArray* handles = [self.handles copy];
+            for (CURLHandle* handle in handles)
+            {
+                [self removeHandleInternal:handle];
+            }
+            // we may be the last thing holding on to the handles
+            // curl should be finished with them by now, but for safety's sake we autorelease our
+            // array copy
+            [handles autorelease];
+        });
+    }
 }
 
 #pragma mark - Multi Handle Management
+
+// Everything in this section should be called from our internal queue.
 
 - (CURLM*)multi
 {
@@ -189,7 +205,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     return _multi;
 }
 
-- (CURLMcode)createMulti
+- (CURLMcode)multiCreate
 {
     CURLMcode result = CURLM_OK;
     CURLM* multi = curl_multi_init();
@@ -220,7 +236,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     return result;
 }
 
-- (void)releaseMulti
+- (void)multiRelease
 {
     CURLHandleLog(@"released multi %@", self);
 
@@ -234,7 +250,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 }
 
 
-- (void)processMultiActionForSocket:(int)socket action:(int)action
+- (void)multiProcessAction:(int)action forSocket:(int)socket
 {
     CURLMulti* multi = self.multi;
     if (multi)
@@ -281,7 +297,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 }
 
-- (void)addHandleToMulti:(CURLHandle*)handle
+- (void)multiAddHandle:(CURLHandle*)handle
 {
     NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
     CURLMulti* multi = self.multi;
@@ -301,6 +317,42 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
 
 }
+
+- (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
+{
+    CURLMulti* multi = self.multi;
+    if (multi)
+    {
+        if (what == CURL_POLL_NONE)
+        {
+            NSAssert(socket == nil, @"should have no socket object first time");
+        }
+
+        if (!socket)
+        {
+            NSAssert(what != CURL_POLL_REMOVE, @"shouldn't need to make a socket if we're being asked to remove it");
+#ifndef __clang_analyzer__
+            socket = [[CURLSocket alloc] init];
+#endif
+            curl_multi_assign(multi, raw, socket);
+            CURLHandleLog(@"new socket:%@", socket);
+        }
+
+        [socket updateSourcesForSocket:raw mode:what multi:self];
+
+        if (what == CURL_POLL_REMOVE)
+        {
+                NSAssert(socket != nil, @"should have socket");
+                CURLHandleLog(@"removed socket:%@", socket);
+#ifndef __clang_analyzer__
+                [socket release];
+                socket = nil;
+#endif
+                curl_multi_assign(multi, raw, nil);
+        }
+    }
+}
+
 #pragma mark - Queue Management
 
 - (void)createQueue
@@ -311,13 +363,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)releaseQueue
 {
-    dispatch_queue_t queue = self.queue;
-    self.queue = nil;
-    dispatch_async(queue, ^{
-        [self releaseMulti];
-        dispatch_release(queue);
-    });
-
+    if (self.queue)
+    {
+        dispatch_queue_t queue = self.queue;
+        dispatch_async(queue, ^{
+            [self multiRelease];
+            dispatch_release(queue);
+        });
+        self.queue = nil;
+    }
 }
 
 #pragma mark - Timer Management
@@ -327,7 +381,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
 
     dispatch_source_set_event_handler(self.timer, ^{
-        [self processMultiActionForSocket:0 action:CURL_SOCKET_TIMEOUT];
+        [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
     });
 
     dispatch_source_set_cancel_handler(self.timer, ^{
@@ -361,40 +415,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLHandleLog(@"timeout changed to %ldms", (long)timeout);
 }
 
-- (void)updateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
-{
-    CURLMulti* multi = self.multi;
-    if (multi)
-    {
-        switch(what)
-        {
-            case CURL_POLL_NONE:
-                NSAssert(socket == nil, @"should have no socket object first time");
-                break;
-
-            case CURL_POLL_REMOVE:
-                NSAssert(socket != nil, @"should have socket");
-                CURLHandleLog(@"removed socket:%@", socket);
-#ifndef __clang_analyzer__
-                [socket release];
-                socket = nil;
-#endif
-                curl_multi_assign(multi, raw, nil);
-                break;
-        }
-
-        if (!socket)
-        {
-#ifndef __clang_analyzer__
-            socket = [[CURLSocket alloc] init];
-#endif
-            curl_multi_assign(multi, raw, socket);
-            CURLHandleLog(@"new socket:%@", socket);
-        }
-        
-        [socket updateSourcesForSocket:raw mode:what multi:self];
-    }
-}
 
 - (NSString*)nameForType:(dispatch_source_type_t)type
 {
@@ -412,7 +432,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
             dispatch_source_set_event_handler(source, ^{
                     int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
-                    [self processMultiActionForSocket:socket action:action];
+                    [self multiProcessAction:action forSocket:socket];
             });
 
             dispatch_source_set_cancel_handler(source, ^{
@@ -446,7 +466,7 @@ int timeout_callback(CURLM *multi, long timeout_ms, void *userp)
 int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *socketp)
 {
     CURLMulti* source = userp;
-    [source updateSocket:socketp raw:s what:what];
+    [source multiUpdateSocket:socketp raw:s what:what];
 
     return CURLM_OK;
 }
