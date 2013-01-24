@@ -37,6 +37,14 @@
                BlueprintName = "CURLHandleTests"
                ReferencedContainer = "container:CURLHandle.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "KMSTestCase">
+               </Test>
+               <Test
+                  Identifier = "CURLHandleBasedTest">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>

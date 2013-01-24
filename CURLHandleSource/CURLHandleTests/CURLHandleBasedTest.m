@@ -36,18 +36,19 @@
     self.sending = YES;
     if (bytesWritten == 0)
     {
-        [self pause];
+        NSLog(@"test: upload done");
     }
 }
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type
 {
-    CURLHandleLog(@"got debug info: %@ type:%d", string, type);
+    NSLog(@"test: got debug info: %@ type:%d", string, type);
 }
 
 - (void)handleDidFinish:(CURLHandle *)handle
 {
-    CURLHandleLog(@"handle finished");
+    NSLog(@"test: handle %@ finished", handle);
+    self.finishedCount++;
     [self pause];
 }
 
@@ -59,13 +60,14 @@
 
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
 {
-    CURLHandleLog(@"handle failed with error %@", error);
+    NSLog(@"test: handle failed with error %@", error);
     self.error = error;
     [self pause];
 }
 
 - (void)pause
 {
+    NSLog(@"test: pause requested");
     if (self.server)
     {
         [self.server pause];
@@ -90,6 +92,7 @@
         }
         self.exitRunLoop = NO;
     }
+    NSLog(@"test: paused");
 }
 
 - (void)stopServer

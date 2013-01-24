@@ -16,6 +16,7 @@
 @property (strong, nonatomic) NSError* error;
 @property (assign, nonatomic) NSUInteger expected;
 @property (assign, atomic) BOOL exitRunLoop;
+@property (assign, atomic) NSUInteger finishedCount;
 @property (strong, nonatomic) NSURLResponse* response;
 @property (assign, nonatomic) BOOL sending;
 
