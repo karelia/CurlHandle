@@ -680,15 +680,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (void)failWithCode:(CURLMcode)code
 {
     NSError* error = [self errorForURL:nil code:code];
+    CURLHandleLog(@"handle %@ failed with error %@", self, error);
     if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
     {
-        CURLHandleLog(@"handle %@ failed with error %@", self, error);
         [self.delegate handle:self didFailWithError:error];
     }
 }
 
 - (void)cancel;
 {
+    CURLHandleLog(@"handle %@ cancelled", self);
     _cancelled = YES;
 }
 
@@ -706,6 +707,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 {
 	size_t written = inSize*inNumber;
+    CURLHandleLog(@"handle %@ write %ld at %p", self, written, inPtr);
 	NSData *data = [NSData dataWithBytes:inPtr length:written];
 
 	if (_cancelled)
@@ -774,6 +776,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 {
+    CURLHandleLog(@"handle %@ read up to %ld into %p", self, inSize * inNumber, inPtr);
     if (_cancelled) return CURL_READFUNC_ABORT;
     
     NSInteger result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
@@ -851,6 +854,7 @@ int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype p
 
 size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
+    CURLHandleLog(@"handle %@ got body", self);
 	return [self curlWritePtr:ptr size:size number:nmemb isHeader:NO];
 }
 
@@ -860,6 +864,7 @@ size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 
 size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
+    CURLHandleLog(@"handle %@ got header", self);
 	return [self curlWritePtr:ptr size:size number:nmemb isHeader:YES];
 }
 

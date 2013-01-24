@@ -6,4 +6,4 @@
     #import <Cocoa/Cocoa.h>
 #endif
 
-// #define CURLHandleLog NSLog 
+#define CURLHandleLog NSLog 
