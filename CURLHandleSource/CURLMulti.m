@@ -99,7 +99,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)shutdown
 {
     [self releaseTimer];
-    if (self.multi)
+    if (_multi)
     {
         [self removeAllHandles];
         [self releaseQueue];
@@ -184,7 +184,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (CURLM*)multi
 {
-    NSAssert(dispatch_get_current_queue() == self.queue, @"should be running on our queue");
+    NSAssert(self.queue == nil || dispatch_get_current_queue() == self.queue, @"should be running on our queue");
 
     return _multi;
 }
