@@ -104,7 +104,7 @@
     }
 }
 
-- (void)checkDownloadedBufferWasCorrect
+- (BOOL)checkDownloadedBufferWasCorrect
 {
     STAssertNotNil(self.response, @"got no response");
     STAssertFalse(self.cancelled, @"shouldn't have cancelled");
@@ -115,7 +115,14 @@
     NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
     NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
     NSString* receivedNotes = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
-    STAssertTrue([receivedNotes isEqualToString:devNotes], @"received notes didn't match: was:\n'%@'\n\nshould have been:\n'%@'", receivedNotes, devNotes);
+
+    BOOL result = [receivedNotes isEqualToString:devNotes];
+    STAssertTrue(result, @"received notes didn't match: was:\n'%@'\n\nshould have been:\n'%@'", receivedNotes, devNotes);
+
+    // clear the buffer
+    [self.buffer setLength:0];
+    
+    return result;
 }
 
 - (NSURL*)ftpTestServer

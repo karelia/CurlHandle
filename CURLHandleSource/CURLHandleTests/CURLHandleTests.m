@@ -44,8 +44,8 @@
 
         [self runUntilPaused];
         
-        [self checkDownloadedBufferWasCorrect];
-        
+        STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
+
         [handle release];
     }
 }
@@ -90,7 +90,7 @@
 
         [self runUntilPaused];
 
-        [self checkDownloadedBufferWasCorrect];
+        STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
 
         [handle release];
 
@@ -99,7 +99,7 @@
 
         [self runUntilPaused];
 
-        [self checkDownloadedBufferWasCorrect];
+        STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
 
         [handle release];
     }

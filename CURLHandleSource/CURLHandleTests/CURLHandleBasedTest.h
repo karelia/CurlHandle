@@ -19,7 +19,7 @@
 @property (strong, nonatomic) NSURLResponse* response;
 @property (assign, nonatomic) BOOL sending;
 
-- (void)checkDownloadedBufferWasCorrect;
+- (BOOL)checkDownloadedBufferWasCorrect;
 - (void)runUntilPaused;
 - (void)stopServer;
 
