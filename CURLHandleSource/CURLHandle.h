@@ -65,7 +65,8 @@ enum { CURLM_CANCELLED = -2 };
 #pragma mark - RunLoop Support
 
 @interface CURLHandle(MultiSupport)
-- (void)completeWithCode:(CURLMcode)code;
+- (void)completeWithMultiCode:(CURLMcode)code;
+- (void)completeWithCode:(CURLcode)code;
 - (BOOL)hasCompleted;
 @end
 

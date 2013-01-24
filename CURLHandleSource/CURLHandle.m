@@ -53,7 +53,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 - (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
-- (void)failWithCode:(CURLMcode)code;
 
 #pragma mark - Private Properties
 
@@ -169,7 +168,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         }
         else
         {
-            [self failWithCode:code];
+            [self failWithCode:code isMulti:NO];
         }
     }
     
@@ -546,6 +545,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         case CURLE_COULDNT_CONNECT:
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost underlyingError:result];
             break;
+            
+        case CURLE_REMOTE_ACCESS_DENIED:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorNoPermissionsToReadFile underlyingError:result];
+            break;
 
         case CURLE_WRITE_ERROR:
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotWriteToFile underlyingError:result];
@@ -650,7 +653,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return _executing == NO;
 }
 
-- (void)completeWithCode:(CURLMcode)code
+- (void)completeWithMultiCode:(CURLMcode)code;
 {
     if (code == CURLM_OK)
     {
@@ -670,17 +673,39 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
     else
     {
-        [self failWithCode:code];
+        [self failWithCode:code isMulti:YES];
     }
 
     [self cleanup];
     _delegate = nil;
 }
 
-- (void)failWithCode:(CURLMcode)code
+- (void)completeWithCode:(CURLcode)code;
 {
-    NSError* error = [self errorForURL:nil code:code];
+    if (code == CURLE_OK)
+    {
+        if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
+        {
+            CURLHandleLog(@"handle %@ finished", self);
+            [self.delegate handleDidFinish:self];
+        }
+    }
+    else
+    {
+        [self failWithCode:code isMulti:NO];
+    }
+
+    [self cleanup];
+    _delegate = nil;
+}
+
+- (void)failWithCode:(int)code isMulti:(BOOL)isMultiCode;
+{
+    NSError* error = (isMultiCode ?
+                      [NSError errorWithDomain:CURLMcodeErrorDomain code:code userInfo:nil] :
+                      [self errorForURL:_URL code:code]);
     CURLHandleLog(@"handle %@ failed with error %@", self, error);
+
     if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
     {
         [self.delegate handle:self didFailWithError:error];
