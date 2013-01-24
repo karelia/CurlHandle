@@ -78,4 +78,31 @@
     }
 }
 
+- (void)testFTPThrash
+{
+    NSURL* ftpRoot = [self ftpTestServer];
+    if (ftpRoot)
+    {
+        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+
+        NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
+        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
+
+        [self runUntilPaused];
+
+        [self checkDownloadedBufferWasCorrect];
+
+        [handle release];
+
+        request = [NSMutableURLRequest requestWithURL:ftpDownload];
+        handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
+
+        [self runUntilPaused];
+
+        [self checkDownloadedBufferWasCorrect];
+
+        [handle release];
+    }
+
+}
 @end
