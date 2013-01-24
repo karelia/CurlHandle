@@ -112,10 +112,10 @@
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
     {
-        [self doFTPDownloadWithRoot:ftpRoot];
         [self doFTPUploadWithRoot:ftpRoot];
         [self doFTPDownloadWithRoot:ftpRoot];
         [self doFTPUploadWithRoot:ftpRoot];
+        [self doFTPDownloadWithRoot:ftpRoot];
     }
 }
 
