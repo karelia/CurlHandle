@@ -51,6 +51,9 @@
                   Identifier = "CURLProtocolTests">
                </Test>
                <Test
+                  Identifier = "CURLHandleTests/testVersion">
+               </Test>
+               <Test
                   Identifier = "CURLHandleTests/testFTPDownload">
                </Test>
                <Test
@@ -64,9 +67,6 @@
                </Test>
                <Test
                   Identifier = "CURLHandleTests/testHTTPDownload">
-               </Test>
-               <Test
-                  Identifier = "CURLHandleTests/testVersion">
                </Test>
             </SkippedTests>
          </TestableReference>

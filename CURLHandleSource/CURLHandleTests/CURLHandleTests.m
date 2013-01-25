@@ -50,6 +50,12 @@ static NSUInteger gLastIteration = 1;
 
 - (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
+    if (iteration == 1)
+    {
+        [self tearDown];
+        [self setUp];
+    }
+    
     self.useCustomMulti = iteration > 0;
     gLastIteration = iteration;
 }
