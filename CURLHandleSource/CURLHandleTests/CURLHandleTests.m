@@ -274,7 +274,7 @@ static NSUInteger gLastIteration = 1;
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
     {
-        NSURL* ftpUploadFolder = [ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"];
+        NSURL* ftpUploadFolder = [ftpRoot URLByAppendingPathComponent:@"CURLHandleTests/"];
         [self doFTPUploadWithRoot:ftpRoot];
 
         self.response = nil;
