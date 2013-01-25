@@ -24,6 +24,7 @@
 - (BOOL)checkDownloadedBufferWasCorrect;
 - (void)runUntilPaused;
 - (void)stopServer;
+- (void)cleanup;
 
 - (NSURL*)ftpTestServer;
 

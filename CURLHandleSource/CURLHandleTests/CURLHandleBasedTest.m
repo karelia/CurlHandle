@@ -169,14 +169,19 @@ const NSString *const infoNames[] =
     return result;
 }
 
-- (void)tearDown
+- (void)cleanup
 {
-    [super tearDown];
     NSLog(@"Transcript:\n\n%@", self.transcript);
     self.buffer = nil;
     self.transcript = nil;
     self.response = nil;
     self.error = nil;
+}
+
+- (void)tearDown
+{
+    [self cleanup];
+    [super tearDown];
 }
 
 @end
