@@ -286,7 +286,7 @@ static NSUInteger gLastIteration = 1;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:ftpUploadFolder];
         [request setHTTPMethod:@"HEAD"];
         [request curl_setCreateIntermediateDirectories:YES];
-        [request curl_setPostTransferCommands:@[@"CHMOD 0777 Upload.txt"]];
+        [request curl_setPostTransferCommands:@[@"SITE CHMOD 0777 Upload.txt"]];
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
 
