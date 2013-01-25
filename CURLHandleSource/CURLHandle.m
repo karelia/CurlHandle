@@ -693,6 +693,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)finish;
 {
+    [self notifyDelegateOfResponseIfNeeded];
+    
     if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
     {
         CURLHandleLog(@"handle %@ finished", self);
@@ -776,7 +778,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         [_headerBuffer setLength:0];
         
         long code;
-        if (curl_easy_getinfo(_curl, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
+        if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK)
         {
             char *urlBuffer;
             if (curl_easy_getinfo(_curl, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
