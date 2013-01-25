@@ -325,11 +325,7 @@ static NSUInteger gLastIteration = 1;
 
         STAssertNil(self.error, @"got error %@", self.error);
         STAssertNotNil(self.response, @"got unexpected response %@", self.response);
-
-        NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
-        BOOL result = [reply isEqualToString:@"test"];
-        STAssertTrue(result, @"reply didn't match: was:'%@' should have been:'%@'", reply, @"test");
-        [reply release];
+        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
 
         [handle release];
     }
