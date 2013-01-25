@@ -758,50 +758,55 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 		else
 		{
             // Once the body starts arriving, we know we have the full header, so can report that
-            if ([_headerBuffer length])
-            {
-                NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
-                [_headerBuffer setLength:0];
-                
-                long code;
-                if (curl_easy_getinfo(_curl, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
-                {
-                    char *urlBuffer;
-                    if (curl_easy_getinfo(_curl, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
-                    {
-                        NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
-                        if (urlString)
-                        {
-                            NSURL *url = [[NSURL alloc] initWithString:urlString];
-                            if (url)
-                            {
-                                Class responseClass = ([NSHTTPURLResponse instancesRespondToSelector:@selector(initWithURL:statusCode:HTTPVersion:headerFields:)] ? [NSHTTPURLResponse class] : [CURLResponse class]);
-                                
-                                NSURLResponse *response = [[responseClass alloc] initWithURL:url
-                                                                                  statusCode:code
-                                                                                 HTTPVersion:[headerString headerHTTPVersion]
-                                                                                headerFields:[headerString allHTTPHeaderFields]];
-                                
-                                [[self delegate] handle:self didReceiveResponse:response];
-                                [response release];
-                                
-                                [url release];
-                            }
-                            
-                            [urlString release];
-                        }
-                        
-                    }
-                }
-				[headerString release];
-            }
-            
+            [self notifyDelegateOfResponseIfNeeded];
             
             // Report regular body data
 			[[self delegate] handle:self didReceiveData:data];
 		}
 	}
 	return written;
+}
+
+// If a response has been buffered, send that off
+- (void)notifyDelegateOfResponseIfNeeded;
+{
+    if ([_headerBuffer length])
+    {
+        NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
+        [_headerBuffer setLength:0];
+        
+        long code;
+        if (curl_easy_getinfo(_curl, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
+        {
+            char *urlBuffer;
+            if (curl_easy_getinfo(_curl, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
+            {
+                NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
+                if (urlString)
+                {
+                    NSURL *url = [[NSURL alloc] initWithString:urlString];
+                    if (url)
+                    {
+                        Class responseClass = ([NSHTTPURLResponse instancesRespondToSelector:@selector(initWithURL:statusCode:HTTPVersion:headerFields:)] ? [NSHTTPURLResponse class] : [CURLResponse class]);
+                        
+                        NSURLResponse *response = [[responseClass alloc] initWithURL:url
+                                                                          statusCode:code
+                                                                         HTTPVersion:[headerString headerHTTPVersion]
+                                                                        headerFields:[headerString allHTTPHeaderFields]];
+                        
+                        [[self delegate] handle:self didReceiveResponse:response];
+                        [response release];
+                        
+                        [url release];
+                    }
+                    
+                    [urlString release];
+                }
+                
+            }
+        }
+        [headerString release];
+    }
 }
 
 - (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
