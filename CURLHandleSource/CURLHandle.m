@@ -56,8 +56,14 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 #pragma mark - Private Properties
 
-@property (assign, nonatomic) struct curl_slist* httpHeaders;
-@property (assign, nonatomic) struct curl_slist* postQuoteCommands;
+// TODO: Might be worth splitting out a class to manage curl_slists
+@property (readonly, nonatomic) struct curl_slist* httpHeaders;
+- (void)addHttpHeader:(NSString *)header;
+@property (readonly, nonatomic) struct curl_slist* preQuoteCommands;
+- (void)addPreQuoteCommand:(NSString *)command;
+@property (readonly, nonatomic) struct curl_slist* postQuoteCommands;
+- (void)addPostQuoteCommand:(NSString *)command;
+
 @property(nonatomic, readonly) id <CURLHandleDelegate> delegate;
 
 @end
@@ -65,8 +71,26 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 @implementation CURLHandle
 
+#pragma mark curl_slist Accessor Methods
+
 @synthesize httpHeaders = _httpHeaders;
+- (void)addHttpHeader:(NSString *)header;
+{
+    _httpHeaders = curl_slist_append(_httpHeaders, [header UTF8String]);
+}
+
+@synthesize preQuoteCommands = _preQuoteCommands;
+- (void)addPreQuoteCommand:(NSString *)command;
+{
+    _preQuoteCommands = curl_slist_append(_preQuoteCommands, [command UTF8String]);
+}
+
 @synthesize postQuoteCommands = _postQuoteCommands;
+- (void)addPostQuoteCommand:(NSString *)command;
+{
+    _postQuoteCommands = curl_slist_append(_postQuoteCommands, [command UTF8String]);
+}
+
 
 /*"	CURLHandle is a wrapper around a CURL.
 	This is in the public domain, but please report any improvements back to the author
@@ -429,7 +453,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             else
             {
                 NSString *pair = [NSString stringWithFormat:@"%@: %@",aHeaderField,theValue];
-                self.httpHeaders = curl_slist_append( self.httpHeaders, [pair UTF8String] );
+                [self addHttpHeader:pair];
             }
         }
         LOAD_REQUEST_SET_OPTION(CURLOPT_HTTPHEADER, self.httpHeaders);
@@ -477,17 +501,17 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     // Pre-quote
     for (NSString *aCommand in [request curl_preTransferCommands])
     {
-        _preQuoteCommands = curl_slist_append(_preQuoteCommands, [aCommand UTF8String]);
+        [self addPreQuoteCommand:aCommand];
     }
-    if (_preQuoteCommands)
+    if (self.preQuoteCommands)
     {
-        LOAD_REQUEST_SET_OPTION(CURLOPT_PREQUOTE, _preQuoteCommands);
+        LOAD_REQUEST_SET_OPTION(CURLOPT_PREQUOTE, self.preQuoteCommands);
     }
 
     // Post-quote
     for (NSString *aCommand in [request curl_postTransferCommands])
     {
-        self.postQuoteCommands = curl_slist_append(self.postQuoteCommands, [aCommand UTF8String]);
+        [self addPostQuoteCommand:aCommand];
     }
     if (self.postQuoteCommands)
     {
@@ -641,22 +665,22 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         [_uploadStream close];
     }
 
-    if (self.httpHeaders)
+    if (_httpHeaders)
     {
-        curl_slist_free_all(self.httpHeaders);
-        self.httpHeaders = nil;
+        curl_slist_free_all(_httpHeaders);
+        _httpHeaders = NULL;
     }
     
     if (_preQuoteCommands)
     {
         curl_slist_free_all(_preQuoteCommands);
-        _preQuoteCommands = nil;
+        _preQuoteCommands = NULL;
     }
 
-    if (self.postQuoteCommands)
+    if (_postQuoteCommands)
     {
-        curl_slist_free_all(self.postQuoteCommands);
-        self.postQuoteCommands = nil;
+        curl_slist_free_all(_postQuoteCommands);
+        _postQuoteCommands = NULL;
     }
 
     _executing = NO;
