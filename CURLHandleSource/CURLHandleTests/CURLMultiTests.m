@@ -107,7 +107,7 @@
 
         STAssertTrue(self.sending, @"should have set sending flag");
         STAssertNil(self.error, @"got error %@", self.error);
-        STAssertNil(self.response, @"got unexpected response %@", self.response);
+        STAssertNotNil(self.response, @"expected response");
         STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
         
         [handle release];

@@ -47,7 +47,7 @@
 }
 
 static NSUInteger gIteration = 0;
-static const NSUInteger kIterationToUseCustomMulti = 1;
+static const NSUInteger kIterationToUseCustomMulti = 0;
 
 - (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
@@ -65,7 +65,7 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
 {
-    return 2;
+    return 1;
 }
 
 - (NSString*)name
@@ -150,7 +150,7 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
     STAssertNil(self.error, @"got error %@", self.error);
 
     NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
-    STAssertTrue([response isMemberOfClass:[NSHTTPURLResponse class]], @"got response of class %@", [NSHTTPURLResponse class]);
+    STAssertTrue([response isMemberOfClass:[NSHTTPURLResponse class]], @"got response of class %@", [response class]);
     STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
     STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
 

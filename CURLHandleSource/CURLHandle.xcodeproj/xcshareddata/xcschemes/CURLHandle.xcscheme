@@ -39,16 +39,7 @@
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "KMSTestCase">
-               </Test>
-               <Test
-                  Identifier = "CURLHandleBasedTest">
-               </Test>
-               <Test
-                  Identifier = "CURLMultiTests">
-               </Test>
-               <Test
-                  Identifier = "CURLProtocolTests">
+                  Identifier = "CURLHandleTests">
                </Test>
             </SkippedTests>
          </TestableReference>
