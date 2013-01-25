@@ -657,11 +657,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     if (code == CURLM_OK)
     {
-        if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
-        {
-            CURLHandleLog(@"handle %@ finished", self);
-            [self.delegate handleDidFinish:self];
-        }
+        [self finish];
     }
     else if (code == CURLM_CANCELLED)
     {
@@ -684,11 +680,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     if (code == CURLE_OK)
     {
-        if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
-        {
-            CURLHandleLog(@"handle %@ finished", self);
-            [self.delegate handleDidFinish:self];
-        }
+        [self finish];
     }
     else
     {
@@ -697,6 +689,15 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     [self cleanup];
     _delegate = nil;
+}
+
+- (void)finish;
+{
+    if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
+    {
+        CURLHandleLog(@"handle %@ finished", self);
+        [self.delegate handleDidFinish:self];
+    }
 }
 
 - (void)failWithCode:(int)code isMulti:(BOOL)isMultiCode;
