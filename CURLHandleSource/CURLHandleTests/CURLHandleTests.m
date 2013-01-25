@@ -35,7 +35,7 @@
     [super dealloc];
 }
 
-- (void)tearDown
+- (void)cleanup
 {
     if (self.useCustomMulti)
     {
@@ -43,34 +43,34 @@
         self.multi = nil;
     }
 
-    [super tearDown];
+    [super cleanup];
 }
 
-static NSUInteger gLastIteration = 1;
+static NSUInteger gIteration = 0;
 
 - (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
-    if (iteration == 1)
-    {
-        [self tearDown];
-        [self setUp];
-    }
-
     NSLog(@"\n\nIteration #%ld\n\n", iteration);
 
-    self.useCustomMulti = iteration > 0;
-    gLastIteration = iteration;
+    self.useCustomMulti = iteration == 0;
+}
+
+- (void)afterTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
+{
+    [self cleanup];
+    [self cleanupServer];
+    gIteration++;
 }
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
 {
-    return 2;
+    return 1;
 }
 
 - (NSString*)name
 {
     NSString* result = [super name];
-    if (gLastIteration == 0)
+    if (gIteration == 0)
     {
         NSRange range = [result rangeOfString:@" "];
         result = [NSString stringWithFormat:@"%@WithCustomMulti %@", [result substringToIndex:range.location], [result substringFromIndex:range.location + 1]];
@@ -147,8 +147,11 @@ static NSUInteger gLastIteration = 1;
 
     STAssertTrue(self.sending, @"should have set sending flag");
     STAssertNil(self.error, @"got error %@", self.error);
-    STAssertNil(self.response, @"got unexpected response %@", self.response);
-    STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+
+    NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
+    STAssertTrue([response isMemberOfClass:[NSHTTPURLResponse class]], @"got response of class %@", [NSHTTPURLResponse class]);
+    STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
+    STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
 
     [handle release];
 }
@@ -257,11 +260,7 @@ static NSUInteger gLastIteration = 1;
 
         STAssertNil(self.error, @"got error %@", self.error);
         STAssertNotNil(self.response, @"got unexpected response %@", self.response);
-
-        NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
-        BOOL result = [reply isEqualToString:@""];
-        STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
-        [reply release];
+        STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
 
         [handle release];
 
@@ -327,7 +326,7 @@ static NSUInteger gLastIteration = 1;
 
         STAssertNil(self.error, @"got error %@", self.error);
         STAssertNotNil(self.response, @"got unexpected response %@", self.response);
-        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+        STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
 
         [handle release];
     }
