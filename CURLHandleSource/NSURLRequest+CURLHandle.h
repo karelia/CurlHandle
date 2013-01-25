@@ -14,8 +14,10 @@
 
 @property(nonatomic, readonly) BOOL curl_shouldVerifySSLCertificate;    // CURLOPT_SSL_VERIFYPEER
 
-// An array of strings. Executed in turn once the main request is done
+// An array of strings. Executed in turn before/after the main request is done
+// NOTE: We have seen crashes (mishandling of buffers) when using post-transfer commands for a request that doesn't actually do a transfer. This may be a bug in libcurl; we don't know yet!
 @property(nonatomic, copy, readonly) NSArray *curl_postTransferCommands;
+@property(nonatomic, copy, readonly) NSArray *curl_preTransferCommands;
 
 // A value greater than 0 will cause Curl to create missing directories. I'm pretty certain this only applies when uploading
 // Default is 0
@@ -36,8 +38,10 @@
 
 - (void)curl_setDesiredSSLLevel:(curl_usessl)level;
 - (void)curl_setShouldVerifySSLCertificate:(BOOL)verify;
-- (void)curl_setPostTransferCommands:(NSArray *)postTransferCommands;
 - (void)curl_setCreateIntermediateDirectories:(NSUInteger)createIntermediateDirectories;
+
+- (void)curl_setPreTransferCommands:(NSArray *)commands;
+- (void)curl_setPostTransferCommands:(NSArray *)commands;
 
 - (void)curl_setNewFilePermissions:(NSNumber *)permissions;
 - (void)curl_setNewDirectoryPermissions:(NSNumber *)permissions;

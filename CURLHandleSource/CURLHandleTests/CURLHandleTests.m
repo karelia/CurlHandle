@@ -253,7 +253,7 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:ftpUploadFolder];
         [request setHTTPMethod:@"HEAD"];
         [request curl_setCreateIntermediateDirectories:YES];
-        [request curl_setPostTransferCommands:@[@"DELE Upload.txt"]];
+        [request curl_setPreTransferCommands:@[@"DELE Upload.txt"]];
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
 
@@ -286,7 +286,7 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:ftpUploadFolder];
         [request setHTTPMethod:@"HEAD"];
         [request curl_setCreateIntermediateDirectories:YES];
-        [request curl_setPostTransferCommands:@[@"SITE CHMOD 0777 Upload.txt"]];
+        [request curl_setPreTransferCommands:@[@"SITE CHMOD 0777 Upload.txt"]];
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
 
@@ -319,7 +319,7 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:ftpDirectory];
         [request setHTTPMethod:@"HEAD"];
         [request curl_setCreateIntermediateDirectories:YES];
-        [request curl_setPostTransferCommands:@[@"MKD Subdirectory"]];
+        [request curl_setPreTransferCommands:@[@"MKD Subdirectory"]];
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
 
