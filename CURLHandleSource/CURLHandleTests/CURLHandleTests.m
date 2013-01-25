@@ -55,7 +55,9 @@ static NSUInteger gLastIteration = 1;
         [self tearDown];
         [self setUp];
     }
-    
+
+    NSLog(@"\n\nIteration #%ld\n\n", iteration);
+
     self.useCustomMulti = iteration > 0;
     gLastIteration = iteration;
 }
