@@ -309,7 +309,7 @@ static NSUInteger gLastIteration = 1;
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
     {
-        NSURL* ftpDirectory = [ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"];
+        NSURL* ftpDirectory = [ftpRoot URLByAppendingPathComponent:@"CURLHandleTests/"];
 
         // Navigate to the directory
         // @"HEAD" => CURLOPT_NOBODY, which stops libcurl from trying to list the directory's contents
