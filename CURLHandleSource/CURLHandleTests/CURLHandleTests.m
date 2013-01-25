@@ -46,14 +46,29 @@
     [super tearDown];
 }
 
+static NSUInteger gLastIteration = 1;
+
 - (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
     self.useCustomMulti = iteration > 0;
+    gLastIteration = iteration;
 }
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
 {
     return 2;
+}
+
+- (NSString*)name
+{
+    NSString* result = [super name];
+    if (gLastIteration == 0)
+    {
+        NSRange range = [result rangeOfString:@" "];
+        result = [NSString stringWithFormat:@"%@WithCustomMulti %@", [result substringToIndex:range.location], [result substringFromIndex:range.location + 1]];
+    }
+
+    return result;
 }
 
 - (CURLHandle*)makeHandleWithRequest:(NSURLRequest*)request
