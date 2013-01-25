@@ -5,6 +5,11 @@
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
+// Each test here is run twice.
+// - Once, using the default [CURLMulti sharedInstance] multi: this is potentially dubious because the state of the multi is retained across tests. However,
+//   it's also how things are in the real world.
+// - Once, using a custom CURLMulti instance for each test: this makes each test more isolated, although libcurl is probably still caching things.
+
 #import "CURLHandleBasedTest.h"
 #import "CURLMulti.h"
 
@@ -301,8 +306,8 @@
         STAssertNotNil(self.response, @"got unexpected response %@", self.response);
 
         NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
-        BOOL result = [reply isEqualToString:@""];
-        STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
+        BOOL result = [reply isEqualToString:@"test"];
+        STAssertTrue(result, @"reply didn't match: was:'%@' should have been:'%@'", reply, @"test");
         [reply release];
 
         [handle release];
