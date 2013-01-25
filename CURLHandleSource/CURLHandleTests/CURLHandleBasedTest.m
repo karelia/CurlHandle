@@ -173,5 +173,10 @@ const NSString *const infoNames[] =
 {
     [super tearDown];
     NSLog(@"Transcript:\n\n%@", self.transcript);
+    self.buffer = nil;
+    self.transcript = nil;
+    self.response = nil;
+    self.error = nil;
 }
+
 @end
