@@ -6,20 +6,112 @@
 //
 
 #import "CURLHandleBasedTest.h"
+#import "CURLMulti.h"
+
 #import "NSURLRequest+CURLHandle.h"
 
+@interface CURLHandle(TestingOnly)
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
+@end
+
 @interface CURLHandleTests : CURLHandleBasedTest
+
+@property (strong, nonatomic) CURLMulti* multi;
+@property (assign, nonatomic) BOOL useCustomMulti;
 
 @end
 
 @implementation CURLHandleTests
+
+static BOOL gUseCustomMulti = NO;
+
+// --------------------------------------------------------------------------
+//! We make two sets of tests - one that use a custom multi, and
+//! one that use the default one.
+// --------------------------------------------------------------------------
+
++ (id) defaultTestSuite
+{
+    SenTestSuite* result = [[SenTestSuite alloc] initWithName:NSStringFromClass(self)];
+
+    gUseCustomMulti = YES;
+    SenTestSuite* customMulti = [[SenTestSuite alloc] initWithName:@"WithCustomMulti"];
+    [customMulti addTest:[super defaultTestSuite]];
+    [result addTest:customMulti];
+    [customMulti release];
+
+    gUseCustomMulti = NO;
+    SenTestSuite* globalMulti = [[SenTestSuite alloc] initWithName:@"WithGlobalMulti"];
+    [globalMulti addTest:[super defaultTestSuite]];
+    [result addTest:globalMulti];
+    [globalMulti release];
+
+    return [result autorelease];
+}
+
+- (id) initWithInvocation:(NSInvocation *) anInvocation;
+{
+    if ((self = [super initWithInvocation:anInvocation]) != nil)
+    {
+        self.useCustomMulti = gUseCustomMulti;
+    }
+
+    return self;
+}
+
+- (void)dealloc
+{
+    [_multi release];
+
+    [super dealloc];
+}
+
+- (void)tearDown
+{
+    if (self.useCustomMulti)
+    {
+        [self.multi shutdown];
+        self.multi = nil;
+    }
+
+    [super tearDown];
+}
+
+- (NSString*)name
+{
+    NSString* result = [super name];
+    if (self.useCustomMulti)
+    {
+        NSRange range = [result rangeOfString:@" "];
+        result = [NSString stringWithFormat:@"%@WithCustomMulti %@", [result substringToIndex:range.location], [result substringFromIndex:range.location + 1]];
+    }
+
+    return result;
+}
+
+- (CURLHandle*)makeHandleWithRequest:(NSURLRequest*)request
+{
+    if (self.useCustomMulti)
+    {
+        self.multi = [[[CURLMulti alloc] init] autorelease];
+        [self.multi startup];
+    }
+    else
+    {
+        self.multi = [CURLMulti sharedInstance];
+    }
+
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:self.multi];
+
+    return handle;
+}
 
 - (CURLHandle*)newDownloadWithRoot:(NSURL*)ftpRoot
 {
     NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
+    CURLHandle* handle = [self makeHandleWithRequest:request];
 
     return handle;
 }
@@ -47,7 +139,7 @@
     request.shouldUseCurlHandle = YES;
     [request curl_setCreateIntermediateDirectories:1];
     [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
+    CURLHandle* handle = [self makeHandleWithRequest:request];
 
     return handle;
 }
@@ -77,7 +169,7 @@
 - (void)testHTTPDownload
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self];
+    CURLHandle* handle = [self makeHandleWithRequest:request];
 
     [self runUntilPaused];
 
@@ -145,6 +237,111 @@
         {
             [handle release];
         }
+    }
+}
+
+- (void)testFTPUploadThenDelete
+{
+    NSURL* ftpRoot = [self ftpTestServer];
+    if (ftpRoot)
+    {
+        NSURL* ftpUploadFolder = [ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"];
+        [self doFTPUploadWithRoot:ftpRoot];
+
+        self.response = nil;
+        [self.buffer setLength:0];
+
+        // Navigate to the directory
+        // @"HEAD" => CURLOPT_NOBODY, which stops libcurl from trying to list the directory's contents
+        // If the connection is already at that directory then curl wisely does nothing
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:ftpUploadFolder];
+        [request setHTTPMethod:@"HEAD"];
+        [request curl_setCreateIntermediateDirectories:YES];
+        [request curl_setPostTransferCommands:@[@"DELE Upload.txt"]];
+
+        CURLHandle* handle = [self makeHandleWithRequest:request];
+
+        [self runUntilPaused];
+
+        STAssertNil(self.error, @"got error %@", self.error);
+        STAssertNotNil(self.response, @"got unexpected response %@", self.response);
+
+        NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
+        BOOL result = [reply isEqualToString:@""];
+        STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
+        [reply release];
+
+        [handle release];
+
+
+    }
+}
+
+- (void)testFTPUploadThenChangePermissions
+{
+    NSURL* ftpRoot = [self ftpTestServer];
+    if (ftpRoot)
+    {
+        NSURL* ftpUploadFolder = [ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"];
+        [self doFTPUploadWithRoot:ftpRoot];
+
+        self.response = nil;
+        [self.buffer setLength:0];
+
+        // Navigate to the directory
+        // @"HEAD" => CURLOPT_NOBODY, which stops libcurl from trying to list the directory's contents
+        // If the connection is already at that directory then curl wisely does nothing
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:ftpUploadFolder];
+        [request setHTTPMethod:@"HEAD"];
+        [request curl_setCreateIntermediateDirectories:YES];
+        [request curl_setPostTransferCommands:@[@"CHMOD 0777 Upload.txt"]];
+
+        CURLHandle* handle = [self makeHandleWithRequest:request];
+
+        [self runUntilPaused];
+
+        STAssertNil(self.error, @"got error %@", self.error);
+        STAssertNotNil(self.response, @"got unexpected response %@", self.response);
+
+        NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
+        BOOL result = [reply isEqualToString:@""];
+        STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
+        [reply release];
+        
+        [handle release];
+        
+        
+    }
+}
+
+- (void)testFTPMakeDirectory
+{
+    NSURL* ftpRoot = [self ftpTestServer];
+    if (ftpRoot)
+    {
+        NSURL* ftpDirectory = [ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"];
+
+        // Navigate to the directory
+        // @"HEAD" => CURLOPT_NOBODY, which stops libcurl from trying to list the directory's contents
+        // If the connection is already at that directory then curl wisely does nothing
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:ftpDirectory];
+        [request setHTTPMethod:@"HEAD"];
+        [request curl_setCreateIntermediateDirectories:YES];
+        [request curl_setPostTransferCommands:@[@"MKD Subdirectory"]];
+
+        CURLHandle* handle = [self makeHandleWithRequest:request];
+
+        [self runUntilPaused];
+
+        STAssertNil(self.error, @"got error %@", self.error);
+        STAssertNotNil(self.response, @"got unexpected response %@", self.response);
+
+        NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
+        BOOL result = [reply isEqualToString:@""];
+        STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
+        [reply release];
+
+        [handle release];
     }
 }
 

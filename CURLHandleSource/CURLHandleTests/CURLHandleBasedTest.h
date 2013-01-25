@@ -19,6 +19,7 @@
 @property (assign, atomic) NSUInteger finishedCount;
 @property (strong, nonatomic) NSURLResponse* response;
 @property (assign, nonatomic) BOOL sending;
+@property (strong, nonatomic) NSMutableString* transcript;
 
 - (BOOL)checkDownloadedBufferWasCorrect;
 - (void)runUntilPaused;

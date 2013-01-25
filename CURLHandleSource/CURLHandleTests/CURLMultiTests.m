@@ -79,8 +79,6 @@
 
     [multi shutdown];
 
-    //    [self stopServer];
-
     [multi release];
 }
 

@@ -44,6 +44,30 @@
                <Test
                   Identifier = "CURLHandleBasedTest">
                </Test>
+               <Test
+                  Identifier = "CURLMultiTests">
+               </Test>
+               <Test
+                  Identifier = "CURLProtocolTests">
+               </Test>
+               <Test
+                  Identifier = "CURLHandleTests/testFTPDownload">
+               </Test>
+               <Test
+                  Identifier = "CURLHandleTests/testFTPThrashInParallel">
+               </Test>
+               <Test
+                  Identifier = "CURLHandleTests/testFTPThrashInSeries">
+               </Test>
+               <Test
+                  Identifier = "CURLHandleTests/testFTPUpload">
+               </Test>
+               <Test
+                  Identifier = "CURLHandleTests/testHTTPDownload">
+               </Test>
+               <Test
+                  Identifier = "CURLHandleTests/testVersion">
+               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>
