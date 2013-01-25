@@ -32,6 +32,7 @@ enum { CURLM_CANCELLED = -2 };
     BOOL                    _executing;                     // debugging
 	NSMutableData           *_headerBuffer;                 /*" The buffer that is filled with data from the header as the download progresses; it's appended to one line at a time. "*/
     struct curl_slist       *_httpHeaders;
+    struct curl_slist       *_preQuoteCommands;
     struct curl_slist       *_postQuoteCommands;
 	NSDictionary            *_proxies;                      /*" Dictionary of proxy information; it's released when the handle is deallocated since it's needed for the transfer."*/
     NSInputStream           *_uploadStream;

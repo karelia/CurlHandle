@@ -22,6 +22,11 @@ static NSString *const UseCurlHandleKey = @"useCurlHandle";
     return (result ? [result boolValue] : YES);
 }
 
+- (NSArray *)curl_preTransferCommands;
+{
+    return [NSURLProtocol propertyForKey:@"curl_preTransferCommands" inRequest:self];
+}
+
 - (NSArray *)curl_postTransferCommands;
 {
     return [NSURLProtocol propertyForKey:@"curl_postTransferCommands" inRequest:self];
@@ -51,6 +56,25 @@ static NSString *const UseCurlHandleKey = @"useCurlHandle";
     [NSURLProtocol setProperty:[NSNumber numberWithBool:verify] forKey:@"curl_shouldVerifySSLCertificate" inRequest:self];
 }
 
+- (void)curl_setCreateIntermediateDirectories:(NSUInteger)value;
+{
+    [NSURLProtocol setProperty:[NSNumber numberWithUnsignedInteger:value] forKey:@"curl_createIntermediateDirectories" inRequest:self];
+}
+
+- (void)curl_setPreTransferCommands:(NSArray *)commands;
+{
+    if (commands)
+    {
+        commands = [commands copy];
+        [NSURLProtocol setProperty:commands forKey:@"curl_preTransferCommands" inRequest:self];
+        [commands release];
+    }
+    else
+    {
+        [NSURLProtocol removePropertyForKey:@"curl_preTransferCommands" inRequest:self];
+    }
+}
+
 - (void)curl_setPostTransferCommands:(NSArray *)commands;
 {
     if (commands)
@@ -63,11 +87,6 @@ static NSString *const UseCurlHandleKey = @"useCurlHandle";
     {
         [NSURLProtocol removePropertyForKey:@"curl_postTransferCommands" inRequest:self];
     }
-}
-
-- (void)curl_setCreateIntermediateDirectories:(NSUInteger)value;
-{
-    [NSURLProtocol setProperty:[NSNumber numberWithUnsignedInteger:value] forKey:@"curl_createIntermediateDirectories" inRequest:self];
 }
 
 - (void)curl_setNewFilePermissions:(NSNumber *)permissions;

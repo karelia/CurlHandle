@@ -477,6 +477,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (permissions) LOAD_REQUEST_SET_OPTION(CURLOPT_NEW_DIRECTORY_PERMS, [permissions longValue]);
     
 
+    // Pre-quote
+    for (NSString *aCommand in [request curl_preTransferCommands])
+    {
+        _preQuoteCommands = curl_slist_append(_preQuoteCommands, [aCommand UTF8String]);
+    }
+    if (_preQuoteCommands)
+    {
+        LOAD_REQUEST_SET_OPTION(CURLOPT_PREQUOTE, _preQuoteCommands);
+    }
+
     // Post-quote
     for (NSString *aCommand in [request curl_postTransferCommands])
     {
@@ -486,7 +496,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         LOAD_REQUEST_SET_OPTION(CURLOPT_POSTQUOTE, self.postQuoteCommands);
     }
-
+    
+    
     // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
     LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_USE_EPSV, 0);
 
@@ -637,6 +648,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         curl_slist_free_all(self.httpHeaders);
         self.httpHeaders = nil;
+    }
+    
+    if (_preQuoteCommands)
+    {
+        curl_slist_free_all(_preQuoteCommands);
+        _preQuoteCommands = nil;
     }
 
     if (self.postQuoteCommands)
