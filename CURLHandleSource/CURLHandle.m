@@ -253,9 +253,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     _cancelled = NO;
 
-    self.httpHeaders = NULL;
-    self.postQuoteCommands = NULL;
-
     curl_easy_reset([self curl]);
 
     CURLcode code = CURLE_OK;
