@@ -23,42 +23,6 @@
 
 @implementation CURLHandleTests
 
-static BOOL gUseCustomMulti = NO;
-
-// --------------------------------------------------------------------------
-//! We make two sets of tests - one that use a custom multi, and
-//! one that use the default one.
-// --------------------------------------------------------------------------
-
-+ (id) defaultTestSuite
-{
-    SenTestSuite* result = [[SenTestSuite alloc] initWithName:NSStringFromClass(self)];
-
-    gUseCustomMulti = YES;
-    SenTestSuite* customMulti = [[SenTestSuite alloc] initWithName:@"WithCustomMulti"];
-    [customMulti addTest:[super defaultTestSuite]];
-    [result addTest:customMulti];
-    [customMulti release];
-
-    gUseCustomMulti = NO;
-    SenTestSuite* globalMulti = [[SenTestSuite alloc] initWithName:@"WithGlobalMulti"];
-    [globalMulti addTest:[super defaultTestSuite]];
-    [result addTest:globalMulti];
-    [globalMulti release];
-
-    return [result autorelease];
-}
-
-- (id) initWithInvocation:(NSInvocation *) anInvocation;
-{
-    if ((self = [super initWithInvocation:anInvocation]) != nil)
-    {
-        self.useCustomMulti = gUseCustomMulti;
-    }
-
-    return self;
-}
-
 - (void)dealloc
 {
     [_multi release];
@@ -77,27 +41,27 @@ static BOOL gUseCustomMulti = NO;
     [super tearDown];
 }
 
-- (NSString*)name
+- (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
-    NSString* result = [super name];
-    if (self.useCustomMulti)
-    {
-        NSRange range = [result rangeOfString:@" "];
-        result = [NSString stringWithFormat:@"%@WithCustomMulti %@", [result substringToIndex:range.location], [result substringFromIndex:range.location + 1]];
-    }
+    self.useCustomMulti = iteration > 0;
+}
 
-    return result;
+- (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
+{
+    return 2;
 }
 
 - (CURLHandle*)makeHandleWithRequest:(NSURLRequest*)request
 {
     if (self.useCustomMulti)
     {
+        NSLog(@"Using custom multi");
         self.multi = [[[CURLMulti alloc] init] autorelease];
         [self.multi startup];
     }
     else
     {
+        NSLog(@"Using default shared multi");
         self.multi = [CURLMulti sharedInstance];
     }
 
