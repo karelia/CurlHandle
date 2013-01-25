@@ -47,12 +47,13 @@
 }
 
 static NSUInteger gIteration = 0;
+static const NSUInteger kIterationToUseCustomMulti = 1;
 
 - (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
     NSLog(@"\n\nIteration #%ld\n\n", iteration);
 
-    self.useCustomMulti = iteration == 0;
+    self.useCustomMulti = iteration == kIterationToUseCustomMulti;
 }
 
 - (void)afterTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
@@ -64,13 +65,13 @@ static NSUInteger gIteration = 0;
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
 {
-    return 1;
+    return 2;
 }
 
 - (NSString*)name
 {
     NSString* result = [super name];
-    if (gIteration == 0)
+    if (gIteration == kIterationToUseCustomMulti)
     {
         NSRange range = [result rangeOfString:@" "];
         result = [NSString stringWithFormat:@"%@WithCustomMulti %@", [result substringToIndex:range.location], [result substringFromIndex:range.location + 1]];
