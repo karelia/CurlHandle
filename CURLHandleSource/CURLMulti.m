@@ -357,7 +357,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)createQueue
 {
-    self.queue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
+    NSString* name = [NSString stringWithFormat:@"com.karelia.CURLMulti.%p", self];
+    self.queue = dispatch_queue_create([name UTF8String], NULL);
 }
 
 - (void)releaseQueue
