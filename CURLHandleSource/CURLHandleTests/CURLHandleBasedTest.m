@@ -153,7 +153,7 @@ const NSString *const infoNames[] =
     NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleFTPTestURL"];
     if ([ftpTest isEqualToString:@"MockServer"])
     {
-        [self setupServerWithScheme:@"ftp" responses:@"ftp"];
+        [self setupServerWithResponseFileNamed:@"ftp"];
 
         NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
         self.server.data = [NSData dataWithContentsOfURL:devNotesURL];
