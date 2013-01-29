@@ -358,7 +358,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)createQueue
 {
     self.queue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
-    dispatch_set_target_queue(self.queue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
 }
 
 - (void)releaseQueue
