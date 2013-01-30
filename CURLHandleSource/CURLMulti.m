@@ -357,8 +357,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)createQueue
 {
-    self.queue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
-    dispatch_set_target_queue(self.queue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
+    NSString* name = [NSString stringWithFormat:@"com.karelia.CURLMulti.%p", self];
+    self.queue = dispatch_queue_create([name UTF8String], NULL);
 }
 
 - (void)releaseQueue
@@ -381,7 +381,16 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
 
     dispatch_source_set_event_handler(self.timer, ^{
-        [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
+#ifdef REDISPATCH_SOURCE_EVENT_TO_QUEUE
+        if (self.queue)
+        {
+            dispatch_async(self.queue, ^{
+#endif
+                [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
+#ifdef REDISPATCH_SOURCE_EVENT_TO_QUEUE
+            });
+        }
+#endif
     });
 
     dispatch_source_set_cancel_handler(self.timer, ^{
@@ -431,8 +440,17 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             source = dispatch_source_create(type, socket, 0, self.queue);
 
             dispatch_source_set_event_handler(source, ^{
-                    int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
-                    [self multiProcessAction:action forSocket:socket];
+#if REDISPATCH_SOURCE_EVENT_TO_QUEUE
+                if (self.queue)
+                {
+                    dispatch_async(self.queue, ^{
+#endif
+                        int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
+                        [self multiProcessAction:action forSocket:socket];
+#if REDISPATCH_SOURCE_EVENT_TO_QUEUE
+                    });
+                }
+#endif
             });
 
             dispatch_source_set_cancel_handler(source, ^{

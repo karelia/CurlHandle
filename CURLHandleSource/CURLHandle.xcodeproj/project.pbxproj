@@ -127,6 +127,12 @@
 		22731039161305FF00D6D49E /* CURLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22731037161305FF00D6D49E /* CURLSocket.m */; };
 		22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */; };
 		22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */; };
+		2287EBF116B7CF9A0039E555 /* KMSCloseCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBE616B7CF9A0039E555 /* KMSCloseCommand.m */; };
+		2287EBF216B7CF9A0039E555 /* KMSCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBE816B7CF9A0039E555 /* KMSCommand.m */; };
+		2287EBF316B7CF9A0039E555 /* KMSPauseCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBEA16B7CF9A0039E555 /* KMSPauseCommand.m */; };
+		2287EBF416B7CF9A0039E555 /* KMSSendDataCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBEC16B7CF9A0039E555 /* KMSSendDataCommand.m */; };
+		2287EBF516B7CF9A0039E555 /* KMSSendServerDataCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBEE16B7CF9A0039E555 /* KMSSendServerDataCommand.m */; };
+		2287EBF616B7CF9A0039E555 /* KMSSendStringCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBF016B7CF9A0039E555 /* KMSSendStringCommand.m */; };
 		229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */; };
 		22BCCE3016ADD63500DFFE8D /* libssh2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
 		22BCCE3316ADD66900DFFE8D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
@@ -270,6 +276,18 @@
 		22731037161305FF00D6D49E /* CURLSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLSocket.m; sourceTree = "<group>"; };
 		22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+CURLHandle.h"; sourceTree = "<group>"; };
 		22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+CURLHandle.m"; sourceTree = "<group>"; };
+		2287EBE516B7CF9A0039E555 /* KMSCloseCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSCloseCommand.h; sourceTree = "<group>"; };
+		2287EBE616B7CF9A0039E555 /* KMSCloseCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSCloseCommand.m; sourceTree = "<group>"; };
+		2287EBE716B7CF9A0039E555 /* KMSCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSCommand.h; sourceTree = "<group>"; };
+		2287EBE816B7CF9A0039E555 /* KMSCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSCommand.m; sourceTree = "<group>"; };
+		2287EBE916B7CF9A0039E555 /* KMSPauseCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSPauseCommand.h; sourceTree = "<group>"; };
+		2287EBEA16B7CF9A0039E555 /* KMSPauseCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSPauseCommand.m; sourceTree = "<group>"; };
+		2287EBEB16B7CF9A0039E555 /* KMSSendDataCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSSendDataCommand.h; sourceTree = "<group>"; };
+		2287EBEC16B7CF9A0039E555 /* KMSSendDataCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSSendDataCommand.m; sourceTree = "<group>"; };
+		2287EBED16B7CF9A0039E555 /* KMSSendServerDataCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSSendServerDataCommand.h; sourceTree = "<group>"; };
+		2287EBEE16B7CF9A0039E555 /* KMSSendServerDataCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSSendServerDataCommand.m; sourceTree = "<group>"; };
+		2287EBEF16B7CF9A0039E555 /* KMSSendStringCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMSSendStringCommand.h; sourceTree = "<group>"; };
+		2287EBF016B7CF9A0039E555 /* KMSSendStringCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMSSendStringCommand.m; sourceTree = "<group>"; };
 		229748FA1610C1AE0042A51A /* CURLHandleBasedTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLHandleBasedTest.h; sourceTree = "<group>"; };
 		229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleBasedTest.m; sourceTree = "<group>"; };
 		22BCCE2716ADD53000DFFE8D /* libssh2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssh2.dylib; path = ../SFTP/libssh2.dylib; sourceTree = "<group>"; };
@@ -461,17 +479,28 @@
 		22BF085916AEECEC009BE5A3 /* MockServer */ = {
 			isa = PBXGroup;
 			children = (
-				22BF08C216AEEDD8009BE5A3 /* UnitTests */,
+				2287EBE516B7CF9A0039E555 /* KMSCloseCommand.h */,
+				2287EBE616B7CF9A0039E555 /* KMSCloseCommand.m */,
+				2287EBE716B7CF9A0039E555 /* KMSCommand.h */,
+				2287EBE816B7CF9A0039E555 /* KMSCommand.m */,
 				22BF086216AEECEC009BE5A3 /* KMSConnection.h */,
 				22BF086316AEECEC009BE5A3 /* KMSConnection.m */,
 				22BF086416AEECEC009BE5A3 /* KMSListener.h */,
 				22BF086516AEECEC009BE5A3 /* KMSListener.m */,
+				2287EBE916B7CF9A0039E555 /* KMSPauseCommand.h */,
+				2287EBEA16B7CF9A0039E555 /* KMSPauseCommand.m */,
 				22BF086616AEECEC009BE5A3 /* KMSRegExResponder.h */,
 				22BF086716AEECEC009BE5A3 /* KMSRegExResponder.m */,
 				22BF086816AEECEC009BE5A3 /* KMSResponder.h */,
 				22BF086916AEECEC009BE5A3 /* KMSResponder.m */,
 				22BF086A16AEECEC009BE5A3 /* KMSResponseCollection.h */,
 				22BF086B16AEECEC009BE5A3 /* KMSResponseCollection.m */,
+				2287EBEB16B7CF9A0039E555 /* KMSSendDataCommand.h */,
+				2287EBEC16B7CF9A0039E555 /* KMSSendDataCommand.m */,
+				2287EBED16B7CF9A0039E555 /* KMSSendServerDataCommand.h */,
+				2287EBEE16B7CF9A0039E555 /* KMSSendServerDataCommand.m */,
+				2287EBEF16B7CF9A0039E555 /* KMSSendStringCommand.h */,
+				2287EBF016B7CF9A0039E555 /* KMSSendStringCommand.m */,
 				22BF086C16AEECEC009BE5A3 /* KMSServer.h */,
 				22BF086D16AEECEC009BE5A3 /* KMSServer.m */,
 				22BF086E16AEECEC009BE5A3 /* KMSState.h */,
@@ -479,6 +508,7 @@
 				22BF087016AEECEC009BE5A3 /* KMSTestCase.m */,
 				22BF08BF16AEEDA9009BE5A3 /* KMSTranscriptEntry.h */,
 				22BF08C016AEEDA9009BE5A3 /* KMSTranscriptEntry.m */,
+				22BF08C216AEEDD8009BE5A3 /* UnitTests */,
 			);
 			path = MockServer;
 			sourceTree = "<group>";
@@ -843,6 +873,12 @@
 				22BF08A116AEECEC009BE5A3 /* KMSServer.m in Sources */,
 				22BF08A216AEECEC009BE5A3 /* KMSTestCase.m in Sources */,
 				22BF08C116AEEDA9009BE5A3 /* KMSTranscriptEntry.m in Sources */,
+				2287EBF116B7CF9A0039E555 /* KMSCloseCommand.m in Sources */,
+				2287EBF216B7CF9A0039E555 /* KMSCommand.m in Sources */,
+				2287EBF316B7CF9A0039E555 /* KMSPauseCommand.m in Sources */,
+				2287EBF416B7CF9A0039E555 /* KMSSendDataCommand.m in Sources */,
+				2287EBF516B7CF9A0039E555 /* KMSSendServerDataCommand.m in Sources */,
+				2287EBF616B7CF9A0039E555 /* KMSSendStringCommand.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
