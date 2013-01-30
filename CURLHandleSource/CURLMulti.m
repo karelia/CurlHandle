@@ -52,6 +52,15 @@
 
 static int kMaximumTimeoutMilliseconds = 1000;
 
+NSString *const kActionNames[] =
+{
+    @"CURL_SOCKET_TIMEOUT",
+    @"",
+    @"CURL_CSELECT_IN",
+    @"CURL_CSELECT_OUT",
+    @"",
+};
+
 #pragma mark - Callback Prototypes
 
 static int timeout_callback(CURLM *multi, long timeout_ms, void *userp);
@@ -264,9 +273,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     if (multi)
     {
         int running;
+        CURLMultiLog(@"processing for socket %d action %@", socket, kActionNames[action+1]);
         CURLMcode result = curl_multi_socket_action(multi, socket, action, &running);
         if (result == CURLM_OK)
         {
+            CURLMultiLog(@"%d handles reported as running", running);
             CURLMsg* message;
             int count;
             while ((message = curl_multi_info_read(multi, &count)) != NULL)
@@ -398,6 +409,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             NSAssert(self.queue != nil, @"should still have queue");
             dispatch_async(self.queue, ^{
 #endif
+                CURLMultiLog(@"timer fired");
                 [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
 #ifdef REDISPATCH_SOURCE_EVENT_TO_QUEUE
             });

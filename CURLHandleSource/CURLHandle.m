@@ -29,7 +29,7 @@ NSString * const CURLSHcodeErrorDomain = @"se.haxx.curl.libcurl.CURLSHcode";
 
 NSString *const kInfoNames[] =
 {
-    @"TEXT",
+    @"DEBUG",
     @"HEADER_IN",
     @"HEADER_OUT",
     @"DATA_IN",
@@ -1027,7 +1027,7 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
                 }
             }
 
-            CURLHandleLog(@"%@:  %@", [self nameForType:infoType], string);
+            CURLHandleLog(@"%@ - %@", [self nameForType:infoType], string);
 
             if (delegateResponds)
             {
