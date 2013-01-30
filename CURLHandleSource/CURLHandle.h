@@ -22,7 +22,6 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 @interface CURLHandle : NSObject
 {
-	BOOL                    _cancelled;                     /*" A flag that is set by the foreground thread and read by the background thread; it's an indicator that the user has cancelled. "*/
 	CURL                    *_curl;                         /*" Pointer to the actual CURL object that does all the hard work "*/
     NSURL                   *_URL;
 	id <CURLHandleDelegate> _delegate;
@@ -67,6 +66,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 - (void)completeWithMultiCode:(CURLMcode)code;
 - (void)completeWithCode:(CURLcode)code;
 - (BOOL)hasCompleted;
+- (BOOL)isCancelled;
 @end
 
 #pragma mark - Old API

@@ -12,7 +12,6 @@
 @interface CURLHandleBasedTest : KMSTestCase<CURLHandleDelegate>
 
 @property (strong, nonatomic) NSMutableData* buffer;
-@property (assign, nonatomic) BOOL cancelled;
 @property (strong, nonatomic) NSError* error;
 @property (assign, nonatomic) NSUInteger expected;
 @property (assign, atomic) BOOL exitRunLoop;

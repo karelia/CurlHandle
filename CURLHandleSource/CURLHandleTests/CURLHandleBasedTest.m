@@ -123,7 +123,6 @@ const NSString *const infoNames[] =
 - (BOOL)checkDownloadedBufferWasCorrect
 {
     STAssertNotNil(self.response, @"got no response");
-    STAssertFalse(self.cancelled, @"shouldn't have cancelled");
     STAssertTrue([self.buffer length] > 0, @"got no data, expected %ld", self.expected);
     STAssertNil(self.error, @"got error %@", self.error);
 

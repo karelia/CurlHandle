@@ -51,8 +51,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 #pragma mark - Private Methods
 
-- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
-- (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
+- (size_t) curlReceiveData:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
+- (size_t) curlSendData:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 #pragma mark - Private Properties
 
@@ -209,8 +209,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     [_delegate release];
 
-    // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this
-    _cancelled = YES;
+    // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
     _delegate = nil;
     
     // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
@@ -276,8 +275,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     NSAssert(_executing == NO, @"CURLHandle instances may not be accessed on multiple threads at once, or re-entrantly");
     _executing = YES;
-
-    _cancelled = NO;
 
     curl_easy_reset([self curl]);
 
@@ -690,6 +687,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     _executing = NO;
 }
 
+- (BOOL)isCancelled
+{
+    return _delegate == nil;
+}
+
 - (BOOL)hasCompleted
 {
     return _executing == NO;
@@ -697,16 +699,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithMultiCode:(CURLMcode)code;
 {
-    if (!_cancelled)
+    if (code == CURLM_OK)
     {
-        if (code == CURLM_OK)
-        {
-            [self finish];
-        }
-        else
-        {
-            [self failWithCode:code isMulti:YES];
-        }
+        [self finish];
+    }
+    else
+    {
+        [self failWithCode:code isMulti:YES];
     }
 
     [self cleanup];
@@ -715,16 +714,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithCode:(CURLcode)code;
 {
-    if (!_cancelled)
+    if (code == CURLE_OK)
     {
-        if (code == CURLE_OK)
-        {
-            [self finish];
-        }
-        else
-        {
-            [self failWithCode:code isMulti:NO];
-        }
+        [self finish];
+    }
+    else
+    {
+        [self failWithCode:code isMulti:NO];
     }
 
     [self cleanup];
@@ -733,11 +729,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)finish;
 {
+    CURLHandleLog(@"handle %@ finished", self);
     [self notifyDelegateOfResponseIfNeeded];
-    
-    if ([[self delegate] respondsToSelector:@selector(handleDidFinish:)])
+    if ([_delegate respondsToSelector:@selector(handleDidFinish:)])
     {
-        CURLHandleLog(@"handle %@ finished", self);
         [self.delegate handleDidFinish:self];
     }
 }
@@ -746,8 +741,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (void)cancel;
 {
     CURLHandleLog(@"handle %@ cancelled", self);
+
+    // setting the delegate to nil ensures that we don't send any more delegate messages, and
+    // also tells anything internal that wants to know that we've been cancelled
     self.delegate = nil;
-    _cancelled = YES;
 }
 
 - (void)failWithCode:(int)code isMulti:(BOOL)isMultiCode;
@@ -774,27 +771,19 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 /*"	Continue the writing callback in Objective C; now we have our instance variables.
 "*/
 
-- (size_t) curlWritePtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
+- (size_t) curlReceiveData:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 {
 	size_t written = inSize*inNumber;
     CURLHandleLog(@"handle %@ write %ld at %p", self, written, inPtr);
-	NSData *data = [NSData dataWithBytes:inPtr length:written];
 
-	if (_cancelled)
+	if (self.delegate)
 	{
-		written = -1;		// signify to Curl that we are stopping
-							// Do NOT send message; see "cancelLoadInBackground" comments
-	}
-	else	// Foreground, just write the bytes
-	{
-        NSString *dataString = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-        NSLog(@"data: %@", dataString);
-        [dataString release];
+        NSData *data = [NSData dataWithBytes:inPtr length:written];
 
 		if (header)
 		{
             // Delegate might not care about the response
-            if ([[self delegate] respondsToSelector:@selector(handle:didReceiveResponse:)])
+            if ([self.delegate respondsToSelector:@selector(handle:didReceiveResponse:)])
             {
                 [_headerBuffer appendData:data];
             }
@@ -805,9 +794,15 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             [self notifyDelegateOfResponseIfNeeded];
             
             // Report regular body data
-			[[self delegate] handle:self didReceiveData:data];
+			[self.delegate handle:self didReceiveData:data];
 		}
 	}
+    else
+    {
+        // no delegate means we've been cancelled (or something else is badly wrong)
+		written = -1;
+	}
+
 	return written;
 }
 
@@ -838,7 +833,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                                                                          HTTPVersion:[headerString headerHTTPVersion]
                                                                         headerFields:[headerString allHTTPHeaderFields]];
                         
-                        [[self delegate] handle:self didReceiveResponse:response];
+                        [self.delegate handle:self didReceiveResponse:response];
                         [response release];
                         
                         [url release];
@@ -853,43 +848,51 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 }
 
-- (size_t) curlReadPtr:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
+- (size_t) curlSendData:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 {
     CURLHandleLog(@"handle %@ read up to %ld into %p", self, inSize * inNumber, inPtr);
-    if (_cancelled) return CURL_READFUNC_ABORT;
-    
-    NSInteger result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
-    if (result < 0)
+    NSInteger result;
+
+    if (self.delegate)
     {
-        if ([[self delegate] respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)])
+        result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
+        if (result < 0)
         {
-            NSError *error = [_uploadStream streamError];
-            
-            [[self delegate] handle:self
-         didReceiveDebugInformation:[NSString stringWithFormat:@"Read failed: %@", [error debugDescription]]
-                             ofType:CURLINFO_HEADER_IN];
+            if ([self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)])
+            {
+                NSError *error = [_uploadStream streamError];
+
+                [self.delegate handle:self
+             didReceiveDebugInformation:[NSString stringWithFormat:@"Read failed: %@", [error debugDescription]]
+                                 ofType:CURLINFO_HEADER_IN];
+            }
+
+            return CURL_READFUNC_ABORT;
         }
-        
-        return CURL_READFUNC_ABORT;
+
+        if (result >= 0 && [self.delegate respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
+        {
+            [self.delegate handle:self willSendBodyDataOfLength:result];
+            if (_uploadStream.streamStatus == NSStreamStatusAtEnd)
+            {
+                [self.delegate handle:self willSendBodyDataOfLength:0];
+            }
+        }
     }
-    
-    if (result >= 0 && [[self delegate] respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
+    else
     {
-        [[self delegate] handle:self willSendBodyDataOfLength:result];
-        if (_uploadStream.streamStatus == NSStreamStatusAtEnd)
-        {
-            [[self delegate] handle:self willSendBodyDataOfLength:0];
-        }
+        // no delegate means we've been cancelled (or something else is badly wrong)
+        result = CURL_READFUNC_ABORT;
     }
-    
+
     return result;
 }
 
 - (enum curl_khstat)didFindHostFingerprint:(const struct curl_khkey *)foundKey knownFingerprint:(const struct curl_khkey *)knownkey match:(enum curl_khmatch)match;
 {
-    if ([_delegate respondsToSelector:@selector(handle:didFindHostFingerprint:knownFingerprint:match:)])
+    if ([self.delegate respondsToSelector:@selector(handle:didFindHostFingerprint:knownFingerprint:match:)])
     {
-        return [_delegate handle:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
+        return [self.delegate handle:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
     }
     else
     {
@@ -900,7 +903,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @end
 
 #pragma mark - Callbacks
-
 
 
 int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype purpose)
@@ -932,7 +934,7 @@ int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype p
 size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
     CURLHandleLog(@"handle %@ got body", self);
-	return [self curlWritePtr:ptr size:size number:nmemb isHeader:NO];
+	return [self curlReceiveData:ptr size:size number:nmemb isHeader:NO];
 }
 
 /*"	Callback from reading a chunk of data.  Since we pass "self" in as the "data pointer",
@@ -942,7 +944,7 @@ size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
     CURLHandleLog(@"handle %@ got header", self);
-	return [self curlWritePtr:ptr size:size number:nmemb isHeader:YES];
+	return [self curlReceiveData:ptr size:size number:nmemb isHeader:YES];
 }
 
 /*"	Callback to provide a chunk of data for sending.  Since we pass "self" in as the "data pointer",
@@ -951,7 +953,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self
 
 size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
-    return [self curlReadPtr:ptr size:size number:nmemb];
+    return [self curlSendData:ptr size:size number:nmemb];
 }
 
 // We always log out the debug info in DEBUG builds. We also send everything to the delegate.
@@ -965,7 +967,7 @@ size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 
 int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
 {
-    BOOL delegateResponds = [[self delegate] respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)];
+    BOOL delegateResponds = [self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)];
     if (LOG_DEBUG || delegateResponds)
     {
         BOOL shouldProcess = LOG_DEBUG || (infoType == CURLINFO_HEADER_IN) || (infoType == CURLINFO_HEADER_OUT);
@@ -1003,7 +1005,7 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
 
             if (delegateResponds)
             {
-                [[self delegate] handle:self didReceiveDebugInformation:string ofType:infoType];
+                [self.delegate handle:self didReceiveDebugInformation:string ofType:infoType];
             }
             
             [string release];
