@@ -20,8 +20,6 @@ extern NSString * const CURLcodeErrorDomain;
 extern NSString * const CURLMcodeErrorDomain;
 extern NSString * const CURLSHcodeErrorDomain;
 
-enum { CURLM_CANCELLED = -2 };
-
 @interface CURLHandle : NSObject
 {
 	BOOL                    _cancelled;                     /*" A flag that is set by the foreground thread and read by the background thread; it's an indicator that the user has cancelled. "*/

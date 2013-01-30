@@ -88,15 +88,16 @@
 
 - (void)stopLoading;
 {
-    if (![self.handle hasCompleted] && !self.uploaded)
+    // this protocol object is going away
+    // if our associated handle hasn't completed yet, we need to cancel it, to stop
+    // it from trying to send us delegate messages after we've been disposed
+    if (![self.handle hasCompleted])
     {
         CURLMulti* multi = [CURLMulti sharedInstance];
         [multi cancelHandle:self.handle];
     }
-    else
-    {
-        self.handle = nil;
-    }
+
+    self.handle = nil;
 }
 
 #pragma mark - Utilities

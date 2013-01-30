@@ -152,7 +152,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert(self.queue, @"need queue");
 
     [handle cancel];
-    [handle completeWithMultiCode:CURLM_CANCELLED];
     dispatch_async(self.queue, ^{
         [self multiRemoveHandle:handle];
     });
@@ -229,10 +228,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         dispatch_source_cancel(self.timer);
         self.timer = nil;
 
+        // give handles a last chance to process
+        [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
+
         NSArray* handles = [self.handles retain];
         self.handles = nil; // stop removeHandle from mutating the array whilst we iterate through it
         for (CURLHandle* handle in handles)
         {
+            CURLHandleLog(@"handle %@ still alive when multi being cleaned up - cancelling", handle);
+            [handle cancel];
             [self removeHandle:handle fromMulti:multi];
         }
         [handles release];
@@ -321,7 +325,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 }
 
-- (void)multiRemoveHandle:(CURL*)handle
+- (void)multiRemoveHandle:(CURLHandle*)handle
 {
     CURLMulti* multi = [self checkMulti];
     if (multi)

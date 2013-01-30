@@ -695,21 +695,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithMultiCode:(CURLMcode)code;
 {
-    if (code == CURLM_OK)
+    if (!_cancelled)
     {
-        [self finish];
-    }
-    else if (code == CURLM_CANCELLED)
-    {
-        if ([[self delegate] respondsToSelector:@selector(handleWasCancelled:)])
+        if (code == CURLM_OK)
         {
-            CURLHandleLog(@"handle %@ cancelled", self);
-            [self.delegate handleWasCancelled:self];
+            [self finish];
         }
-    }
-    else
-    {
-        [self failWithCode:code isMulti:YES];
+        else
+        {
+            [self failWithCode:code isMulti:YES];
+        }
     }
 
     [self cleanup];
@@ -718,13 +713,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithCode:(CURLcode)code;
 {
-    if (code == CURLE_OK)
+    if (!_cancelled)
     {
-        [self finish];
-    }
-    else
-    {
-        [self failWithCode:code isMulti:NO];
+        if (code == CURLE_OK)
+        {
+            [self finish];
+        }
+        else
+        {
+            [self failWithCode:code isMulti:NO];
+        }
     }
 
     [self cleanup];
@@ -742,6 +740,28 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 }
 
+
+- (void)cancel;
+{
+    CURLHandleLog(@"handle %@ cancelled", self);
+
+    if (!_cancelled)
+    {
+        [self notifyDelegateOfResponseIfNeeded];
+
+        if ([[self delegate] respondsToSelector:@selector(handleWasCancelled:)])
+        {
+            CURLHandleLog(@"handle %@ cancelled", self);
+            [self.delegate handleWasCancelled:self];
+        }
+
+        [self cleanup];
+        _delegate = nil;
+    }
+
+    _cancelled = YES;
+}
+
 - (void)failWithCode:(int)code isMulti:(BOOL)isMultiCode;
 {
     NSError* error = (isMultiCode ?
@@ -753,12 +773,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         [self.delegate handle:self didFailWithError:error];
     }
-}
-
-- (void)cancel;
-{
-    CURLHandleLog(@"handle %@ cancelled", self);
-    _cancelled = YES;
 }
 
 - (NSString *)initialFTPPath;
