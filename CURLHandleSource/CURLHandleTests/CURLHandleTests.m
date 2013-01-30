@@ -65,7 +65,7 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
 {
-    return 2;
+    return 1;
 }
 
 - (NSString*)name
