@@ -191,6 +191,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     if (self = [self init])
     {
+        if (!multi)
+        {
+            multi = [CURLMulti sharedInstance];
+        }
+        
         _URL = [[request URL] copy];
         
         self.delegate = delegate;
