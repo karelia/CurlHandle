@@ -11,13 +11,6 @@
 #import "NSURLRequest+CURLHandle.h"
 #import "KMSServer.h"
 
-@interface CURLHandle(TestOnly)
-
-// this is a private method but we need it for testing
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
-
-@end
-
 @interface CURLMultiTests : CURLHandleBasedTest
 
 @end

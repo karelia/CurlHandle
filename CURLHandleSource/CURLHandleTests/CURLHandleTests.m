@@ -24,12 +24,6 @@ static const NSUInteger kIterationsToPerform = 2;
 static NSUInteger gIteration = 0;
 static const NSUInteger kIterationToUseCustomMulti = 0;
 
-#pragma mark - Private CURLHandle API
-
-@interface CURLHandle(TestingOnly)
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
-@end
-
 #pragma mark - Test Class
 
 @interface CURLHandleTests : CURLHandleBasedTest
