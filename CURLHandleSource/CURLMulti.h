@@ -9,6 +9,10 @@
 
 #import <curl/curl.h>
 
+#ifndef CURLMultiLog
+#define CURLMultiLog(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLMultiLog NSLog
+#endif
+
 @class CURLHandle;
 
 /**

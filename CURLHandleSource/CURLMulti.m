@@ -107,6 +107,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     [_handles release];
 
+    CURLMultiLog(@"dealloced");
     [super dealloc];
 }
 
@@ -115,7 +116,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)startup
 
 {
-    CURLHandleLog(@"started monitoring");
+    CURLMultiLog(@"started monitoring");
     dispatch_resume(self.timer);
 }
 
@@ -127,11 +128,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     if (queue)
     {
         [self multiCleanup];
-        CURLHandleLog(@"shutdown");
+        CURLMultiLog(@"shutdown");
     }
     else
     {
-        CURLHandleLog(@"shutdown called multiple times");
+        CURLMultiLog(@"shutdown called multiple times");
     }
 }
 
@@ -235,7 +236,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         self.handles = nil; // stop removeHandle from mutating the array whilst we iterate through it
         for (CURLHandle* handle in handles)
         {
-            CURLHandleLog(@"handle %@ still alive when multi being cleaned up - cancelling", handle);
+            CURLMultiLog(@"handle %@ still alive when multi being cleaned up - cancelling", handle);
             [handle cancel];
             [self removeHandle:handle fromMulti:multi];
         }
@@ -272,7 +273,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             {
                 if (message->msg == CURLMSG_DONE)
                 {
-                    CURLHandleLog(@"got done msg result %d", message->data.result);
+                    CURLMultiLog(@"got done msg result %d", message->data.result);
                     CURL* easy = message->easy_handle;
                     CURLHandle* handle = [self findHandleWithEasyHandle:easy];
                     if (handle)
@@ -285,20 +286,20 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                     else
                     {
                         // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
-                        CURLHandleLog(@"seem to have an easy handle without a matching CURLHandle");
+                        CURLMultiLog(@"seem to have an easy handle without a matching CURLHandle");
                         result = curl_multi_remove_handle(multi, message->easy_handle);
                         NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
                     }
                 }
                 else
                 {
-                    CURLHandleLog(@"got unexpected multi message %d", message->msg);
+                    CURLMultiLog(@"got unexpected multi message %d", message->msg);
                 }
             }
         }
         else
         {
-            CURLHandleLog(@"curl_multi_socket_action returned error %d", result);
+            CURLMultiLog(@"curl_multi_socket_action returned error %d", result);
         }
     }
 
@@ -313,12 +314,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         CURLMcode result = curl_multi_add_handle(multi, [handle curl]);
         if (result == CURLM_OK)
         {
-            CURLHandleLog(@"added handle %@ (%p) to multi %@", handle, [handle curl], self);
+            CURLMultiLog(@"added handle %@ (%p) to multi %@", handle, [handle curl], self);
             [self.handles addObject:handle];
         }
         else
         {
-            CURLHandleLog(@"failed to add handle %@ (%p) to multi %@", handle, [handle curl], self);
+            CURLMultiLog(@"failed to add handle %@ (%p) to multi %@", handle, [handle curl], self);
             [handle completeWithMultiCode:result];
         }
     }
@@ -353,18 +354,19 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         {
             NSAssert(what != CURL_POLL_REMOVE, @"shouldn't need to make a socket if we're being asked to remove it");
 #ifndef __clang_analyzer__
-            socket = [[CURLSocket alloc] init];
+            socket = [[CURLSocket alloc] initWithSocket:raw];
 #endif
             curl_multi_assign(multi, raw, socket);
-            CURLHandleLog(@"new socket:%@", socket);
+            CURLMultiLog(@"new socket:%@", socket);
         }
 
         [socket updateSourcesForSocket:raw mode:what multi:self];
+        CURLMultiLog(@"updated socket:%@", socket);
 
         if (what == CURL_POLL_REMOVE)
         {
             NSAssert(socket != nil, @"should have socket");
-            CURLHandleLog(@"removed socket:%@", socket);
+            CURLMultiLog(@"removed socket:%@", socket);
 #ifndef __clang_analyzer__
             [socket release];
             socket = nil;
@@ -403,7 +405,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     });
 
     dispatch_source_set_cancel_handler(self.timer, ^{
-        CURLHandleLog(@"cancelled timer");
+        CURLMultiLog(@"cancelled timer");
         dispatch_release(timer);
     });
 }
@@ -427,7 +429,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         int64_t nano_timeout = timeout * 1000000LL;
         dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, nano_timeout, nano_timeout / 100);
 
-        CURLHandleLog(@"timeout changed to %ldms", (long)timeout);
+        CURLMultiLog(@"timeout changed to %ldms", (long)timeout);
     }
 }
 
@@ -443,7 +445,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         if (!source)
         {
-            CURLHandleLog(@"%@ added for socket %d", [self nameForType:type], socket);
+            CURLMultiLog(@"%@ source added for socket %d", [self nameForType:type], socket);
             source = dispatch_source_create(type, socket, 0, self.queue);
 
             dispatch_source_set_event_handler(source, ^{
@@ -462,7 +464,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             });
 
             dispatch_source_set_cancel_handler(source, ^{
-                CURLHandleLog(@"%@ removed for socket %d", [self nameForType:type], socket);
+                CURLMultiLog(@"%@ source cancel handler fired for socket %d", [self nameForType:type], socket);
                 dispatch_release(source);
             });
 
@@ -471,6 +473,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
     else if (source)
     {
+        CURLMultiLog(@"%@ source removed for socket %d", [self nameForType:type], socket);
         dispatch_source_cancel(source);
         source = nil;
     }
@@ -482,7 +485,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeHandle:(CURLHandle*)handle fromMulti:(CURLMulti*)multi
 {
-    CURLHandleLog(@"removed handle %@ (%p) from multi %@", handle, [handle curl], self);
+    CURLMultiLog(@"removed handle %@ (%p) from multi %@", handle, [handle curl], self);
     CURLMcode result = curl_multi_remove_handle(multi, [handle curl]);
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [self.handles removeObject:handle];
@@ -491,6 +494,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (BOOL)notShutdown
 {
     return self.multi != nil;
+}
+
+- (NSString*)description
+{
+    NSString* managing = [self.handles count] ? [NSString stringWithFormat:@"managing %@", [self.handles componentsJoinedByString:@","]] : @"";
+    return [NSString stringWithFormat:@"<CURLMulti %p%@>", self, managing];
 }
 
 #pragma mark - Callbacks

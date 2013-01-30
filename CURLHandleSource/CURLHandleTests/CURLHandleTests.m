@@ -166,7 +166,7 @@ static const NSUInteger kIterationToUseCustomMulti = 0;
 
 - (void)testVersion
 {
-    CURLHandleLog(@"curl version %@", [CURLHandle curlVersion]);
+    NSLog(@"curl version %@", [CURLHandle curlVersion]);
 }
 
 - (void)testHTTPDownload

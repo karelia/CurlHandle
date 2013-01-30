@@ -16,9 +16,12 @@
 
 @interface CURLSocket : NSObject
 {
+    int _socket;
     dispatch_source_t _reader;
     dispatch_source_t _writer;
 }
+
+- (id)initWithSocket:(int)socket;
 
 /**
  * Create/destroy the dispatch sources, based on the values in the mode parameter.

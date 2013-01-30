@@ -40,28 +40,15 @@
     }
 }
 
-const NSString *const infoNames[] =
-{
-    @"TEXT",
-    @"HEADER_IN",
-    @"HEADER_OUT",
-    @"DATA_IN",
-    @"DATA_OUT",
-    @"SSL_DATA_IN",
-    @"SSL_DATA_OUT",
-    @"END"
-};
-
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type
 {
-    NSLog(@"%@: %@", infoNames[type], string);
-    
+    NSString* typeName = [handle nameForType:type];
     if (!self.transcript)
     {
         self.transcript = [NSMutableString stringWithString:@""];
     }
 
-    [self.transcript appendFormat:@"%@: %@", infoNames[type], string];
+    [self.transcript appendFormat:@"%@: %@", typeName, string];
 }
 
 - (void)handleDidFinish:(CURLHandle *)handle

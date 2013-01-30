@@ -57,6 +57,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 - (NSString *)initialFTPPath;    // CURLINFO_FTP_ENTRY_PATH. Only suitable once handle has finished
 + (NSString *)curlVersion;
+- (NSString*)nameForType:(curl_infotype)type;
 
 @end
 
