@@ -86,6 +86,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @synthesize delegate = _delegate;
 @synthesize httpHeaders = _httpHeaders;
 @synthesize preQuoteCommands = _preQuoteCommands;
+@synthesize postQuoteCommands = _postQuoteCommands;
 
 #pragma mark curl_slist Accessor Methods
 
