@@ -304,6 +304,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     LOAD_REQUEST_SET_OPTION(CURLOPT_DEBUGFUNCTION, curlDebugFunction);
     LOAD_REQUEST_SET_OPTION(CURLOPT_DEBUGDATA, self);
 
+    // store self in the private data, so that we can turn an easy handle back into a CURLHandle object
+    LOAD_REQUEST_SET_OPTION(CURLOPT_PRIVATE, self);
 
     /*"	Zero disables connection timeout (it
      will then only timeout on the system's internal
