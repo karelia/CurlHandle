@@ -5,19 +5,32 @@
 //  Copyright (c) 2012 Karelia Software. All rights reserved.
 //
 
-// Each test here is run twice.
-// - Once, using the default [CURLMulti sharedInstance] multi: this is potentially dubious because the state of the multi is retained across tests. However,
-//   it's also how things are in the real world.
-// - Once, using a custom CURLMulti instance for each test: this makes each test more isolated, although libcurl is probably still caching things.
-
 #import "CURLHandleBasedTest.h"
 #import "CURLMulti.h"
 
 #import "NSURLRequest+CURLHandle.h"
 
+#pragma mark - Globals
+
+// If kIterationsToPerform is set to 2, the tests will run twice, once with a custom multi for each test,
+// and once with all tests using the shared multi from [CURLMulti sharedInstance].
+// Using the shared multi is potentially dubious because the state of the multi is retained across tests.
+// However, it's also how things are in the real world.
+// You can use kIterationToUseCustomMulti to control which iteration uses [CURLMulti sharedInstance].
+// If kIterationsToPerform is set to 1, kIterationToUseCustomMulti effectively becomes a switch indicating
+// whether the tests use the shared or custom multi.
+
+static const NSUInteger kIterationsToPerform = 2;
+static NSUInteger gIteration = 0;
+static const NSUInteger kIterationToUseCustomMulti = 0;
+
+#pragma mark - Private CURLHandle API
+
 @interface CURLHandle(TestingOnly)
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
 @end
+
+#pragma mark - Test Class
 
 @interface CURLHandleTests : CURLHandleBasedTest
 
@@ -25,6 +38,7 @@
 @property (assign, nonatomic) BOOL useCustomMulti;
 
 @end
+
 
 @implementation CURLHandleTests
 
@@ -46,9 +60,6 @@
     [super cleanup];
 }
 
-static NSUInteger gIteration = 0;
-static const NSUInteger kIterationToUseCustomMulti = 0;
-
 - (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
     NSLog(@"\n\nIteration #%ld\n\n", iteration);
@@ -65,7 +76,7 @@ static const NSUInteger kIterationToUseCustomMulti = 0;
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
 {
-    return 1;
+    return kIterationsToPerform;
 }
 
 - (NSString*)name
@@ -156,6 +167,8 @@ static const NSUInteger kIterationToUseCustomMulti = 0;
 
     [handle release];
 }
+
+#pragma mark - Tests
 
 - (void)testVersion
 {
