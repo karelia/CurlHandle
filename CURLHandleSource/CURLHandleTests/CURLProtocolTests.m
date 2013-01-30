@@ -110,8 +110,10 @@
 
         [self runUntilPaused];
 
+        NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
+        STAssertTrue([response isMemberOfClass:[NSHTTPURLResponse class]], @"got response of class %@", [response class]);
+        STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
         STAssertNil(self.error, @"got error %@", self.error);
-        STAssertNil(self.response, @"got unexpected response %@", self.response);
         STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
     }
 }
