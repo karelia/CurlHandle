@@ -42,22 +42,16 @@
                   Identifier = "CURLHandleBasedTest">
                </Test>
                <Test
-                  Identifier = "CURLHandleTests">
-               </Test>
-               <Test
                   Identifier = "CURLMultiTests">
                </Test>
                <Test
                   Identifier = "KMSTestCase">
                </Test>
                <Test
-                  Identifier = "CURLProtocolTests/testFTPUpload">
-               </Test>
-               <Test
-                  Identifier = "CURLProtocolTests/testHTTPDownload">
-               </Test>
-               <Test
                   Identifier = "CURLProtocolTests/testCancelling">
+               </Test>
+               <Test
+                  Identifier = "CURLProtocolTests">
                </Test>
             </SkippedTests>
          </TestableReference>

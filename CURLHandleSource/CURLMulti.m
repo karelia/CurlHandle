@@ -273,14 +273,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             {
                 if (message->msg == CURLMSG_DONE)
                 {
-                    CURLMultiLog(@"got done msg result %d", message->data.result);
+                    CURLcode code = message->data.result;
+                    CURLMultiLog(@"got done msg result %d", code);
                     CURL* easy = message->easy_handle;
                     CURLHandle* handle = [self findHandleWithEasyHandle:easy];
                     if (handle)
                     {
                         [handle retain];
-                        [handle completeWithCode:message->data.result];
                         [self removeHandle:handle fromMulti:multi];
+                        [handle completeWithCode:code];
                         [handle release];
                     }
                     else

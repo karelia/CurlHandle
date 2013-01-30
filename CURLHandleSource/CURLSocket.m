@@ -17,7 +17,7 @@
 
 @property (assign, nonatomic) dispatch_source_t reader;
 @property (assign, nonatomic) dispatch_source_t writer;
-@property (assign, nonatomic) int socket;
+@property (assign, nonatomic) int socket; // TODO: this is only needed for debugging - could remove eventually
 
 @end
 

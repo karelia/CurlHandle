@@ -20,9 +20,9 @@
 // If kIterationsToPerform is set to 1, kIterationToUseCustomMulti effectively becomes a switch indicating
 // whether the tests use the shared or custom multi.
 
-static const NSUInteger kIterationsToPerform = 2;
+static const NSUInteger kIterationsToPerform = 1;
 static NSUInteger gIteration = 0;
-static const NSUInteger kIterationToUseCustomMulti = 0;
+static const NSUInteger kIterationToUseCustomMulti = 1;
 
 #pragma mark - Test Class
 
@@ -87,16 +87,19 @@ static const NSUInteger kIterationToUseCustomMulti = 0;
 
 - (CURLHandle*)makeHandleWithRequest:(NSURLRequest*)request
 {
-    if (self.useCustomMulti)
+    if (!self.multi)
     {
-        NSLog(@"Using custom multi");
-        self.multi = [[[CURLMulti alloc] init] autorelease];
-        [self.multi startup];
-    }
-    else
-    {
-        NSLog(@"Using default shared multi");
-        self.multi = [CURLMulti sharedInstance];
+        if (self.useCustomMulti)
+        {
+            NSLog(@"Using custom multi");
+            self.multi = [[[CURLMulti alloc] init] autorelease];
+            [self.multi startup];
+        }
+        else
+        {
+            NSLog(@"Using default shared multi");
+            self.multi = [CURLMulti sharedInstance];
+        }
     }
 
     CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:self.multi];
@@ -231,7 +234,7 @@ static const NSUInteger kIterationToUseCustomMulti = 0;
                              ];
 
         NSUInteger count = [handles count];
-        while (self.finishedCount < count)
+        while (self.error == nil && (self.finishedCount < count))
         {
             [self runUntilPaused];
         }

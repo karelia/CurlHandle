@@ -718,6 +718,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithMultiCode:(CURLMcode)code;
 {
+    CURLHandleLog(@"completed with multi code %d", code);
+    
     if (code == CURLM_OK)
     {
         [self finish];
@@ -733,6 +735,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithCode:(CURLcode)code;
 {
+    CURLHandleLog(@"completed with code %d", code);
+
     if (code == CURLE_OK)
     {
         [self finish];
