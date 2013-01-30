@@ -51,7 +51,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 //  Delegate messages are delivered on an arbitrary thread; you should bounce over a specific thread if required for thread safety, or doing any significant work
 //
 //  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
 
 // Can be called from any thread. Causes -loadRequest:err_delegateor: as soon as it can
 - (void)cancel;

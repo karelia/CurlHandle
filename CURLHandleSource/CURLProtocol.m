@@ -13,12 +13,14 @@
 @interface CURLProtocol()
 
 @property (strong, nonatomic) CURLHandle* handle;
+@property (strong, nonatomic) CURLMulti* multi;
 @property (assign, nonatomic) BOOL uploaded;
 @end
 
 @implementation CURLProtocol
 
 @synthesize handle = _handle;
+@synthesize multi = _multi;
 @synthesize uploaded = _uploaded;
 
 #pragma mark - Object Lifecycle
@@ -26,7 +28,8 @@
 - (void)dealloc
 {
     [_handle release];
-
+    [_multi release];
+    
     [super dealloc];
 }
 
@@ -81,7 +84,8 @@
 
 - (void)startLoadingWithCredential:(NSURLCredential *)credential;
 {
-    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self];
+    self.multi = [CURLMulti sharedInstance]; // in theory we don't need to retain this, since it's a singleton, but we do in case something (a unit testing scenario for example) messes with it before we're done
+    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self multi:self.multi];
     self.handle = handle;
     [handle release];
 }
@@ -93,8 +97,7 @@
     // it from trying to send us delegate messages after we've been disposed
     if (![self.handle hasCompleted])
     {
-        CURLMulti* multi = [CURLMulti sharedInstance];
-        [multi cancelHandle:self.handle];
+        [self.multi cancelHandle:self.handle];
     }
 
     self.handle = nil;

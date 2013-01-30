@@ -64,28 +64,29 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @property (readonly, nonatomic) struct curl_slist* postQuoteCommands;
 - (void)addPostQuoteCommand:(NSString *)command;
 
-@property(nonatomic, readonly) id <CURLHandleDelegate> delegate;
+@property(nonatomic, strong) id <CURLHandleDelegate> delegate;
 
 @end
 
 
 @implementation CURLHandle
 
+@synthesize delegate = _delegate;
+@synthesize httpHeaders = _httpHeaders;
+@synthesize preQuoteCommands = _preQuoteCommands;
+
 #pragma mark curl_slist Accessor Methods
 
-@synthesize httpHeaders = _httpHeaders;
 - (void)addHttpHeader:(NSString *)header;
 {
     _httpHeaders = curl_slist_append(_httpHeaders, [header UTF8String]);
 }
 
-@synthesize preQuoteCommands = _preQuoteCommands;
 - (void)addPreQuoteCommand:(NSString *)command;
 {
     _preQuoteCommands = curl_slist_append(_preQuoteCommands, [command UTF8String]);
 }
 
-@synthesize postQuoteCommands = _postQuoteCommands;
 - (void)addPostQuoteCommand:(NSString *)command;
 {
     _postQuoteCommands = curl_slist_append(_postQuoteCommands, [command UTF8String]);
@@ -180,7 +181,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         _URL = [[request URL] copy];
         
-        _delegate = delegate;
+        self.delegate = delegate;
         
         // Turn automatic redirects off by default, so can properly report them to delegate
         curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
@@ -197,11 +198,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
     
     return self;
-}
-
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
-{
-    return [self initWithRequest:request credential:credential delegate:delegate multi:[CURLMulti sharedInstance]];
 }
 
 
@@ -708,7 +704,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     [self cleanup];
-    _delegate = nil;
+    self.delegate = nil;
 }
 
 - (void)completeWithCode:(CURLcode)code;
@@ -726,7 +722,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     [self cleanup];
-    _delegate = nil;
+    self.delegate = nil;
 }
 
 - (void)finish;
@@ -756,7 +752,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         }
 
         [self cleanup];
-        _delegate = nil;
+        self.delegate = nil;
     }
 
     _cancelled = YES;
@@ -908,8 +904,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         return (match == CURLKHMATCH_OK ? CURLKHSTAT_FINE : CURLKHSTAT_REJECT);
     }
 }
-
-@synthesize delegate = _delegate;
 
 @end
 
