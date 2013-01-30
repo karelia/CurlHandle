@@ -207,6 +207,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     [self cleanup];
 
+    [_delegate release];
+
+    // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this
+    _cancelled = YES;
+    _delegate = nil;
+    
     // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
     // can get accessed when calling curl_multi_cleanup, even though the easy handle has been removed from the multi, and cleaned up itself!
     // see http://curl.haxx.se/mail/lib-2009-10/0222.html
@@ -740,21 +746,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (void)cancel;
 {
     CURLHandleLog(@"handle %@ cancelled", self);
-
-    if (!_cancelled)
-    {
-        [self notifyDelegateOfResponseIfNeeded];
-
-        if ([[self delegate] respondsToSelector:@selector(handleWasCancelled:)])
-        {
-            CURLHandleLog(@"handle %@ cancelled", self);
-            [self.delegate handleWasCancelled:self];
-        }
-
-        [self cleanup];
-        self.delegate = nil;
-    }
-
+    self.delegate = nil;
     _cancelled = YES;
 }
 

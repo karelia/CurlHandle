@@ -86,7 +86,6 @@ extern NSString * const CURLSHcodeErrorDomain;
 @optional
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 - (void)handleDidFinish:(CURLHandle *)handle;
-- (void)handleWasCancelled:(CURLHandle *)handle;
 
 // Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. There will generally be a CURLcodeErrorDomain error present; either directly, or as an underlying error (KSError <https://github.com/karelia/KSError> is handy for querying underlying errors)
 // The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate

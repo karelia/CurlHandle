@@ -71,12 +71,6 @@ const NSString *const infoNames[] =
     [self pause];
 }
 
-- (void)handleWasCancelled:(CURLHandle *)handle
-{
-    self.cancelled = YES;
-    [self pause];
-}
-
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
 {
     NSLog(@"test: handle failed with error %@", error);

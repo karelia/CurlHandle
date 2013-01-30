@@ -27,9 +27,11 @@
 
 - (void)dealloc
 {
+    NSAssert((_handle == nil) || [_handle hasCompleted], @"handle should be done by the time we are destroyed");
+
     [_handle release];
     [_multi release];
-    
+
     [super dealloc];
 }
 
@@ -126,11 +128,6 @@
 - (void)handleDidFinish:(CURLHandle *)handle
 {
     [[self client] URLProtocolDidFinishLoading:self];
-}
-
-- (void)handleWasCancelled:(CURLHandle *)handle
-{
-    self.handle = nil;
 }
 
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
