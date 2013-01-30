@@ -32,6 +32,8 @@
     [_handle release];
     [_multi release];
 
+    CURLProtocolLog(@"dealloced");
+
     [super dealloc];
 }
 
@@ -50,6 +52,8 @@
 
 - (void)startLoading;
 {
+    CURLProtocolLog(@"starting");
+
     // Request auth before trying FTP connection
     NSURL *url = [[self request] URL];
     NSString *scheme = [url scheme];
@@ -94,6 +98,8 @@
 
 - (void)stopLoading;
 {
+    CURLProtocolLog(@"stopping");
+    
     // this protocol object is going away
     // if our associated handle hasn't completed yet, we need to cancel it, to stop
     // it from trying to send us delegate messages after we've been disposed
@@ -107,6 +113,10 @@
 
 #pragma mark - Utilities
 
+- (NSString*)description
+{
+    return [NSString stringWithFormat:@"<CURLProtocol %p %@>", self, self.request.URL];
+}
 
 #pragma mark - CURLHandleDelegate
 

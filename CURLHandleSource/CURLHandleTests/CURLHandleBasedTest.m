@@ -151,7 +151,15 @@
 
 - (void)cleanup
 {
-    NSLog(@"Transcript:\n\n%@", self.transcript);
+    if (self.transcript)
+    {
+        NSLog(@"Transcript:\n\n%@", self.transcript);
+    }
+    else
+    {
+        NSLog(@"No transcript.");
+    }
+
     self.buffer = nil;
     self.transcript = nil;
     self.response = nil;

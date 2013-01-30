@@ -7,6 +7,10 @@
 
 #import "CURLHandle.h"
 
+#ifndef CURLProtocolLog
+#define CURLProtocolLog(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLHandleLog NSLog
+#endif
+
 
 @interface CURLProtocol : NSURLProtocol <CURLHandleDelegate, NSURLAuthenticationChallengeSender>
 {

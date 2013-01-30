@@ -314,12 +314,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         CURLMcode result = curl_multi_add_handle(multi, [handle curl]);
         if (result == CURLM_OK)
         {
-            CURLMultiLog(@"added handle %@ (%p) to multi %@", handle, [handle curl], self);
+            CURLMultiLog(@"added handle %@", handle);
             [self.handles addObject:handle];
         }
         else
         {
-            CURLMultiLog(@"failed to add handle %@ (%p) to multi %@", handle, [handle curl], self);
+            CURLMultiLog(@"failed to add handle %@", handle);
             [handle completeWithMultiCode:result];
         }
     }
@@ -485,7 +485,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)removeHandle:(CURLHandle*)handle fromMulti:(CURLMulti*)multi
 {
-    CURLMultiLog(@"removed handle %@ (%p) from multi %@", handle, [handle curl], self);
+    CURLMultiLog(@"removed handle %@", handle);
     CURLMcode result = curl_multi_remove_handle(multi, [handle curl]);
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [self.handles removeObject:handle];
@@ -498,7 +498,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (NSString*)description
 {
-    NSString* managing = [self.handles count] ? [NSString stringWithFormat:@"managing %@", [self.handles componentsJoinedByString:@","]] : @"";
+    NSString* managing = [self.handles count] ? [NSString stringWithFormat:@" managing %@", [self.handles componentsJoinedByString:@","]] : @"";
     return [NSString stringWithFormat:@"<CURLMulti %p%@>", self, managing];
 }
 
