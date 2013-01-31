@@ -12,24 +12,33 @@
 
 #pragma mark - Globals
 
-// If kIterationsToPerform is set to 2, the tests will run twice, once with a custom multi for each test,
-// and once with all tests using the shared multi from [CURLMulti sharedInstance].
+typedef enum
+{
+    TEST_SYNCHRONOUS,
+    TEST_WITH_SHARED_MULTI,
+    TEST_WITH_OWN_MULTI,
+
+    TEST_MODE_COUNT
+} TestMode;
+
+static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
+
+// Each test will run kIterationsToPerform times, working its way through the modes in the TestMode enum.
+// You can re-order the enums, and reduce the value of kIterationsToPerform if you only want to use some of these modes.
+//
+// In mode TEST_WITH_SHARED_MULTI  all the tests use the shared multi from [CURLMulti sharedInstance].
 // Using the shared multi is potentially dubious because the state of the multi is retained across tests.
 // However, it's also how things are in the real world.
-// You can use kIterationToUseCustomMulti to control which iteration uses [CURLMulti sharedInstance].
-// If kIterationsToPerform is set to 1, kIterationToUseCustomMulti effectively becomes a switch indicating
-// whether the tests use the shared or custom multi.
-
-static const NSUInteger kIterationsToPerform = 1;
-static NSUInteger gIteration = 0;
-static const NSUInteger kIterationToUseCustomMulti = 1;
+// In mode TEST_WITH_OWN_MULTI a new multi is made at the start of each test, all test operations are done using it
+// and it's then shutdown at the end of the test.
+// In mode TEST_SYNCHRONOUS the old synchronous API is used.
 
 #pragma mark - Test Class
 
 @interface CURLHandleTests : CURLHandleBasedTest
 
 @property (strong, nonatomic) CURLMulti* multi;
-@property (assign, nonatomic) BOOL useCustomMulti;
+@property (assign, nonatomic) TestMode mode;
 
 @end
 
@@ -45,27 +54,53 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
 - (void)cleanup
 {
-    if (self.useCustomMulti)
+    switch (self.mode)
     {
-        [self.multi shutdown];
-        self.multi = nil;
+        case TEST_WITH_OWN_MULTI:
+            [self.multi shutdown];
+            break;
+
+        default:
+            break;
     }
 
+    self.multi = nil;
     [super cleanup];
 }
 
 - (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
-    NSLog(@"\n\nIteration #%ld\n\n", iteration);
+    STAssertTrue(iteration < TEST_MODE_COUNT, @"invalid iteration count %d", iteration);
 
-    self.useCustomMulti = iteration == kIterationToUseCustomMulti;
+    NSString* iterationName;
+    switch (iteration)
+    {
+        case TEST_SYNCHRONOUS:
+            iterationName = @"Synchronous";
+            break;
+
+        case TEST_WITH_SHARED_MULTI:
+            iterationName = @"Shared Multi";
+            break;
+
+        case TEST_WITH_OWN_MULTI:
+            iterationName = @"Own Multi";
+            break;
+
+        default:
+            iterationName = @"Invalid";
+            break;
+    }
+
+    NSLog(@"\n\n************************************************************\n%@ %@\n************************************************************\n\n", [self name], iterationName);
+
+    self.mode = (TestMode)iteration;
 }
 
 - (void)afterTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
 {
     [self cleanup];
     [self cleanupServer];
-    gIteration++;
 }
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
@@ -73,37 +108,38 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
     return kIterationsToPerform;
 }
 
-- (NSString*)name
-{
-    NSString* result = [super name];
-    if (gIteration == kIterationToUseCustomMulti)
-    {
-        NSRange range = [result rangeOfString:@" "];
-        result = [NSString stringWithFormat:@"%@WithCustomMulti %@", [result substringToIndex:range.location], [result substringFromIndex:range.location + 1]];
-    }
-
-    return result;
-}
-
 - (CURLHandle*)makeHandleWithRequest:(NSURLRequest*)request
 {
-    if (!self.multi)
+    switch (self.mode)
     {
-        if (self.useCustomMulti)
-        {
-            NSLog(@"Using custom multi");
-            self.multi = [[[CURLMulti alloc] init] autorelease];
-            [self.multi startup];
-        }
-        else
-        {
-            NSLog(@"Using default shared multi");
+        case TEST_WITH_OWN_MULTI:
+            if (!self.multi)
+            {
+                NSLog(@"Using custom multi");
+                self.multi = [[[CURLMulti alloc] init] autorelease];
+                [self.multi startup];
+            }
+            break;
+
+        case TEST_WITH_SHARED_MULTI:
             self.multi = [CURLMulti sharedInstance];
-        }
+            break;
+
+        default:
+            break;
     }
 
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:self.multi];
-
+    CURLHandle* handle;
+    if (self.mode == TEST_SYNCHRONOUS)
+    {
+        handle = [[CURLHandle alloc] init];
+        [handle sendSynchronousRequest:request credential:nil delegate:self];
+    }
+    else
+    {
+       handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:self.multi];
+    }
+    
     return handle;
 }
 
@@ -121,7 +157,10 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 {
     CURLHandle* handle = [self newDownloadWithRoot:ftpRoot];
 
-    [self runUntilPaused];
+    if (self.mode != TEST_SYNCHRONOUS)
+    {
+        [self runUntilPaused];
+    }
 
     STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
 
@@ -152,7 +191,10 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
     CURLHandle* handle = [self newUploadWithRoot:ftpRoot];
 
-    [self runUntilPaused];
+    if (self.mode != TEST_SYNCHRONOUS)
+    {
+        [self runUntilPaused];
+    }
 
     STAssertTrue(self.sending, @"should have set sending flag");
     STAssertNil(self.error, @"got error %@", self.error);
@@ -179,7 +221,10 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
     CURLHandle* handle = [self makeHandleWithRequest:request];
 
-    [self runUntilPaused];
+    if (self.mode != TEST_SYNCHRONOUS)
+    {
+        [self runUntilPaused];
+    }
 
     STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
 
@@ -225,27 +270,30 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 {
     // do a quick sequence of stuff
 
-    NSURL* ftpRoot = [self ftpTestServer];
-    if (ftpRoot)
+    if (self.mode != TEST_SYNCHRONOUS)
     {
-        NSArray* handles = @[
-                             [self newDownloadWithRoot:ftpRoot],
-                             [self newUploadWithRoot:ftpRoot],
-                             [self newDownloadWithRoot:ftpRoot],
-                             [self newUploadWithRoot:ftpRoot],
-                             [self newDownloadWithRoot:ftpRoot],
-                             [self newUploadWithRoot:ftpRoot]
-                             ];
-
-        NSUInteger count = [handles count];
-        while (self.error == nil && (self.finishedCount < count))
+        NSURL* ftpRoot = [self ftpTestServer];
+        if (ftpRoot)
         {
-            [self runUntilPaused];
-        }
+            NSArray* handles = @[
+                                 [self newDownloadWithRoot:ftpRoot],
+                                 [self newUploadWithRoot:ftpRoot],
+                                 [self newDownloadWithRoot:ftpRoot],
+                                 [self newUploadWithRoot:ftpRoot],
+                                 [self newDownloadWithRoot:ftpRoot],
+                                 [self newUploadWithRoot:ftpRoot]
+                                 ];
 
-        for (CURLHandle* handle in handles)
-        {
-            [handle release];
+            NSUInteger count = [handles count];
+            while (self.error == nil && (self.finishedCount < count))
+            {
+                [self runUntilPaused];
+            }
+
+            for (CURLHandle* handle in handles)
+            {
+                [handle release];
+            }
         }
     }
 }
@@ -271,7 +319,10 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
 
-        [self runUntilPaused];
+        if (self.mode != TEST_SYNCHRONOUS)
+        {
+            [self runUntilPaused];
+        }
 
         STAssertNil(self.error, @"got error %@", self.error);
         STAssertNotNil(self.response, @"got unexpected response %@", self.response);
@@ -304,7 +355,10 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
 
+        if (self.mode != TEST_SYNCHRONOUS)
+        {
         [self runUntilPaused];
+        }
 
         STAssertNil(self.error, @"got error %@", self.error);
         STAssertNotNil(self.response, @"got unexpected response %@", self.response);
@@ -337,7 +391,10 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
 
+        if (self.mode != TEST_SYNCHRONOUS)
+        {
         [self runUntilPaused];
+        }
 
         STAssertTrue((self.error == nil) || ((self.error.code == 21) && ([self.error.localizedDescription isEqualToString:@"QUOT command failed with 550"])), @"got unexpected error %@", self.error);
         STAssertTrue((self.error != nil) || (self.response == nil), @"got unexpected response %@", self.response);
