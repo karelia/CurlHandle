@@ -437,11 +437,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             NSString *theValue = [request valueForHTTPHeaderField:aHeaderField];
 
             // Range requests are a special case that should inform Curl directly
-#define HTTP_RANGE_PREFIX @"bytes="
-            if ([aHeaderField caseInsensitiveCompare:@"Range"] == NSOrderedSame &&
-                [theValue hasPrefix:HTTP_RANGE_PREFIX])
+            if ([aHeaderField caseInsensitiveCompare:@"Range"] == NSOrderedSame)
             {
-                LOAD_REQUEST_SET_OPTION(CURLOPT_RANGE, [[theValue substringFromIndex:[HTTP_RANGE_PREFIX length]] UTF8String]);
+                NSRange bytesPrefixRange = [theValue rangeOfString:@"bytes=" options:NSAnchoredSearch];
+                if (bytesPrefixRange.location != NSNotFound)
+                {
+                    LOAD_REQUEST_SET_OPTION(CURLOPT_RANGE, [[theValue substringFromIndex:bytesPrefixRange.length] UTF8String]);
+                }
             }
 
             // Accept-Encoding requests are also special
