@@ -225,7 +225,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void) dealloc
 {
-    [self cleanup];
+    [self cleanupIncludingHandle:YES];
 
     [_delegate release];
     [_URL release];
@@ -534,7 +534,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return CURLE_OK;
 }
 
-- (void)cleanup
+- (void)cleanupIncludingHandle:(BOOL)cleanupHandleToo;
 {
     CURLHandleLog(@"cleanup");
 
@@ -547,10 +547,15 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
         // can get accessed when calling curl_multi_cleanup, even though the easy handle has been removed from the multi, and cleaned up itself!
         // see http://curl.haxx.se/mail/lib-2009-10/0222.html
+        //
+        // Additionally, it ought to be done anyway since we're clearing away the curl_slists that the handle currently references
         curl_easy_reset(_curl);
-
-        curl_easy_cleanup(_curl);
-        _curl = nil;
+        
+        if (_curl)
+        {
+            curl_easy_cleanup(_curl);
+            _curl = NULL;
+        }
     }
     
     if (_uploadStream)
@@ -607,7 +612,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         [self failWithCode:code isMulti:YES];
     }
 
-    [self cleanup];
+    [self cleanupIncludingHandle:YES];
 }
 
 - (void)completeWithCode:(CURLcode)code;
@@ -623,7 +628,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         [self failWithCode:code isMulti:NO];
     }
 
-    [self cleanup];
+    [self cleanupIncludingHandle:YES];
 }
 
 - (void)finish;
@@ -809,7 +814,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         [self finish];
     }
     
-    [self cleanup];
+    [self cleanupIncludingHandle:NO];
 }
 
 #pragma mark Post-Request Info
