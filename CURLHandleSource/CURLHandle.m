@@ -551,7 +551,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         // Additionally, it ought to be done anyway since we're clearing away the curl_slists that the handle currently references
         curl_easy_reset(_curl);
         
-        if (_curl)
+        if (cleanupHandleToo)
         {
             curl_easy_cleanup(_curl);
             _curl = NULL;
