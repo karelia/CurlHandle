@@ -164,6 +164,7 @@
     self.transcript = nil;
     self.response = nil;
     self.error = nil;
+    self.exitRunLoop = NO;
 }
 
 - (void)tearDown

@@ -15,13 +15,13 @@
 typedef enum
 {
     TEST_SYNCHRONOUS,
-    TEST_WITH_SHARED_MULTI,
     TEST_WITH_OWN_MULTI,
+    TEST_WITH_SHARED_MULTI,
 
     TEST_MODE_COUNT
 } TestMode;
 
-static const NSUInteger kIterationsToPerform = 1; // TEST_MODE_COUNT;
+static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 
 // Each test will run kIterationsToPerform times, working its way through the modes in the TestMode enum.
 // You can re-order the enums, and reduce the value of kIterationsToPerform if you only want to use some of these modes.
@@ -68,10 +68,8 @@ static const NSUInteger kIterationsToPerform = 1; // TEST_MODE_COUNT;
     [super cleanup];
 }
 
-- (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
+- (NSString*)nameForIteration:(NSUInteger)iteration
 {
-    STAssertTrue(iteration < TEST_MODE_COUNT, @"invalid iteration count %d", iteration);
-
     NSString* iterationName;
     switch (iteration)
     {
@@ -92,8 +90,14 @@ static const NSUInteger kIterationsToPerform = 1; // TEST_MODE_COUNT;
             break;
     }
 
-    NSLog(@"\n\n************************************************************\n%@ %@\n************************************************************\n\n", [self name], iterationName);
+    return iterationName;
+}
 
+- (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
+{
+    STAssertTrue(iteration < TEST_MODE_COUNT, @"invalid iteration count %d", iteration);
+
+    NSLog(@"\n\n************************************************************\nStarting %@ %@\n************************************************************\n\n", [self nameForIteration:iteration], [self name]);
     self.mode = (TestMode)iteration;
 }
 
@@ -101,6 +105,7 @@ static const NSUInteger kIterationsToPerform = 1; // TEST_MODE_COUNT;
 {
     [self cleanup];
     [self cleanupServer];
+    NSLog(@"\n\n************************************************************\nDone %@ %@\n************************************************************\n\n", [self nameForIteration:iteration], [self name]);
 }
 
 - (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
