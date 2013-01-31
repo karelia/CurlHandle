@@ -180,7 +180,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 
 // -----------------------------------------------------------------------------
-#pragma mark ----- NSURLHANDLE OVERRIDES
+#pragma mark Lifecycle
 // -----------------------------------------------------------------------------
 
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi
@@ -255,7 +255,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 
 // -----------------------------------------------------------------------------
-#pragma mark ----- CURL DATA LOADING SUPPORT
+#pragma mark Loading a Request
 // -----------------------------------------------------------------------------
 
 /*""*/
