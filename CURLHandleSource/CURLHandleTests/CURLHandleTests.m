@@ -216,6 +216,8 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
         //[self doFTPDownloadWithRoot:ftpRoot];
         [self doFTPUploadWithRoot:ftpRoot];
         //[self doFTPDownloadWithRoot:ftpRoot];
+        [self doFTPUploadWithRoot:ftpRoot];
+        [self doFTPUploadWithRoot:ftpRoot];
     }
 }
 
