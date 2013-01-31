@@ -34,6 +34,14 @@ NSString *const kInfoNames[] =
     @"END"
 };
 
+#if !defined (MAC_OS_X_VERSION_10_7)
+#define MAC_OS_X_VERSION_10_7 (MAC_OS_X_VERSION_MAX_ALLOWED + 1)
+#endif
+
+#if !defined (__IPHONE_5_0)
+#define __IPHONE_5_0 (__IPHONE_OS_VERSION_MAX_ALLOWED + 1)
+#endif
+
 #pragma mark - Globals
 
 BOOL				sAllowsProxy = YES;		// by default, allow proxy to be used./
@@ -868,10 +876,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             break;
 #endif
             
-#if !defined (MAC_OS_X_VERSION_10_7)
-#define MAC_OS_X_VERSION_10_7 (MAC_OS_X_VERSION_MAX_ALLOWED + 1)
-#endif
-            
 #if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED
         case CURLE_SEND_FAIL_REWIND:
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorRequestBodyStreamExhausted underlyingError:result];
@@ -885,10 +889,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         case CURLE_REMOTE_DISK_FULL:
             result = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteOutOfSpaceError underlyingError:result];
             break;
-            
-#if !defined (__IPHONE_5_0)
-#define __IPHONE_5_0 (__IPHONE_OS_VERSION_MAX_ALLOWED + 1)
-#endif
             
 #if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_5_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
         case CURLE_REMOTE_FILE_EXISTS:
