@@ -927,14 +927,75 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return result;
 }
 
+#pragma mark Debugging
+
 - (NSString*)description
 {
     return [NSString stringWithFormat:@"<CURLHandle %p (easy %p)>", self, self.curl];
 }
 
+// We always log out the debug info in DEBUG builds. We also send everything to the delegate.
+// In release builds, we just send header related stuff to the delegate.
+
+#if defined(DEBUG) || defined(_DEBUG)
+#define LOG_DEBUG 1
+#else
+#define LOG_DEBUG 0
+#endif
+
+int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
+{
+    BOOL delegateResponds = [self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)];
+    if (LOG_DEBUG || delegateResponds)
+    {
+        BOOL shouldProcess = LOG_DEBUG || (infoType == CURLINFO_HEADER_IN) || (infoType == CURLINFO_HEADER_OUT);
+        if (shouldProcess)
+        {
+            // the length we're passed seems to be unreliable; we use strnlen to ensure that we never go past the infoLength we were given,
+            // but often it seems that the string is *much* shorter
+            NSUInteger actualLength = strnlen(info, infoLength);
+            
+            NSString *string = [[NSString alloc] initWithBytes:info length:actualLength encoding:NSUTF8StringEncoding];
+            if (!string)
+            {
+                // FTP servers are fairly free to use whatever encoding they like. We've run into one that appears to be Hungarian; as far as I can tell ISO Latin 2 is the best compromise for that
+                string = [[NSString alloc] initWithBytes:info length:actualLength encoding:NSISOLatin2StringEncoding];
+            }
+            
+            if (!string)
+            {
+                // I don't yet know what causes this, but it does happen from time to time. If so, insist that something useful go in the log
+                if (infoLength == 0)
+                {
+                    string = [@"<NULL> debug info" retain];
+                }
+                else if (infoLength < 100000)
+                {
+                    string = [[NSString alloc] initWithFormat:@"Invalid debug info: %@", [NSData dataWithBytes:info length:infoLength]];
+                }
+                else
+                {
+                    string = [[NSString alloc] initWithFormat:@"Invalid debug info - info length seems to be too big: %ld", infoLength];
+                }
+            }
+            
+            CURLHandleLog(@"%@ - %@", [self nameForType:infoType], string);
+            
+            if (delegateResponds)
+            {
+                [self.delegate handle:self didReceiveDebugInformation:string ofType:infoType];
+            }
+            
+            [string release];
+        }
+    }
+    
+    return 0;
+}
+
 @end
 
-#pragma mark - Callbacks
+#pragma mark - Non-Debug Callbacks
 
 
 int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype purpose)
@@ -984,65 +1045,6 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self
 size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
 {
     return [self curlSendDataTo:ptr size:size number:nmemb];
-}
-
-// We always log out the debug info in DEBUG builds. We also send everything to the delegate.
-// In release builds, we just send header related stuff to the delegate.
-
-#if defined(DEBUG) || defined(_DEBUG)
-    #define LOG_DEBUG 1
-#else
-    #define LOG_DEBUG 0
-#endif
-
-int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
-{
-    BOOL delegateResponds = [self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)];
-    if (LOG_DEBUG || delegateResponds)
-    {
-        BOOL shouldProcess = LOG_DEBUG || (infoType == CURLINFO_HEADER_IN) || (infoType == CURLINFO_HEADER_OUT);
-        if (shouldProcess)
-        {
-            // the length we're passed seems to be unreliable; we use strnlen to ensure that we never go past the infoLength we were given,
-            // but often it seems that the string is *much* shorter
-            NSUInteger actualLength = strnlen(info, infoLength);
-
-            NSString *string = [[NSString alloc] initWithBytes:info length:actualLength encoding:NSUTF8StringEncoding];
-            if (!string)
-            {
-                // FTP servers are fairly free to use whatever encoding they like. We've run into one that appears to be Hungarian; as far as I can tell ISO Latin 2 is the best compromise for that
-                string = [[NSString alloc] initWithBytes:info length:actualLength encoding:NSISOLatin2StringEncoding];
-            }
-
-            if (!string)
-            {
-                // I don't yet know what causes this, but it does happen from time to time. If so, insist that something useful go in the log
-                if (infoLength == 0)
-                {
-                    string = [@"<NULL> debug info" retain];
-                }
-                else if (infoLength < 100000)
-                {
-                    string = [[NSString alloc] initWithFormat:@"Invalid debug info: %@", [NSData dataWithBytes:info length:infoLength]];
-                }
-                else
-                {
-                    string = [[NSString alloc] initWithFormat:@"Invalid debug info - info length seems to be too big: %ld", infoLength];
-                }
-            }
-
-            CURLHandleLog(@"%@ - %@", [self nameForType:infoType], string);
-
-            if (delegateResponds)
-            {
-                [self.delegate handle:self didReceiveDebugInformation:string ofType:infoType];
-            }
-            
-            [string release];
-        }
-    }
-
-    return 0;
 }
 
 int curlKnownHostsFunction(CURL *easy,     /* easy handle */
