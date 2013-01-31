@@ -791,6 +791,27 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 }
 
+#pragma mark Synchronous Loading
+
+- (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+{
+    self.delegate = delegate;
+    
+    [self setupRequest:request credential:credential];
+    
+    CURLcode result = curl_easy_perform(self.curl);
+    if (result != CURLE_OK)
+    {
+        [self failWithCode:result isMulti:NO];
+    }
+    else
+    {
+        [self finish];
+    }
+    
+    [self cleanup];
+}
+
 #pragma mark Post-Request Info
 
 - (NSString *)initialFTPPath;

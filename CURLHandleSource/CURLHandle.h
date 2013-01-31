@@ -73,6 +73,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 #pragma mark - Old API
 
 @interface CURLHandle(OldAPI)
+- (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
 - (CURL *) curl;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
