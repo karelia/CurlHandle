@@ -16,11 +16,6 @@
 #define NSS(s) (NSString *)(s)
 #include <SystemConfiguration/SystemConfiguration.h>
 
-
-// Un-comment these to do some debugging things
-//#define DEBUGCURL 1
-//#define DEBUGCURL_SLOW
-
 #pragma mark - Constants
 
 NSString * const CURLcodeErrorDomain = @"se.haxx.curl.libcurl.CURLcode";
@@ -236,25 +231,25 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 /*" %{Initializes a newly created URL handle with the request.}
 
-	#{TODO: initWithRequest ought to clean up better if init failed; release what was allocated.}
 "*/
 
 - (id)init
 {
-#ifdef DEBUGCURL
-	NSLog(@"...initWithURL: %@",[request URL]);
-#endif
-	if (self = [super init])
+	if ((self = [super init]) != nil)
 	{
 		_curl = curl_easy_init();
-		if (nil == _curl)
+		if (_curl)
 		{
-			return nil;
+            _errorBuffer[0] = 0;	// initialize the error buffer to empty
+            _headerBuffer = [[NSMutableData alloc] init];
+        }
+        else
+        {
+            [self dealloc];
+			self = nil;
 		}
-        
-        _errorBuffer[0] = 0;	// initialize the error buffer to empty
-		_headerBuffer = [[NSMutableData alloc] init];
 	}
+
 	return self;
 }
 
@@ -953,7 +948,7 @@ int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype p
 
             if (result)
             {
-                NSLog(@"Unable to set FTP control connection keepalive with error:%i", result);
+                CURLHandleLog(@"Unable to set FTP control connection keepalive with error:%i", result);
                 return 1;
             }
         }
