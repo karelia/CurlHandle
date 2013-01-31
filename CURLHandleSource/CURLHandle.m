@@ -87,11 +87,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @implementation CURLHandle
 
 @synthesize delegate = _delegate;
+
+#pragma mark curl_slist Accessor Methods
+
 @synthesize httpHeaders = _httpHeaders;
 @synthesize preQuoteCommands = _preQuoteCommands;
 @synthesize postQuoteCommands = _postQuoteCommands;
-
-#pragma mark curl_slist Accessor Methods
 
 - (void)addHttpHeader:(NSString *)header;
 {
