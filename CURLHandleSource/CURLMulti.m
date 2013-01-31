@@ -161,10 +161,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     NSAssert(self.queue, @"need queue");
 
-    [handle cancel];
-    dispatch_async(self.queue, ^{
-        [self multiRemoveHandle:handle];
-    });
+    if (!([handle isCancelled] || [handle hasCompleted]))
+    {
+        [handle cancel];
+        dispatch_async(self.queue, ^{
+            [self multiRemoveHandle:handle];
+        });
+    }
 }
 
 - (CURLHandle*)findHandleWithEasyHandle:(CURL*)easy
@@ -343,8 +346,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMulti* multi = [self checkMulti];
     if (multi)
     {
+        // by the time this runs, the handle may already have finished naturally and been removed,
+        // so it's not an error to get here and discover that we're not managing it
         BOOL weOwnTheHandle = [self.handles containsObject:handle];
-        NSAssert(weOwnTheHandle, @"should be managing the handle");
         if (weOwnTheHandle)
         {
             [self removeHandle:handle fromMulti:multi];
