@@ -73,7 +73,11 @@ extern NSString * const CURLSHcodeErrorDomain;
 #pragma mark - Old API
 
 @interface CURLHandle(OldAPI)
+
+// Please don't use this unless you have to!
+// To use, -init a handle, and then call this method, as many times as you like. Delegate messages will be delivered fairly normally during the request
 - (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+
 - (CURL *) curl;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
