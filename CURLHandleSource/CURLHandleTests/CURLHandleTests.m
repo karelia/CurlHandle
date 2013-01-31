@@ -396,8 +396,16 @@ static const NSUInteger kIterationsToPerform = 1; // TEST_MODE_COUNT;
         [self runUntilPaused];
         }
 
-        STAssertTrue((self.error == nil) || ((self.error.code == 21) && ([self.error.localizedDescription isEqualToString:@"QUOT command failed with 550"])), @"got unexpected error %@", self.error);
-        STAssertTrue((self.error != nil) || (self.response == nil), @"got unexpected response %@", self.response);
+        if (self.error)
+        {
+            NSInteger curlResponse = [[[self.error userInfo] objectForKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]] integerValue];
+            STAssertTrue((self.error.code == 21) && (curlResponse == 550), @"got unexpected error %@", self.error);
+        }
+        else
+        {
+            STAssertTrue(self.response == nil, @"got unexpected response %@", self.response);
+        }
+
         STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
 
         [handle release];
