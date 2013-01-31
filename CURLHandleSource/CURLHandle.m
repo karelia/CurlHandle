@@ -201,8 +201,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             multi = [CURLMulti sharedInstance];
         }
         
-        _URL = [[request URL] copy];
-        
         self.delegate = delegate;
         
         // Turn automatic redirects off by default, so can properly report them to delegate
@@ -278,6 +276,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     curl_easy_reset([self curl]);
 
+    _URL = [[request URL] copy];    // assumes caller will have ensured _URL is suitable for overwriting
+    
     CURLcode code = CURLE_OK;
 
     // SET OPTIONS -- NOTE THAT WE DON'T SET ANY STRINGS DIRECTLY AT THIS STAGE.
@@ -802,6 +802,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     self.delegate = delegate;
     
+    [_URL release]; // -setupRequest:É will fill it back in
     CURLcode result = [self setupRequest:request credential:credential];
     
     if (result == CURLE_OK)
