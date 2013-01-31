@@ -802,16 +802,20 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     self.delegate = delegate;
     
-    [self setupRequest:request credential:credential];
+    CURLcode result = [self setupRequest:request credential:credential];
     
-    CURLcode result = curl_easy_perform(self.curl);
-    if (result != CURLE_OK)
+    if (result == CURLE_OK)
     {
-        [self failWithCode:result isMulti:NO];
+        result = curl_easy_perform(self.curl);
+    }
+    
+    if (result == CURLE_OK)
+    {
+        [self finish];
     }
     else
     {
-        [self finish];
+        [self failWithCode:result isMulti:NO];
     }
     
     [self cleanupIncludingHandle:NO];
