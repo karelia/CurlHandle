@@ -169,7 +169,9 @@ static const NSUInteger kIterationToUseCustomMulti = 1;
 
 - (void)testVersion
 {
-    NSLog(@"curl version %@", [CURLHandle curlVersion]);
+    NSString* version = [CURLHandle curlVersion];
+    NSLog(@"curl version %@", version);
+    STAssertTrue([version isEqualToString:@"libcurl/7.28.1-DEV SecureTransport zlib/1.2.5 c-ares/1.9.0-DEV libssh2/1.4.3_DEV"], @"version %@", version);
 }
 
 - (void)testHTTPDownload
