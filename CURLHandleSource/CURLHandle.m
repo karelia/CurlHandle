@@ -260,16 +260,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 /*""*/
 
-- (NSError *)errorWithDomain:(NSString *)domain code:(NSInteger)code underlyingError:(NSError *)underlyingError;
-{
-    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithDictionary:[underlyingError userInfo]];
-    [userInfo setObject:underlyingError forKey:NSUnderlyingErrorKey];
-    
-    NSError *result = [NSError errorWithDomain:domain code:code userInfo:userInfo];
-    [userInfo release];
-    return result;
-}
-
 #define LOAD_REQUEST_SET_OPTION(option, parameter) if ((code = curl_easy_setopt(_curl, option, parameter)) != CURLE_OK) return code;
 
 - (CURLcode)setupRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential
@@ -531,133 +521,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     [_headerBuffer setLength:0];	// empty out header buffer
 
     return CURLE_OK;
-}
-
-- (NSError*)errorForURL:(NSURL*)url code:(CURLcode)code
-{
-    NSString *description = [NSString stringWithUTF8String:_errorBuffer];
-
-    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                     url, NSURLErrorFailingURLErrorKey,
-                                     [url absoluteString], NSURLErrorFailingURLStringErrorKey,
-                                     description, NSLocalizedDescriptionKey,
-                                     nil];
-
-    long responseCode;
-    if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
-    {
-        [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]];
-    }
-
-    long osErrorNumber = 0;
-    if (curl_easy_getinfo(_curl, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
-    {
-        [userInfo setObject:[NSError errorWithDomain:NSPOSIXErrorDomain code:osErrorNumber userInfo:nil]
-                     forKey:NSUnderlyingErrorKey];
-    }
-
-    NSError* result = [NSError errorWithDomain:CURLcodeErrorDomain code:code userInfo:userInfo];
-    [userInfo release];
-
-
-    // Try to generate a Cocoa-friendly error on top of the raw libCurl one
-    switch (code)
-    {
-        case CURLE_UNSUPPORTED_PROTOCOL:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorUnsupportedURL underlyingError:result];
-            break;
-
-        case CURLE_URL_MALFORMAT:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorBadURL underlyingError:result];
-            break;
-
-        case CURLE_COULDNT_RESOLVE_HOST:
-        case CURLE_FTP_CANT_GET_HOST:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotFindHost underlyingError:result];
-            break;
-
-        case CURLE_COULDNT_CONNECT:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost underlyingError:result];
-            break;
-            
-        case CURLE_REMOTE_ACCESS_DENIED:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorNoPermissionsToReadFile underlyingError:result];
-            break;
-
-        case CURLE_WRITE_ERROR:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotWriteToFile underlyingError:result];
-            break;
-
-            //case CURLE_FTP_ACCEPT_TIMEOUT:    seems to have been added in a newer version of Curl than ours
-        case CURLE_OPERATION_TIMEDOUT:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorTimedOut underlyingError:result];
-            break;
-
-        case CURLE_SSL_CONNECT_ERROR:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorSecureConnectionFailed underlyingError:result];
-            break;
-
-        case CURLE_TOO_MANY_REDIRECTS:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorHTTPTooManyRedirects underlyingError:result];
-            break;
-
-        case CURLE_BAD_CONTENT_ENCODING:
-            result = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError underlyingError:result];
-            break;
-
-#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_2_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
-        case CURLE_FILESIZE_EXCEEDED:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorDataLengthExceedsMaximum underlyingError:result];
-            break;
-#endif
-
-#if !defined (MAC_OS_X_VERSION_10_7)
-#define MAC_OS_X_VERSION_10_7 (MAC_OS_X_VERSION_MAX_ALLOWED + 1)
-#endif
-
-#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED
-        case CURLE_SEND_FAIL_REWIND:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorRequestBodyStreamExhausted underlyingError:result];
-            break;
-#endif
-
-        case CURLE_LOGIN_DENIED:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorUserAuthenticationRequired underlyingError:result];
-            break;
-
-        case CURLE_REMOTE_DISK_FULL:
-            result = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteOutOfSpaceError underlyingError:result];
-            break;
-
-#if !defined (__IPHONE_5_0)
-#define __IPHONE_5_0 (__IPHONE_OS_VERSION_MAX_ALLOWED + 1)
-#endif
-
-#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_5_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
-        case CURLE_REMOTE_FILE_EXISTS:
-            result = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError underlyingError:result];
-            break;
-#endif
-
-        case CURLE_REMOTE_FILE_NOT_FOUND:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorResourceUnavailable underlyingError:result];
-            break;
-
-        case CURLE_SSL_CACERT:
-        {
-            struct curl_certinfo *certInfo = NULL;
-            if (curl_easy_getinfo(_curl, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
-            {
-                // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
-            }
-
-            break;
-        }
-        default:
-            break;
-    }
-
-    return result;
 }
 
 - (void)cleanup
@@ -923,6 +786,145 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         return (match == CURLKHMATCH_OK ? CURLKHSTAT_FINE : CURLKHSTAT_REJECT);
     }
+}
+
+#pragma mark Error Construction
+
+- (NSError*)errorForURL:(NSURL*)url code:(CURLcode)code
+{
+    NSString *description = [NSString stringWithUTF8String:_errorBuffer];
+    
+    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                     url, NSURLErrorFailingURLErrorKey,
+                                     [url absoluteString], NSURLErrorFailingURLStringErrorKey,
+                                     description, NSLocalizedDescriptionKey,
+                                     nil];
+    
+    long responseCode;
+    if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
+    {
+        [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]];
+    }
+    
+    long osErrorNumber = 0;
+    if (curl_easy_getinfo(_curl, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
+    {
+        [userInfo setObject:[NSError errorWithDomain:NSPOSIXErrorDomain code:osErrorNumber userInfo:nil]
+                     forKey:NSUnderlyingErrorKey];
+    }
+    
+    NSError* result = [NSError errorWithDomain:CURLcodeErrorDomain code:code userInfo:userInfo];
+    [userInfo release];
+    
+    
+    // Try to generate a Cocoa-friendly error on top of the raw libCurl one
+    switch (code)
+    {
+        case CURLE_UNSUPPORTED_PROTOCOL:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorUnsupportedURL underlyingError:result];
+            break;
+            
+        case CURLE_URL_MALFORMAT:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorBadURL underlyingError:result];
+            break;
+            
+        case CURLE_COULDNT_RESOLVE_HOST:
+        case CURLE_FTP_CANT_GET_HOST:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotFindHost underlyingError:result];
+            break;
+            
+        case CURLE_COULDNT_CONNECT:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost underlyingError:result];
+            break;
+            
+        case CURLE_REMOTE_ACCESS_DENIED:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorNoPermissionsToReadFile underlyingError:result];
+            break;
+            
+        case CURLE_WRITE_ERROR:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotWriteToFile underlyingError:result];
+            break;
+            
+            //case CURLE_FTP_ACCEPT_TIMEOUT:    seems to have been added in a newer version of Curl than ours
+        case CURLE_OPERATION_TIMEDOUT:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorTimedOut underlyingError:result];
+            break;
+            
+        case CURLE_SSL_CONNECT_ERROR:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorSecureConnectionFailed underlyingError:result];
+            break;
+            
+        case CURLE_TOO_MANY_REDIRECTS:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorHTTPTooManyRedirects underlyingError:result];
+            break;
+            
+        case CURLE_BAD_CONTENT_ENCODING:
+            result = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError underlyingError:result];
+            break;
+            
+#if MAC_OS_X_VERSION_10_5 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_2_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
+        case CURLE_FILESIZE_EXCEEDED:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorDataLengthExceedsMaximum underlyingError:result];
+            break;
+#endif
+            
+#if !defined (MAC_OS_X_VERSION_10_7)
+#define MAC_OS_X_VERSION_10_7 (MAC_OS_X_VERSION_MAX_ALLOWED + 1)
+#endif
+            
+#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED
+        case CURLE_SEND_FAIL_REWIND:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorRequestBodyStreamExhausted underlyingError:result];
+            break;
+#endif
+            
+        case CURLE_LOGIN_DENIED:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorUserAuthenticationRequired underlyingError:result];
+            break;
+            
+        case CURLE_REMOTE_DISK_FULL:
+            result = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteOutOfSpaceError underlyingError:result];
+            break;
+            
+#if !defined (__IPHONE_5_0)
+#define __IPHONE_5_0 (__IPHONE_OS_VERSION_MAX_ALLOWED + 1)
+#endif
+            
+#if MAC_OS_X_VERSION_10_7 <= MAC_OS_X_VERSION_MAX_ALLOWED || __IPHONE_5_0 <= __IPHONE_OS_VERSION_MAX_ALLOWED
+        case CURLE_REMOTE_FILE_EXISTS:
+            result = [self errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError underlyingError:result];
+            break;
+#endif
+            
+        case CURLE_REMOTE_FILE_NOT_FOUND:
+            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorResourceUnavailable underlyingError:result];
+            break;
+            
+        case CURLE_SSL_CACERT:
+        {
+            struct curl_certinfo *certInfo = NULL;
+            if (curl_easy_getinfo(_curl, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
+            {
+                // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
+            }
+            
+            break;
+        }
+        default:
+            break;
+    }
+    
+    return result;
+}
+
+- (NSError *)errorWithDomain:(NSString *)domain code:(NSInteger)code underlyingError:(NSError *)underlyingError;
+{
+    NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithDictionary:[underlyingError userInfo]];
+    [userInfo setObject:underlyingError forKey:NSUnderlyingErrorKey];
+    
+    NSError *result = [NSError errorWithDomain:domain code:code userInfo:userInfo];
+    [userInfo release];
+    return result;
 }
 
 - (NSString*)description
