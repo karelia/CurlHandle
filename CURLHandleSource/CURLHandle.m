@@ -1091,3 +1091,14 @@ int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     return [self didFindHostFingerprint:foundkey knownFingerprint:knownkey match:match];
 }
+
+@implementation NSError(CURLHandle)
+
+- (NSUInteger)curlResponseCode
+{
+    NSInteger result = [[[self userInfo] objectForKey:@(CURLINFO_RESPONSE_CODE)] integerValue];
+
+    return result;
+}
+
+@end

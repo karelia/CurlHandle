@@ -116,5 +116,7 @@ extern NSString * const CURLcodeErrorDomain;
 extern NSString * const CURLMcodeErrorDomain;
 extern NSString * const CURLSHcodeErrorDomain;
 
-
+@interface NSError(CURLHandle)
+- (NSUInteger)curlResponseCode;
+@end
 
