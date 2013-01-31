@@ -21,7 +21,7 @@ typedef enum
     TEST_MODE_COUNT
 } TestMode;
 
-static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
+static const NSUInteger kIterationsToPerform = 1; // TEST_MODE_COUNT;
 
 // Each test will run kIterationsToPerform times, working its way through the modes in the TestMode enum.
 // You can re-order the enums, and reduce the value of kIterationsToPerform if you only want to use some of these modes.
