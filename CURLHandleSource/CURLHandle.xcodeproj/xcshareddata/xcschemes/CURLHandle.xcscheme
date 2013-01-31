@@ -57,17 +57,16 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "8DC2EF4F0486A6940098B216"
+            BuildableName = "CURLHandle.framework"
+            BlueprintName = "CURLHandle"
+            ReferencedContainer = "container:CURLHandle.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
-         <AdditionalOption
-            key = "DYLD_PRINT_LIBRARIES"
-            value = ""
-            isEnabled = "YES">
-         </AdditionalOption>
-         <AdditionalOption
-            key = "DYLD_PRINT_APIS"
-            value = ""
-            isEnabled = "YES">
-         </AdditionalOption>
       </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
