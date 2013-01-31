@@ -659,14 +659,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 }
 
-- (NSString *)initialFTPPath;
-{
-    char *entryPath;
-    if (curl_easy_getinfo(_curl, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
-    
-    return (entryPath ? [NSString stringWithUTF8String:entryPath] : nil);
-}
-
 /*"	Continue the writing callback in Objective C; now we have our instance variables.
 "*/
 
@@ -797,6 +789,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         return (match == CURLKHMATCH_OK ? CURLKHSTAT_FINE : CURLKHSTAT_REJECT);
     }
+}
+
+#pragma mark Post-Request Info
+
+- (NSString *)initialFTPPath;
+{
+    char *entryPath;
+    if (curl_easy_getinfo(_curl, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
+    
+    return (entryPath ? [NSString stringWithUTF8String:entryPath] : nil);
 }
 
 #pragma mark Error Construction
