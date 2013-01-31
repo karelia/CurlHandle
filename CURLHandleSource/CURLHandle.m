@@ -221,23 +221,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void) dealloc
 {
-    CURLHandleLog(@"deallocing");
-
     [self cleanup];
 
     [_delegate release];
-
-    // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
-    _delegate = nil;
-    
-    // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
-    // can get accessed when calling curl_multi_cleanup, even though the easy handle has been removed from the multi, and cleaned up itself!
-    // see http://curl.haxx.se/mail/lib-2009-10/0222.html
-    curl_easy_reset(_curl);
-
-    curl_easy_cleanup(_curl);
-    _curl = nil;
-
     [_URL release];
 	[_headerBuffer release];
 	[_proxies release];
@@ -315,8 +301,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     LOAD_REQUEST_SET_OPTION(CURLOPT_HEADERFUNCTION, curlHeaderFunction);
     LOAD_REQUEST_SET_OPTION(CURLOPT_READFUNCTION, curlReadFunction);
     // pass self to the callback
-    LOAD_REQUEST_SET_OPTION(CURLOPT_WRITEHEADER, self);
-    LOAD_REQUEST_SET_OPTION(CURLOPT_FILE, self);
+    LOAD_REQUEST_SET_OPTION(CURLOPT_HEADERDATA, self);
+    LOAD_REQUEST_SET_OPTION(CURLOPT_WRITEDATA, self);
     LOAD_REQUEST_SET_OPTION(CURLOPT_READDATA, self);
 
     LOAD_REQUEST_SET_OPTION(CURLOPT_VERBOSE, 1);
@@ -508,7 +494,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     LOAD_REQUEST_SET_OPTION(CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]);
 
     // Intermediate directories
-    LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories]);
+    LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories] ? 2 : 0);
     
     
     // Permissions
@@ -681,6 +667,23 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)cleanup
 {
+    CURLHandleLog(@"cleanup");
+
+    // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
+    // (the curl_easy_reset below should fix this anyway by unregistering the callbacks, but let's be paranoid...)
+    self.delegate = nil;
+
+    if (_curl)
+    {
+        // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
+        // can get accessed when calling curl_multi_cleanup, even though the easy handle has been removed from the multi, and cleaned up itself!
+        // see http://curl.haxx.se/mail/lib-2009-10/0222.html
+        curl_easy_reset(_curl);
+
+        curl_easy_cleanup(_curl);
+        _curl = nil;
+    }
+    
     if (_uploadStream)
     {
         [_uploadStream close];
@@ -736,7 +739,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     [self cleanup];
-    self.delegate = nil;
 }
 
 - (void)completeWithCode:(CURLcode)code;
@@ -753,7 +755,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     [self cleanup];
-    self.delegate = nil;
 }
 
 - (void)finish;
