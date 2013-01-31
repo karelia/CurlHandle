@@ -13,7 +13,6 @@
 #import "NSURLRequest+CURLHandle.h"
 #import "CK2SSHCredential.h"
 
-#define NSS(s) (NSString *)(s)
 #include <SystemConfiguration/SystemConfiguration.h>
 
 #pragma mark - Constants
@@ -374,25 +373,25 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
         if (_proxies
             && [scheme isEqualToString:@"http"]
-            && [[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPEnable)] boolValue] )
+            && [[_proxies objectForKey:(NSString *)kSCPropNetProxiesHTTPEnable] boolValue] )
         {
-            proxyHost = (NSString *) [_proxies objectForKey:NSS(kSCPropNetProxiesHTTPProxy)];
-            proxyPort = (NSNumber *)[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPPort)];
+            proxyHost = (NSString *) [_proxies objectForKey:(NSString *)kSCPropNetProxiesHTTPProxy];
+            proxyPort = (NSNumber *)[_proxies objectForKey:(NSString *)kSCPropNetProxiesHTTPPort];
         }
         if (_proxies
             && [scheme isEqualToString:@"https"]
-            && [[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPSEnable)] boolValue] )
+            && [[_proxies objectForKey:(NSString *)kSCPropNetProxiesHTTPSEnable] boolValue] )
         {
-            proxyHost = (NSString *) [_proxies objectForKey:NSS(kSCPropNetProxiesHTTPSProxy)];
-            proxyPort = (NSNumber *)[_proxies objectForKey:NSS(kSCPropNetProxiesHTTPSPort)];
+            proxyHost = (NSString *) [_proxies objectForKey:(NSString *)kSCPropNetProxiesHTTPSProxy];
+            proxyPort = (NSNumber *)[_proxies objectForKey:(NSString *)kSCPropNetProxiesHTTPSPort];
         }
 
         if (_proxies
             && [scheme isEqualToString:@"ftp"]
-            && [[_proxies objectForKey:NSS(kSCPropNetProxiesFTPEnable)] boolValue] )
+            && [[_proxies objectForKey:(NSString *)kSCPropNetProxiesFTPEnable] boolValue] )
         {
-            proxyHost = (NSString *) [_proxies objectForKey:NSS(kSCPropNetProxiesFTPProxy)];
-            proxyPort = (NSNumber *)[_proxies objectForKey:NSS(kSCPropNetProxiesFTPPort)];
+            proxyHost = (NSString *) [_proxies objectForKey:(NSString *)kSCPropNetProxiesFTPProxy];
+            proxyPort = (NSNumber *)[_proxies objectForKey:(NSString *)kSCPropNetProxiesFTPPort];
         }
 
         if (proxyHost && proxyPort)
