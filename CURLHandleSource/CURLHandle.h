@@ -64,6 +64,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 #pragma mark - RunLoop Support
 
 @interface CURLHandle(MultiSupport)
+- (CURL *) curl;
 - (void)completeWithMultiCode:(CURLMcode)code;
 - (void)completeWithCode:(CURLcode)code;
 - (BOOL)hasCompleted;
@@ -78,7 +79,6 @@ extern NSString * const CURLSHcodeErrorDomain;
 // To use, -init a handle, and then call this method, as many times as you like. Delegate messages will be delivered fairly normally during the request
 - (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
 
-- (CURL *) curl;
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
 + (void) setAllowsProxy:(BOOL) inBool;
 @end
