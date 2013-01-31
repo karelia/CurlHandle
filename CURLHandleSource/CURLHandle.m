@@ -78,6 +78,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @property (readonly, nonatomic) struct curl_slist* postQuoteCommands;
 - (void)addPostQuoteCommand:(NSString *)command;
 
+// As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
 @property(nonatomic, strong) id <CURLHandleDelegate> delegate;
 
 @end
