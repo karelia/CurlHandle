@@ -26,6 +26,7 @@
 - (void)cleanup;
 
 - (NSURL*)ftpTestServer;
+- (BOOL)usingMockServer;
 
 @end
 

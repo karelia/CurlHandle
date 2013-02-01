@@ -126,6 +126,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
             }
             break;
 
+        case TEST_SYNCHRONOUS:
         case TEST_WITH_SHARED_MULTI:
             self.multi = [CURLMulti sharedInstance];
             break;
@@ -137,8 +138,16 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     CURLHandle* handle;
     if (self.mode == TEST_SYNCHRONOUS)
     {
-        handle = [[CURLHandle alloc] init];
-        [handle sendSynchronousRequest:request credential:nil delegate:self];
+        if ([self usingMockServer])
+        {
+            handle = nil;
+            NSLog(@"Skipping test for synchronous iteration as we're using MockServer");
+        }
+        else
+        {
+            handle = [[CURLHandle alloc] init];
+            [handle sendSynchronousRequest:request credential:nil delegate:self];
+        }
     }
     else
     {
@@ -161,15 +170,17 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 - (void)doFTPDownloadWithRoot:(NSURL*)ftpRoot
 {
     CURLHandle* handle = [self newDownloadWithRoot:ftpRoot];
-
-    if (self.mode != TEST_SYNCHRONOUS)
+    if (handle)
     {
-        [self runUntilPaused];
+        if (self.mode != TEST_SYNCHRONOUS)
+        {
+            [self runUntilPaused];
+        }
+
+        STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
+        
+        [handle release];
     }
-
-    STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
-
-    [handle release];
 }
 
 - (CURLHandle*)newUploadWithRoot:(NSURL*)ftpRoot
@@ -195,21 +206,23 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     self.response = nil;
 
     CURLHandle* handle = [self newUploadWithRoot:ftpRoot];
-
-    if (self.mode != TEST_SYNCHRONOUS)
+    if (handle)
     {
-        [self runUntilPaused];
+        if (self.mode != TEST_SYNCHRONOUS)
+        {
+            [self runUntilPaused];
+        }
+
+        STAssertTrue(self.sending, @"should have set sending flag");
+        STAssertNil(self.error, @"got error %@", self.error);
+
+        NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
+        STAssertTrue([response isMemberOfClass:[NSHTTPURLResponse class]], @"got response of class %@", [response class]);
+        STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
+        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
+        
+        [handle release];
     }
-
-    STAssertTrue(self.sending, @"should have set sending flag");
-    STAssertNil(self.error, @"got error %@", self.error);
-
-    NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
-    STAssertTrue([response isMemberOfClass:[NSHTTPURLResponse class]], @"got response of class %@", [response class]);
-    STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
-    STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
-
-    [handle release];
 }
 
 #pragma mark - Tests
@@ -323,19 +336,19 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         [request curl_setPreTransferCommands:@[@"DELE Upload.txt"]];
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
-
-        if (self.mode != TEST_SYNCHRONOUS)
+        if (handle)
         {
-            [self runUntilPaused];
+            if (self.mode != TEST_SYNCHRONOUS)
+            {
+                [self runUntilPaused];
+            }
+
+            STAssertNil(self.error, @"got error %@", self.error);
+            STAssertNotNil(self.response, @"got unexpected response %@", self.response);
+            STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
+            
+            [handle release];
         }
-
-        STAssertNil(self.error, @"got error %@", self.error);
-        STAssertNotNil(self.response, @"got unexpected response %@", self.response);
-        STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
-
-        [handle release];
-
-
     }
 }
 
@@ -359,23 +372,23 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         [request curl_setPreTransferCommands:@[@"SITE CHMOD 0777 Upload.txt"]];
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
-
-        if (self.mode != TEST_SYNCHRONOUS)
+        if (handle)
         {
-        [self runUntilPaused];
+            if (self.mode != TEST_SYNCHRONOUS)
+            {
+                [self runUntilPaused];
+            }
+
+            STAssertNil(self.error, @"got error %@", self.error);
+            STAssertNotNil(self.response, @"got unexpected response %@", self.response);
+
+            NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
+            BOOL result = [reply isEqualToString:@""];
+            STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
+            [reply release];
+            
+            [handle release];
         }
-
-        STAssertNil(self.error, @"got error %@", self.error);
-        STAssertNotNil(self.response, @"got unexpected response %@", self.response);
-
-        NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
-        BOOL result = [reply isEqualToString:@""];
-        STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
-        [reply release];
-        
-        [handle release];
-        
-        
     }
 }
 
@@ -395,25 +408,27 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         [request curl_setPreTransferCommands:@[@"MKD Subdirectory"]];
 
         CURLHandle* handle = [self makeHandleWithRequest:request];
-
-        if (self.mode != TEST_SYNCHRONOUS)
+        if (handle)
         {
-        [self runUntilPaused];
-        }
+            if (self.mode != TEST_SYNCHRONOUS)
+            {
+                [self runUntilPaused];
+            }
 
-        if (self.error)
-        {
-            NSInteger curlResponse = [[[self.error userInfo] objectForKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]] integerValue];
-            STAssertTrue((self.error.code == 21) && (curlResponse == 550), @"got unexpected error %@", self.error);
-        }
-        else
-        {
-            STAssertTrue(self.response == nil, @"got unexpected response %@", self.response);
-        }
+            if (self.error)
+            {
+                NSInteger curlResponse = [[[self.error userInfo] objectForKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]] integerValue];
+                STAssertTrue((self.error.code == 21) && (curlResponse == 550), @"got unexpected error %@", self.error);
+            }
+            else
+            {
+                STAssertTrue(self.response == nil, @"got unexpected response %@", self.response);
+            }
 
-        STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
-
-        [handle release];
+            STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
+            
+            [handle release];
+        }
     }
 }
 

@@ -127,6 +127,12 @@
     return result;
 }
 
+- (BOOL)usingMockServer
+{
+    NSString* ftpTest = [[NSUserDefaults standardUserDefaults] objectForKey:@"CURLHandleFTPTestURL"];
+    return [ftpTest isEqualToString:@"MockServer"];
+}
+
 - (NSURL*)ftpTestServer
 {
     NSURL* result = nil;
