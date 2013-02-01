@@ -52,6 +52,8 @@
 
 static int kMaximumTimeoutMilliseconds = 1000;
 
+#define USE_GLOBAL_QUEUE 1
+
 NSString *const kActionNames[] =
 {
     @"CURL_SOCKET_TIMEOUT",
@@ -259,7 +261,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
         // finally chuck away the queue
         dispatch_async(dispatch_get_main_queue(), ^{
+#if !USE_GLOBAL_QUEUE // if we're using a global queue, we dont want to chuck it away
             dispatch_release(self.queue);
+#endif
             self.queue = nil;
         });
     });
@@ -396,8 +400,23 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)createQueue
 {
+#if USE_GLOBAL_QUEUE
+
+    // make a single queue, stored in a static, which we use for all CURLMulti instances
+    static dispatch_queue_t sGlobalQueue;
+    static dispatch_once_t sGlobalQueueToken;
+    dispatch_once(&sGlobalQueueToken, ^{
+        sGlobalQueue = dispatch_queue_create("com.karelia.CURLMulti", NULL);
+    });
+
+    self.queue = sGlobalQueue;
+#else
+
+    // make a new queue for each CURLMulti instance
     NSString* name = [NSString stringWithFormat:@"com.karelia.CURLMulti.%p", self];
     self.queue = dispatch_queue_create([name UTF8String], NULL);
+
+#endif
 }
 
 #pragma mark - Timer Management
