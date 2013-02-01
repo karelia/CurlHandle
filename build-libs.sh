@@ -1,34 +1,22 @@
+build() {
+
+	echo "Building $1"
+
+	xcodebuild -project $1.xcodeproj -target $2 -configuration Debug > /tmp/build.log
+	res=$?
+
+	if [ $res -ne 0 ];
+	then
+		cat /tmp/build.log
+		echo '$1 build failed'
+		exit $res
+	fi
+
+}
+
 cd SFTP
-
-echo 'Building OpenSSL'
-
-xcodebuild -project OpenSSL.xcodeproj -target openssl -configuration Debug
-res=$?
-
-if [ $res -ne 0 ];
-then
-	echo 'OpenSSL build failed'
-	exit $res
-fi
-	
-echo 'Building libssh2'
-
-xcodebuild -project libssh2.xcodeproj -target libssh2 -configuration Debug
-
-if [ $res -ne 0 ];
-then
-	echo 'libssh2 build failed'
-	exit $res
-fi
+build OpenSSL openssl
+build libssh2 libssh2
 
 cd ../CURLHandleSource
-
-echo 'Building libcurl'
-
-xcodebuild -project CURLHandle.xcodeproj -target libcurl -configuration Debug
-
-if [ $res -ne 0 ];
-then
-	echo 'libcurl build failed'
-	exit $res
-fi
+build CURLHandle libcurl
