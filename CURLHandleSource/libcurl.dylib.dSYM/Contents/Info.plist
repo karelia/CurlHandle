@@ -5,16 +5,14 @@
 		<key>CFBundleDevelopmentRegion</key>
 		<string>English</string>
 		<key>CFBundleIdentifier</key>
-		<string>com.apple.xcode.dsym.libcurl.dylib</string>
+		<string>com.apple.xcode.dsym.com.karelia.CURLHandle</string>
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundlePackageType</key>
 		<string>dSYM</string>
 		<key>CFBundleSignature</key>
 		<string>????</string>
-		<key>CFBundleShortVersionString</key>
-		<string>1.0</string>
 		<key>CFBundleVersion</key>
-		<string>1</string>
+		<string>1.0</string>
 	</dict>
 </plist>
