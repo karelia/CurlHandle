@@ -238,15 +238,17 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
     CURLHandle* handle = [self makeHandleWithRequest:request];
-
-    if (self.mode != TEST_SYNCHRONOUS)
+    if (handle)
     {
-        [self runUntilPaused];
+        if (self.mode != TEST_SYNCHRONOUS)
+        {
+            [self runUntilPaused];
+        }
+
+        STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
+        
+        [handle release];
     }
-
-    STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
-
-    [handle release];
 }
 
 
