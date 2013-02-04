@@ -422,7 +422,9 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
             }
             else
             {
-                STAssertTrue(self.response == nil, @"got unexpected response %@", self.response);
+                NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
+                STAssertNotNil(response, @"expecting response");
+                STAssertTrue(response.statusCode == 257, @"unexpected response code %ld", response.statusCode);
             }
 
             STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
