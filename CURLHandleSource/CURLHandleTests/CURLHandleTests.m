@@ -208,11 +208,6 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     CURLHandle* handle = [self newUploadWithRoot:ftpRoot];
     if (handle)
     {
-        if (self.mode != TEST_SYNCHRONOUS)
-        {
-            [self runUntilPaused];
-        }
-
         STAssertTrue(self.sending, @"should have set sending flag");
         STAssertNil(self.error, @"got error %@", self.error);
 
