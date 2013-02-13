@@ -44,7 +44,7 @@
 
 - (void)testHTTPDownload
 {
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[self testFileRemoteURL]];
     request.shouldUseCurlHandle = YES;
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
@@ -58,7 +58,7 @@
 
 - (void)testCancelling
 {
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[self testFileRemoteURL]];
     request.shouldUseCurlHandle = YES;
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];

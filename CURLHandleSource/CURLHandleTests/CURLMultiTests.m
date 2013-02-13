@@ -34,7 +34,7 @@
 
     [multi startup];
 
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://github.com/karelia/CurlHandle/blob/sam/async/CURLHandleSource/CURLHandleTests/TestContent.txt"]];
     CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [self runUntilPaused];
@@ -118,7 +118,7 @@
 
     [multi startup];
 
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+    NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
     CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [handle cancel];

@@ -188,13 +188,13 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
     NSError* error = nil;
-    NSURL* devNotesURL = [self testFileURL];
-    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+    NSURL* testNotesURL = [self testFileURL];
+    NSString* testNotes = [NSString stringWithContentsOfURL:testNotesURL encoding:NSUTF8StringEncoding error:&error];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
     request.shouldUseCurlHandle = YES;
     [request curl_setCreateIntermediateDirectories:1];
-    [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setHTTPBody:[testNotes dataUsingEncoding:NSUTF8StringEncoding]];
     CURLHandle* handle = [self makeHandleWithRequest:request];
 
     return handle;
@@ -236,7 +236,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 
 - (void)testHTTPDownload
 {
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
+    NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
     CURLHandle* handle = [self makeHandleWithRequest:request];
     if (handle)
     {

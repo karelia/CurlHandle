@@ -17,6 +17,13 @@
     return testFileURL;
 }
 
+- (NSURL*)testFileRemoteURL
+{
+    NSURL* testFileURL = [NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/sam/async/CURLHandleSource/CURLHandleTests/TestContent.txt"];
+
+    return testFileURL;
+}
+
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data
 {
     NSMutableData* buffer = self.buffer;
@@ -122,11 +129,11 @@
 
     NSError* error = nil;
     NSURL* testFileURL = [self testFileURL];
-    NSString* devNotes = [NSString stringWithContentsOfURL:testFileURL encoding:NSUTF8StringEncoding error:&error];
+    NSString* testNotes = [NSString stringWithContentsOfURL:testFileURL encoding:NSUTF8StringEncoding error:&error];
     NSString* receivedNotes = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
 
-    BOOL result = [receivedNotes isEqualToString:devNotes];
-    STAssertTrue(result, @"received notes didn't match: was:\n'%@'\n\nshould have been:\n'%@'", receivedNotes, devNotes);
+    BOOL result = [receivedNotes isEqualToString:testNotes];
+    STAssertTrue(result, @"received notes didn't match: was:\n'%@'\n\nshould have been:\n'%@'", receivedNotes, testNotes);
 
     // clear the buffer
     [self.buffer setLength:0];
