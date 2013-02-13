@@ -75,7 +75,7 @@
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
     {
-        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"TestContent.txt"];
 
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
         request.shouldUseCurlHandle = YES;
@@ -97,13 +97,13 @@
         NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
         NSError* error = nil;
-        NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-        NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+        NSURL* testNotesURL = [self testFileURL];
+        NSString* testNotes = [NSString stringWithContentsOfURL:testNotesURL encoding:NSUTF8StringEncoding error:&error];
 
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
         request.shouldUseCurlHandle = YES;
         [request curl_setCreateIntermediateDirectories:1];
-        [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
+        [request setHTTPBody:[testNotes dataUsingEncoding:NSUTF8StringEncoding]];
 
         NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
         STAssertNotNil(connection, @"failed to get connection for request %@", request);

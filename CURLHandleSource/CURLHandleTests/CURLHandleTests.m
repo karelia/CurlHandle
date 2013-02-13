@@ -159,7 +159,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 
 - (CURLHandle*)newDownloadWithRoot:(NSURL*)ftpRoot
 {
-    NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+    NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"TestContent.txt"];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
     CURLHandle* handle = [self makeHandleWithRequest:request];

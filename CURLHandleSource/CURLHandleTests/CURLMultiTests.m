@@ -58,7 +58,7 @@
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
     {
-        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"DevNotes.txt"];
+        NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"TestContent.txt"];
 
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
         CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
@@ -87,7 +87,7 @@
         NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
         NSError* error = nil;
-        NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+        NSURL* devNotesURL = [self testFileURL];
         NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
 
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
