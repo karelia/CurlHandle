@@ -103,11 +103,7 @@
     // this protocol object is going away
     // if our associated handle hasn't completed yet, we need to cancel it, to stop
     // it from trying to send us delegate messages after we've been disposed
-    if (![self.handle hasCompleted])
-    {
-        [self.multi cancelHandle:self.handle];
-    }
-
+    [self.handle cancel];
     self.handle = nil;
 }
 

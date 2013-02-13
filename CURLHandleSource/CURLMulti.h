@@ -75,17 +75,17 @@
 - (void)manageHandle:(CURLHandle*)handle;
 
 /** 
- * Cancel a handle, and remove it from the multi.
- * Cancelling the handle will cause the multi to release it, will stop any progress on it, will call
- * the cancel method on the handle, and will report to the delegate that it was cancelled.
- *
+ * This removes the handle from the multi. *
  * It is safe to call this method for a handle that has already been cancelled, or has completed,
  * (or indeed was never managed by the multi). Doing so will simply do nothing.
+ *
+ * To cancel the handle, call [handle cancel] instead - it will end up calling this method too,
+ * if the handle was being managed by a multi.
  *
  * @param handle The handle to cancel. Should have previously been added with manageHandle:.
  */
 
-- (void)cancelHandle:(CURLHandle*)handle;
+- (void)stopManagingHandle:(CURLHandle*)handle;
 
 - (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket required:(BOOL)required;
 

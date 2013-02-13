@@ -121,7 +121,7 @@
     NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/master/DevNotes.txt"]];
     CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
-    [multi cancelHandle:handle];
+    [handle cancel];
 
     STAssertTrue([handle isCancelled], @"should have been cancelled");
 

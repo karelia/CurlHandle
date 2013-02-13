@@ -79,8 +79,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (void)addPostQuoteCommand:(NSString *)command;
 
 // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
-@property(nonatomic, strong) id <CURLHandleDelegate> delegate;
-
+@property (strong, nonatomic) id <CURLHandleDelegate> delegate;
+@property (strong, nonatomic) CURLMulti* multi;
 @end
 
 
@@ -91,6 +91,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark curl_slist Accessor Methods
 
 @synthesize httpHeaders = _httpHeaders;
+@synthesize multi = _multi;
 @synthesize preQuoteCommands = _preQuoteCommands;
 @synthesize postQuoteCommands = _postQuoteCommands;
 
@@ -202,13 +203,14 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         }
         
         self.delegate = delegate;
-        
+
         // Turn automatic redirects off by default, so can properly report them to delegate
         curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
                 
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
+            self.multi = multi;
             [multi manageHandle:self];
         }
         else
@@ -648,6 +650,22 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     // setting the delegate to nil ensures that we don't send any more delegate messages, and
     // also tells anything internal that wants to know that we've been cancelled
+    self.delegate = nil;
+
+    if (self.multi)
+    {
+        [self.multi stopManagingHandle:self];
+    }
+}
+
+- (void)removedByMulti:(CURLMulti*)multi
+{
+    if (multi)
+    {
+        NSAssert(multi == self.multi, @"removed by the wrong multi: %@ not %@", multi, self.multi);
+    }
+    
+    self.multi = nil;
     self.delegate = nil;
 }
 
