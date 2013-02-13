@@ -188,7 +188,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
     NSError* error = nil;
-    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
+    NSURL* devNotesURL = [self testFileURL];
     NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];

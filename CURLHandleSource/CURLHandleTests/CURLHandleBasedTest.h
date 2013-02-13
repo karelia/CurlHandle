@@ -27,6 +27,7 @@
 
 - (NSURL*)ftpTestServer;
 - (BOOL)usingMockServer;
+- (NSURL*)testFileURL;
 
 @end
 

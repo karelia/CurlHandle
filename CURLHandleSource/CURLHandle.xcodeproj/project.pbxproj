@@ -152,6 +152,7 @@
 		22BF08E216AEEDD9009BE5A3 /* ftp.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08C316AEEDD8009BE5A3 /* ftp.json */; };
 		22BF08E316AEEDD9009BE5A3 /* http.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08C416AEEDD8009BE5A3 /* http.json */; };
 		22BF08F316AEEDD9009BE5A3 /* webdav.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08E116AEEDD9009BE5A3 /* webdav.json */; };
+		22DC488516CC115300211948 /* TestContent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22DC488416CC115300211948 /* TestContent.txt */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -313,6 +314,7 @@
 		22BF08C316AEEDD8009BE5A3 /* ftp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ftp.json; sourceTree = "<group>"; };
 		22BF08C416AEEDD8009BE5A3 /* http.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = http.json; sourceTree = "<group>"; };
 		22BF08E116AEEDD9009BE5A3 /* webdav.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = webdav.json; sourceTree = "<group>"; };
+		22DC488416CC115300211948 /* TestContent.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestContent.txt; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
 		277D77E1160380AF00906915 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -468,6 +470,7 @@
 		223FD09D160B523700BE1C80 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22DC488416CC115300211948 /* TestContent.txt */,
 				223FD0B1160B63F800BE1C80 /* DevNotes.txt */,
 				223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */,
 				223FD09F160B523700BE1C80 /* InfoPlist.strings */,
@@ -641,6 +644,7 @@
 				22BF08E216AEEDD9009BE5A3 /* ftp.json in Resources */,
 				22BF08E316AEEDD9009BE5A3 /* http.json in Resources */,
 				22BF08F316AEEDD9009BE5A3 /* webdav.json in Resources */,
+				22DC488516CC115300211948 /* TestContent.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

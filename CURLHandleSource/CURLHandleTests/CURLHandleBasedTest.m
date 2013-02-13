@@ -10,6 +10,13 @@
 
 @implementation CURLHandleBasedTest
 
+- (NSURL*)testFileURL
+{
+    NSURL* testFileURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"TestContent" withExtension:@"txt"];
+
+    return testFileURL;
+}
+
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data
 {
     NSMutableData* buffer = self.buffer;
@@ -114,8 +121,8 @@
     STAssertNil(self.error, @"got error %@", self.error);
 
     NSError* error = nil;
-    NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-    NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
+    NSURL* testFileURL = [self testFileURL];
+    NSString* devNotes = [NSString stringWithContentsOfURL:testFileURL encoding:NSUTF8StringEncoding error:&error];
     NSString* receivedNotes = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
 
     BOOL result = [receivedNotes isEqualToString:devNotes];
@@ -141,8 +148,8 @@
     {
         [self setupServerWithResponseFileNamed:@"ftp"];
 
-        NSURL* devNotesURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"DevNotes" withExtension:@"txt"];
-        self.server.data = [NSData dataWithContentsOfURL:devNotesURL];
+        NSURL* testFileURL = [self testFileURL];
+        self.server.data = [NSData dataWithContentsOfURL:testFileURL];
 
         result = [self URLForPath:@"/"];
     }
