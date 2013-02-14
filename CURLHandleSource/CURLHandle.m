@@ -985,7 +985,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (NSString*)description
 {
-    return [NSString stringWithFormat:@"<CURLHandle %p (easy %p)>", self, self.curl];
+    return [NSString stringWithFormat:@"<EASY %p (%p)>", self, self.curl];
 }
 
 // We always log out the debug info in DEBUG builds. We also send everything to the delegate.
