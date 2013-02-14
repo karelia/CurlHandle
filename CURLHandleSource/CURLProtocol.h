@@ -14,6 +14,7 @@
 
 @interface CURLProtocol : NSURLProtocol <CURLHandleDelegate, NSURLAuthenticationChallengeSender>
 {
+    BOOL _gotResponse;
     CURLHandle* _handle;
     CURLMulti* _multi;
     BOOL _uploaded;

@@ -12,13 +12,16 @@
 
 @interface CURLProtocol()
 
+@property (assign, nonatomic) BOOL gotResponse;
 @property (strong, nonatomic) CURLHandle* handle;
 @property (strong, nonatomic) CURLMulti* multi;
 @property (assign, nonatomic) BOOL uploaded;
+
 @end
 
 @implementation CURLProtocol
 
+@synthesize gotResponse = _gotResponse;
 @synthesize handle = _handle;
 @synthesize multi = _multi;
 @synthesize uploaded = _uploaded;
@@ -118,22 +121,34 @@
 
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 {
-    [[self client] URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
+    if (!self.gotResponse)
+    {
+        id <NSURLProtocolClient> client = [self client];
+        CURLProtocolLog(@"got didReceiveResponse %ld from %@ for %@", [(NSHTTPURLResponse*)response statusCode], handle, client);
+        [client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
+        self.gotResponse = YES;
+    }
 }
 
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
 {
-    [[self client] URLProtocol:self didLoadData:data];
+    id <NSURLProtocolClient> client = [self client];
+    CURLProtocolLog(@"got didReceiveData from %@ for %@", handle, client);
+    [client URLProtocol:self didLoadData:data];
 }
 
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
 {
-    [[self client] URLProtocol:self didFailWithError:error];
+        id <NSURLProtocolClient> client = [self client];
+        CURLProtocolLog(@"got didFailWithError %@ from %@ for %@", error, handle, client);
+        [client URLProtocol:self didFailWithError:error];
 }
 
 - (void)handleDidFinish:(CURLHandle *)handle
 {
-    [[self client] URLProtocolDidFinishLoading:self];
+    id <NSURLProtocolClient> client = [self client];
+    CURLProtocolLog(@"got didFinish from %@ for %@", handle, client);
+    [client URLProtocolDidFinishLoading:self];
 }
 
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
