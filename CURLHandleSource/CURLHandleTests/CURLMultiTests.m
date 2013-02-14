@@ -28,13 +28,13 @@
     [multi release];
 }
 
-- (void)testHTTPUpload
+- (void)testHTTPDownload
 {
     CURLMulti* multi = [[CURLMulti alloc] init];
 
     [multi startup];
 
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://github.com/karelia/CurlHandle/blob/sam/async/CURLHandleSource/CURLHandleTests/TestContent.txt"]];
+    NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
     CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
 
     [self runUntilPaused];
