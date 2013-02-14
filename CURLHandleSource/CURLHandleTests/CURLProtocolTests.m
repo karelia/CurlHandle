@@ -17,23 +17,31 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
+    NSLog(@"failed with error %@", error);
+
     self.error = error;
     [self pause];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
+    NSLog(@"got response %@", response);
+
     self.response = response;
     self.buffer = [NSMutableData data];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)dataIn
 {
+    NSLog(@"got data %ld bytes", [dataIn length]);
+
     [self.buffer appendData:dataIn];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+    NSLog(@"finished");
+
     [self pause];
 }
 
