@@ -57,8 +57,8 @@
 
 - (NSString*)description
 {
-    NSString* mode = self.reader ? (self.writer ? @" reading writing" : @" reading") : (self.writer ? @" writing" : @"");
-    return [NSString stringWithFormat:@"<%d%@>", self.socket, mode];
+    NSString* mode = self.reader ? (self.writer ? @"dispatch sources: read, write" : @"dispatch source:read") : (self.writer ? @"dispatch source: write" : @"no dispatch sources");
+    return [NSString stringWithFormat:@"<socket %d %@>", self.socket, mode];
 }
 
 @end

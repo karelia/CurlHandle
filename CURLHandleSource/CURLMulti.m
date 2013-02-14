@@ -424,18 +424,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
     self.timer = timer;
     dispatch_source_set_event_handler(timer, ^{
-#ifdef REDISPATCH_SOURCE_EVENT_TO_QUEUE
-        if ([self notShutdown])
-        {
-            NSAssert(self.queue != nil, @"should still have queue");
-            dispatch_async(self.queue, ^{
-#endif
                 CURLMultiLog(@"timer fired");
                 [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
-#ifdef REDISPATCH_SOURCE_EVENT_TO_QUEUE
-            });
-        }
-#endif
     });
 
     dispatch_source_set_cancel_handler(self.timer, ^{
@@ -479,26 +469,23 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         if (!source)
         {
-            CURLMultiLog(@"%@ source added for socket %d", [self nameForType:type], socket);
+            CURLMultiLog(@"%@ dispatch source added for socket %d", [self nameForType:type], socket);
             source = dispatch_source_create(type, socket, 0, self.queue);
 
             dispatch_source_set_event_handler(source, ^{
-#if REDISPATCH_SOURCE_EVENT_TO_QUEUE
                 if ([self notShutdown])
                 {
-                    NSAssert(self.queue != nil, @"should still have queue");
-                    dispatch_async(self.queue, ^{
-#endif
                         int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
                         [self multiProcessAction:action forSocket:socket];
-#if REDISPATCH_SOURCE_EVENT_TO_QUEUE
-                    });
                 }
-#endif
+                else
+                {
+                    CURLMultiLog(@"%@ dispatch source fired  for socket %d on multi that has been shut down", [self nameForType:type], socket);
+                }
             });
 
             dispatch_source_set_cancel_handler(source, ^{
-                CURLMultiLog(@"%@ source cancel handler fired for socket %d", [self nameForType:type], socket);
+                CURLMultiLog(@"%@ removed dispatch source for socket %d", [self nameForType:type], socket);
                 dispatch_release(source);
             });
 
@@ -507,7 +494,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
     else if (source)
     {
-        CURLMultiLog(@"%@ source removed for socket %d", [self nameForType:type], socket);
+        CURLMultiLog(@"%@ removing dispatch source for socket %d", [self nameForType:type], socket);
         dispatch_source_cancel(source);
         source = nil;
     }
