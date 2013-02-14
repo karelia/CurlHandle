@@ -231,7 +231,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 {
     NSString* version = [CURLHandle curlVersion];
     NSLog(@"curl version %@", version);
-    STAssertTrue([version isEqualToString:@"libcurl/7.28.1-DEV SecureTransport zlib/1.2.5 c-ares/1.9.0-DEV libssh2/1.4.3_DEV"], @"version %@", version);
+    STAssertTrue([version isEqualToString:@"libcurl/7.28.2-DEV SecureTransport zlib/1.2.5 c-ares/1.9.0-DEV libssh2/1.4.3_DEV"], @"version was \n\n%@\n\n", version);
 }
 
 - (void)testHTTPDownload
