@@ -16,7 +16,6 @@
 {
     BOOL _gotResponse;
     CURLHandle* _handle;
-    CURLMulti* _multi;
     BOOL _uploaded;
 }
 

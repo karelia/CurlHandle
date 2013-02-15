@@ -14,7 +14,6 @@
 
 @property (assign, nonatomic) BOOL gotResponse;
 @property (strong, nonatomic) CURLHandle* handle;
-@property (strong, nonatomic) CURLMulti* multi;
 @property (assign, nonatomic) BOOL uploaded;
 
 @end
@@ -23,7 +22,6 @@
 
 @synthesize gotResponse = _gotResponse;
 @synthesize handle = _handle;
-@synthesize multi = _multi;
 @synthesize uploaded = _uploaded;
 
 #pragma mark - Object Lifecycle
@@ -33,7 +31,6 @@
     NSAssert((_handle == nil) || [_handle hasCompleted], @"handle should be done by the time we are destroyed");
 
     [_handle release];
-    [_multi release];
 
     CURLProtocolLog(@"dealloced");
 
@@ -93,8 +90,7 @@
 
 - (void)startLoadingWithCredential:(NSURLCredential *)credential;
 {
-    self.multi = [CURLMulti sharedInstance]; // in theory we don't need to retain this, since it's a singleton, but we do in case something (a unit testing scenario for example) messes with it before we're done
-    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self multi:self.multi];
+    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self multi:nil];
     self.handle = handle;
     [handle release];
 }
