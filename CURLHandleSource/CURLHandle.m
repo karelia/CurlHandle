@@ -352,6 +352,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY);
             LOAD_REQUEST_SET_OPTION(CURLOPT_KEYPASSWD, [password UTF8String]);
         }
+        else if (credential.ck2_isPublicKeyCredential)
+        {
+            LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_AUTH_TYPES, (1<<4));    // want to use CURLSSH_AUTH_AGENT, but can't get Xcode to recognise the header
+        }
         else
         {
             LOAD_REQUEST_SET_OPTION(CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
