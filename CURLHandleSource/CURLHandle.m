@@ -600,7 +600,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return _executing == NO;
 }
 
-- (NSString*)nameForType:(curl_infotype)type
++ (NSString*)nameForType:(curl_infotype)type
 {
     return kInfoNames[type];
 }
@@ -1037,7 +1037,7 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
                 }
             }
             
-            CURLHandleLog(@"%@ - %@", [self nameForType:infoType], string);
+            CURLHandleLog(@"%@ - %@", [self.class nameForType:infoType], string);
             
             if (delegateResponds)
             {

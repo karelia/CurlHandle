@@ -56,7 +56,7 @@
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type
 {
-    NSString* typeName = [handle nameForType:type];
+    NSString* typeName = [handle.class nameForType:type];
     if (!self.transcript)
     {
         self.transcript = [NSMutableString stringWithString:@""];
