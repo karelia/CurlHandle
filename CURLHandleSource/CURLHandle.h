@@ -53,7 +53,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 //  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
 
-// Can be called from any thread. Causes -loadRequest:err_delegateor: as soon as it can
+// Stops the request Ñ and delivery of delegate messages Ñ as quickly as possible
 - (void)cancel;
 
 - (NSString *)initialFTPPath;    // CURLINFO_FTP_ENTRY_PATH. Only suitable once handle has finished
@@ -79,6 +79,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 // Please don't use this unless you have to!
 // To use, -init a handle, and then call this method, as many times as you like. Delegate messages will be delivered fairly normally during the request
+// To cancel a synchronous request, call -cancel on a different thread and this method will return as soon as it can
 - (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
 
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
