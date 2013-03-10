@@ -120,7 +120,7 @@
     if (!self.gotResponse)
     {
         id <NSURLProtocolClient> client = [self client];
-        CURLProtocolLog(@"got didReceiveResponse %ld from %@ for %@", [(NSHTTPURLResponse*)response statusCode], handle, client);
+        CURLProtocolLog(@"got didReceiveResponse %ld from %@ for %@", (long)[(NSHTTPURLResponse*)response statusCode], handle, client);
         [client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
         self.gotResponse = YES;
     }
