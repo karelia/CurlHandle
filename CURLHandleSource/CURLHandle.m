@@ -864,6 +864,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                                      url, NSURLErrorFailingURLErrorKey,
                                      [url absoluteString], NSURLErrorFailingURLStringErrorKey,
                                      description, NSLocalizedDescriptionKey,
+                                     description, NSLocalizedFailureReasonErrorKey,
                                      nil];
     
     long responseCode;
