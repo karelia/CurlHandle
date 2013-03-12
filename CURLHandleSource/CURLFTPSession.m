@@ -177,7 +177,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
     // FIXME: The command is a toggle, so must only do it the once. If the session goes unused long enough for a request to require a reconnection, that setting will be reset and we have no way of knowing that. So fingers crossed there are no disconnects before directory listings!
     if (!_doneDirectoryListing)
     {
-        [self executeCustomCommands:@[@"SITE DIRSTYLE"] inDirectory:path createIntermediateDirectories:NO error:NULL];
+        [self executeCustomCommands:[NSArray arrayWithObject:@"SITE DIRSTYLE"] inDirectory:path createIntermediateDirectories:NO error:NULL];
         _doneDirectoryListing = YES;
     }
     
@@ -362,7 +362,7 @@ createIntermediateDirectories:(BOOL)createIntermediates
 {
     NSString *from = [NSString stringWithFormat:@"RNFR %@", [fromPath lastPathComponent]];
     NSString *to = [NSString stringWithFormat:@"RNTO %@", toPath];
-    return [self executeCustomCommands:@[from, to]
+    return [self executeCustomCommands:[NSArray arrayWithObjects:from, to, nil]
                            inDirectory:[fromPath stringByDeletingLastPathComponent]
          createIntermediateDirectories:NO
                                  error:error];
