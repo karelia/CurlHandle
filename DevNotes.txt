@@ -2,7 +2,9 @@
 CURLHandle Notes
 ------------------------------------------------------------------------------
 
-CURLHandle is compatible with Mac OS X 10.2 and up.  For 10.1 compatibility, please see the legacy version 1.9.  Remember that NSURLHandle has been deprecated since 10.4, so you probably don't want to start using CURLHandle for a new project.
+CURLHandle is compatible with Mac OS X 10.6 and up. It likely could support 10.5 with a little extra work if you're so inclined
+For 10.2 compatibility, please see the legacy version 2.0.
+For 10.1 compatibility, please see the legacy version 1.9.
 
 ------------------------------------------------------------------------------
 INSTALLING THE CURLHANDLE FRAMEWORK
