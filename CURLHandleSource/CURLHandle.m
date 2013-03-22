@@ -868,7 +868,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     long responseCode;
     if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
     {
-        [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]];
+        [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:@(CURLINFO_RESPONSE_CODE)];
     }
     
     long osErrorNumber = 0;
