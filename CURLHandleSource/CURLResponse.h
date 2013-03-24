@@ -9,12 +9,14 @@
 @interface CURLResponse : NSURLResponse
 {
 @private
+    NSInteger   _code;
     NSString    *_header;
 }
 
 // For HTTP URLs, returns an NSHTTPURLResponse. For others, a CURLResponse
 + (NSURLResponse *)responseWithURL:(NSURL *)url statusCode:(NSInteger)statusCode headerString:(NSString *)header;
 
+@property(readonly) NSInteger statusCode;
 @property(readonly) NSString *headerString;
 
 @end

@@ -35,6 +35,7 @@
     else
     {
         CURLResponse *result = [[self alloc] initWithURL:url MIMEType:nil expectedContentLength:NSURLResponseUnknownLength textEncodingName:nil];
+        result->_code = statusCode;
         result->_header = [header copy];
         return [result autorelease];
     }
@@ -47,6 +48,7 @@
 }
 
 @synthesize headerString = _header;
+@synthesize statusCode = _statusCode;
 
 @end
 
