@@ -9,7 +9,6 @@
 #import "CURLMulti.h"
 #import "CURLResponse.h"
 
-#import "NSString+CURLHandle.h"
 #import "NSURLRequest+CURLHandle.h"
 #import "CK2SSHCredential.h"
 
@@ -744,15 +743,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                     NSURL *url = [[NSURL alloc] initWithString:urlString];
                     if (url)
                     {
-                        Class responseClass = ([NSHTTPURLResponse instancesRespondToSelector:@selector(initWithURL:statusCode:HTTPVersion:headerFields:)] ? [NSHTTPURLResponse class] : [CURLResponse class]);
-                        
-                        NSURLResponse *response = [[responseClass alloc] initWithURL:url
-                                                                          statusCode:code
-                                                                         HTTPVersion:[headerString headerHTTPVersion]
-                                                                        headerFields:[headerString allHTTPHeaderFields]];
-                        
+                        NSURLResponse *response = [CURLResponse responseWithURL:url statusCode:code headerString:headerString];
                         [self.delegate handle:self didReceiveResponse:response];
-                        [response release];
                         
                         [url release];
                     }
