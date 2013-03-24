@@ -48,7 +48,7 @@
 }
 
 @synthesize headerString = _header;
-@synthesize statusCode = _statusCode;
+@synthesize statusCode = _code;
 
 @end
 
