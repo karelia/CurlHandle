@@ -6,13 +6,17 @@
 
 #import <Foundation/Foundation.h>
 
-@interface CURLResponse : NSHTTPURLResponse
+@interface CURLResponse : NSURLResponse
 {
 @private
-    NSInteger       _statusCode;
-    NSDictionary    *_headerFields;
+    NSInteger   _code;
+    NSString    *_header;
 }
 
-// Implements -initWithURL:statusCode:HTTPVersion:headerFields: on release prior to 10.7.2
+// For HTTP URLs, returns an NSHTTPURLResponse. For others, a CURLResponse
++ (NSURLResponse *)responseWithURL:(NSURL *)url statusCode:(NSInteger)statusCode headerString:(NSString *)header;
+
+@property(readonly) NSInteger statusCode;
+@property(readonly) NSString *headerString;
 
 @end

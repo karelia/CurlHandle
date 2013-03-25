@@ -217,7 +217,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         STAssertNil(self.error, @"got error %@", self.error);
 
         NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
-        STAssertTrue([response isMemberOfClass:[NSHTTPURLResponse class]], @"got response of class %@", [response class]);
+        STAssertTrue([response respondsToSelector:@selector(statusCode)], @"got response of class %@", [response class]);
         STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
         STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
         
