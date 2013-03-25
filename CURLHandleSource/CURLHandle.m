@@ -672,6 +672,14 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     self.delegate = nil;
 }
 
++ (CURLMulti*)standaloneMultiForTestPurposes
+{
+    CURLMulti* multi = [[[CURLMulti alloc] init] autorelease];
+    [multi startup];
+
+    return multi;
+}
+
 - (void)failWithCode:(int)code isMulti:(BOOL)isMultiCode;
 {
     NSError* error = (isMultiCode ?
