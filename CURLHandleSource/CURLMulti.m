@@ -478,8 +478,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 if ([self notShutdown])
                 {
                     int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
-                    unsigned long value = dispatch_source_get_data(source);
-                    CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], socket, value);
+                    CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], socket, dispatch_source_get_data(source));
                     [self multiProcessAction:action forSocket:socket];
                 }
                 else
