@@ -1,6 +1,6 @@
 [submodule "curl"]
-url=git://github.com/karelia/curl.git
-	url = git://github.com/bagder/curl.git
+	path = curl
+	url = git://github.com/karelia/curl.git
 [submodule "c-ares"]
 	path = c-ares
 	url = git://github.com/bagder/c-ares.git
