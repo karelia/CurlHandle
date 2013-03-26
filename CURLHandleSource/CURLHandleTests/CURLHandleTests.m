@@ -113,7 +113,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     return kIterationsToPerform;
 }
 
-- (CURLHandle*)makeHandleWithRequest:(NSURLRequest*)request
+- (CURLHandle*)newHandleWithRequest:(NSURLRequest*)request
 {
     switch (self.mode)
     {
@@ -162,7 +162,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"TestContent.txt"];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-    CURLHandle* handle = [self makeHandleWithRequest:request];
+    CURLHandle* handle = [self newHandleWithRequest:request];
 
     return handle;
 }
@@ -195,7 +195,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     request.shouldUseCurlHandle = YES;
     [request curl_setCreateIntermediateDirectories:1];
     [request setHTTPBody:[testNotes dataUsingEncoding:NSUTF8StringEncoding]];
-    CURLHandle* handle = [self makeHandleWithRequest:request];
+    CURLHandle* handle = [self newHandleWithRequest:request];
 
     return handle;
 }
@@ -237,7 +237,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 - (void)testHTTPDownload
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
-    CURLHandle* handle = [self makeHandleWithRequest:request];
+    CURLHandle* handle = [self newHandleWithRequest:request];
     if (handle)
     {
         if (self.mode != TEST_SYNCHRONOUS)
@@ -296,12 +296,12 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         if (ftpRoot)
         {
             NSArray* handles = @[
-                                 [self newDownloadWithRoot:ftpRoot],
-                                 [self newUploadWithRoot:ftpRoot],
-                                 [self newDownloadWithRoot:ftpRoot],
-                                 [self newUploadWithRoot:ftpRoot],
-                                 [self newDownloadWithRoot:ftpRoot],
-                                 [self newUploadWithRoot:ftpRoot]
+                                 [[self newDownloadWithRoot:ftpRoot] autorelease],
+                                 [[self newUploadWithRoot:ftpRoot] autorelease],
+                                 [[self newDownloadWithRoot:ftpRoot] autorelease],
+                                 [[self newUploadWithRoot:ftpRoot] autorelease],
+                                 [[self newDownloadWithRoot:ftpRoot] autorelease],
+                                 [[self newUploadWithRoot:ftpRoot] autorelease]
                                  ];
 
             NSUInteger count = [handles count];
@@ -337,7 +337,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         [request curl_setCreateIntermediateDirectories:YES];
         [request curl_setPreTransferCommands:@[@"DELE Upload.txt"]];
 
-        CURLHandle* handle = [self makeHandleWithRequest:request];
+        CURLHandle* handle = [self newHandleWithRequest:request];
         if (handle)
         {
             if (self.mode != TEST_SYNCHRONOUS)
@@ -373,7 +373,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         [request curl_setCreateIntermediateDirectories:YES];
         [request curl_setPreTransferCommands:@[@"SITE CHMOD 0777 Upload.txt"]];
 
-        CURLHandle* handle = [self makeHandleWithRequest:request];
+        CURLHandle* handle = [self newHandleWithRequest:request];
         if (handle)
         {
             if (self.mode != TEST_SYNCHRONOUS)
@@ -409,7 +409,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
         [request curl_setCreateIntermediateDirectories:YES];
         [request curl_setPreTransferCommands:@[@"MKD Subdirectory"]];
 
-        CURLHandle* handle = [self makeHandleWithRequest:request];
+        CURLHandle* handle = [self newHandleWithRequest:request];
         if (handle)
         {
             if (self.mode != TEST_SYNCHRONOUS)
