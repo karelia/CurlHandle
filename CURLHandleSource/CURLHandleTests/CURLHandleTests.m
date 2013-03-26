@@ -42,8 +42,38 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 
 @end
 
+static TestMode gModeToUse;
 
 @implementation CURLHandleTests
+
++ (id) defaultTestSuite
+{
+    NSArray* modes = @[@(TEST_SYNCHRONOUS), @(TEST_WITH_OWN_MULTI), @(TEST_WITH_SHARED_MULTI)];
+
+    SenTestSuite* result = [[SenTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Collection", NSStringFromClass(self)]];
+    for (NSNumber* mode in modes)
+    {
+        // in order to re-use the default SenTest mechanism for building up a suite of tests, we set some global variables
+        // to indicate the test configuration we want, then call on to the defaultTestSuite to get a set of tests using that configuration.
+        gModeToUse = (TestMode)[mode unsignedIntegerValue];
+        SenTestSuite* suite = [[SenTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Using%@", NSStringFromClass(self), [CURLHandleTests nameForMode:gModeToUse]]];
+        [suite addTest:[super defaultTestSuite]];
+        [result addTest:suite];
+        [suite release];
+    }
+
+    return [result autorelease];
+}
+
+- (id)initWithInvocation:(NSInvocation *)anInvocation
+{
+    if ((self = [super initWithInvocation:anInvocation]) != nil)
+    {
+        self.mode = gModeToUse;
+    }
+
+    return self;
+}
 
 - (void)dealloc
 {
@@ -68,49 +98,29 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     [super cleanup];
 }
 
-- (NSString*)nameForIteration:(NSUInteger)iteration
++ (NSString*)nameForMode:(TestMode)mode
 {
-    NSString* iterationName;
-    switch (iteration)
+    NSString* name;
+    switch (mode)
     {
         case TEST_SYNCHRONOUS:
-            iterationName = @"Synchronous";
+            name = @"Synchronous";
             break;
 
         case TEST_WITH_SHARED_MULTI:
-            iterationName = @"Shared Multi";
+            name = @"Shared Multi";
             break;
 
         case TEST_WITH_OWN_MULTI:
-            iterationName = @"Own Multi";
+            name = @"Own Multi";
             break;
 
         default:
-            iterationName = @"Invalid";
+            name = @"Invalid";
             break;
     }
 
-    return iterationName;
-}
-
-- (void) beforeTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
-{
-    STAssertTrue(iteration < TEST_MODE_COUNT, @"invalid iteration count %d", iteration);
-
-    NSLog(@"\n\n************************************************************\nStarting %@ %@\n************************************************************\n\n", [self nameForIteration:iteration], [self name]);
-    self.mode = (TestMode)iteration;
-}
-
-- (void)afterTestIteration:(NSUInteger)iteration selector:(SEL)testMethod
-{
-    [self cleanup];
-    [self cleanupServer];
-    NSLog(@"\n\n************************************************************\nDone %@ %@\n************************************************************\n\n", [self nameForIteration:iteration], [self name]);
-}
-
-- (NSUInteger) numberOfTestIterationsForTestWithSelector:(SEL)testMethod
-{
-    return kIterationsToPerform;
+    return name;
 }
 
 - (CURLHandle*)newHandleWithRequest:(NSURLRequest*)request
@@ -278,9 +288,9 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
     if (ftpRoot)
     {
         [self doFTPUploadWithRoot:ftpRoot];
-        //[self doFTPDownloadWithRoot:ftpRoot];
+        [self doFTPDownloadWithRoot:ftpRoot];
         [self doFTPUploadWithRoot:ftpRoot];
-        //[self doFTPDownloadWithRoot:ftpRoot];
+        [self doFTPDownloadWithRoot:ftpRoot];
         [self doFTPUploadWithRoot:ftpRoot];
         [self doFTPUploadWithRoot:ftpRoot];
     }
