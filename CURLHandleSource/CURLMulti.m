@@ -277,7 +277,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         int running;
         CURLMultiLog(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action+1]);
-        CURLMcode result = curl_multi_socket_action(multi, socket, action, &running);
+        CURLMcode result;
+        do
+        {
+            result = curl_multi_socket_action(multi, socket, action, &running);
+        } while (result == CURLM_CALL_MULTI_SOCKET);
         if (result == CURLM_OK)
         {
             CURLMultiLog(@"%d handles reported as running", running);
