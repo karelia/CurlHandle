@@ -99,10 +99,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     if ((self = [super init]) != nil)
     {
-        self.handles = [NSMutableArray array];
-        self.pendingAdditions = [NSMutableArray array];
-        self.pendingRemovals = [NSMutableArray array];
-        if (![self createTimer])
+        if ([self createTimer])
+        {
+            self.handles = [NSMutableArray array];
+            self.pendingAdditions = [NSMutableArray array];
+            self.pendingRemovals = [NSMutableArray array];
+        }
+        else
         {
             [self release];
             self = nil;
@@ -158,7 +161,14 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert(self.pendingAdditions, @"need additions array");
 
     dispatch_async(self.queue, ^{
-        [self.pendingAdditions addObject:handle];
+        if ([self.pendingRemovals containsObject:handle])
+        {
+            [self.pendingRemovals removeObject:handle];
+        }
+        else
+        {
+            [self.pendingAdditions addObject:handle];
+        }
     });
 }
 
@@ -280,11 +290,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 if (handle)
                 {
                     CURLMultiLog(@"done msg result %d for %@", code, handle);
-                    if (![self.pendingRemovals containsObject:handle])
-                    {
-                        [self.pendingRemovals addObject:handle];
-                    }
+                    [self multi:multi removeHandle:handle];
+                    [self.pendingRemovals removeObject:handle]; // just in case it was already scheduled for removal
                     [handle completeWithCode:code];
+                    [handle removedByMulti:self];
                 }
                 else
                 {
@@ -337,21 +346,19 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     // process the pending removals
     for (CURLHandle* handle in self.pendingRemovals)
     {
-        // by the time this runs, the handle may already have finished naturally and been removed,
-        // so it's not an error to get here and discover that we're not managing it
-        BOOL weOwnTheHandle = [self.handles containsObject:handle];
-        if (weOwnTheHandle)
-        {
-            CURLMultiLog(@"removed handle %@", handle);
-            CURLMcode result = curl_multi_remove_handle(multi, [handle curl]);
-            NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
-            [self.handles removeObject:handle];
-            [handle removedByMulti:self];
-        }
+        NSAssert([self.handles containsObject:handle], @"we should be managing this handle");
+        [self multi:multi removeHandle:handle];
         [handle removedByMulti:self];
     }
     [self.pendingRemovals removeAllObjects];
+}
 
+- (void)multi:(CURLM*)multi removeHandle:(CURLHandle*)handle
+{
+    CURLMultiLog(@"removed handle %@", handle);
+    CURLMcode result = curl_multi_remove_handle(multi, [handle curl]);
+    NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
+    [self.handles removeObject:handle];
 }
 
 - (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
@@ -446,7 +453,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
             dispatch_source_set_event_handler(timer, ^{
                 CURLMultiLog(@"timer fired");
-                [self processMulti:multi action:CURL_SOCKET_TIMEOUT forSocket:0];
+                [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
             });
 
             dispatch_source_set_cancel_handler(timer, ^{
@@ -457,6 +464,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 dispatch_release(timer);
 
                 [self cleanupQueue];
+            });
+
+            // kick things off - this should be enough to get the timer scheduled, but it won't actually start firing again until it is resumed
+            dispatch_async(queue, ^{
+                [self updateTimeout:0];
+                //                [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
             });
 
             self.timer = timer;
@@ -505,12 +518,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             CURLMultiLog(@"%@ dispatch source added for socket %d", [self nameForType:type], socket);
             source = dispatch_source_create(type, socket, 0, self.queue);
 
+            CURLM* multi = self.multiForSocket;
             dispatch_source_set_event_handler(source, ^{
                 if ([self notShutdown])
                 {
                     int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
                     CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], socket, dispatch_source_get_data(source));
-                    [self processMulti:self.multiForSocket action:action forSocket:socket];
+                    [self processMulti:multi action:action forSocket:socket];
                 }
                 else
                 {
