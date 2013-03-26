@@ -290,10 +290,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 if (handle)
                 {
                     CURLMultiLog(@"done msg result %d for %@", code, handle);
+                    [handle retain];
                     [self multi:multi removeHandle:handle];
-                    [self.pendingRemovals removeObject:handle]; // just in case it was already scheduled for removal
                     [handle completeWithCode:code];
                     [handle removedByMulti:self];
+                    [self.pendingRemovals removeObject:handle]; // just in case it was already scheduled for removal
+                    [handle autorelease];
                 }
                 else
                 {
