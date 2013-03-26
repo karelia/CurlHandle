@@ -456,7 +456,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             timeout = kMaximumTimeoutMilliseconds;
         }
 
-        int64_t nano_timeout = timeout * 1000000LL;
+        int64_t nano_timeout = timeout * NSEC_PER_MSEC;
         dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, nano_timeout, nano_timeout / 100);
 
         CURLMultiLog(@"timeout changed to %ldms", (long)timeout);
