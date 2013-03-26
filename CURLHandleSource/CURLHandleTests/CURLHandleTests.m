@@ -309,11 +309,6 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
             {
                 [self runUntilPaused];
             }
-
-            for (CURLHandle* handle in handles)
-            {
-                [handle release];
-            }
         }
     }
 }
