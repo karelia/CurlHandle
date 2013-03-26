@@ -240,7 +240,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         self.timer = nil;
 
         // give handles a last chance to process
-        [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
+        [self multiProcessAction:0 forSocket:CURL_SOCKET_TIMEOUT];
 
         NSArray* handles = [self.handles retain];
         self.handles = nil; // stop removeHandle from mutating the array whilst we iterate through it
@@ -431,7 +431,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     self.timer = timer;
     dispatch_source_set_event_handler(timer, ^{
                 CURLMultiLog(@"timer fired");
-                [self multiProcessAction:CURL_SOCKET_TIMEOUT forSocket:0];
+                [self multiProcessAction:0 forSocket:CURL_SOCKET_TIMEOUT];
     });
 
     dispatch_source_set_cancel_handler(self.timer, ^{
