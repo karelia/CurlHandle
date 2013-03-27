@@ -11,6 +11,8 @@
 
 @interface CURLProtocolTests : CURLHandleBasedTest<NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
+@property (assign, nonatomic) BOOL pauseOnResponse;
+
 @end
 
 @implementation CURLProtocolTests
@@ -29,6 +31,10 @@
 
     self.response = response;
     self.buffer = [NSMutableData data];
+    if (self.pauseOnResponse)
+    {
+        [self pause];
+    }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)dataIn
@@ -66,11 +72,15 @@
 
 - (void)testCancelling
 {
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:[self testFileRemoteURL]];
+    self.pauseOnResponse = YES;
+    NSURL* largeFile = [NSURL URLWithString:@"https://github.com/karelia/CurlHandle/archive/master.zip"];
+    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:largeFile];
     request.shouldUseCurlHandle = YES;
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
     STAssertNotNil(connection, @"failed to get connection for request %@", request);
+
+    [self runUntilPaused];
 
     [connection cancel];
 
