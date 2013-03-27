@@ -38,6 +38,11 @@
 
 #include <dispatch/dispatch.h>
 
+#define log_normal(...) fprintf(stderr, __VA_ARGS__)
+#define log_error(...) fprintf(stderr, "ERROR: " __VA_ARGS__)
+//#define log_detail(...) fprintf(stderr, __VA_ARGS__)
+#define log_detail(...)
+
 dispatch_queue_t queue;
 int remaining = 0;
 CURLM *curl_handle;
@@ -53,7 +58,7 @@ curl_context_t* create_curl_context()
     curl_context_t *context = (curl_context_t *) malloc(sizeof *context);
     memset(context, 0, sizeof(curl_context_t));
 
-    fprintf(stderr, "created context %p\n", context);
+    log_detail("created context %p\n", context);
     
     return context;
 }
@@ -66,7 +71,8 @@ void destroy_curl_context(curl_context_t *context)
     if (context->write_source)
         dispatch_source_cancel(context->write_source);
 
-    fprintf(stderr, "destroyed context %p\n", context);
+    log_detail("destroyed context %p\n", context);
+    
     free(context);
 }
 
@@ -80,16 +86,27 @@ void add_download(const char *url, int num)
 
     file = fopen(filename, "w");
     if (file == NULL) {
-        fprintf(stderr, "Error opening %s\n", filename);
+        log_error("Error opening %s\n", filename);
         return;
     }
 
     handle = curl_easy_init();
+
+    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, file);
     curl_easy_setopt(handle, CURLOPT_URL, url);
+    struct curl_slist* list = curl_slist_append(NULL, "*MKD test");
+    list = curl_slist_append(list, "*MKD test2");
+    list = curl_slist_append(list, "SITE CHMOD 0744 test2");
+    list = curl_slist_append(list, "DELE test");
+    list = curl_slist_append(list, "DELE test2");
+    curl_easy_setopt(handle, CURLOPT_POSTQUOTE, list);
+
     curl_multi_add_handle(curl_handle, handle);
-    fprintf(stderr, "Added download %s -> %s\n", url, filename);
+    log_normal("Added download %s -> %s\n", url, filename);
     ++remaining;
+
+    //curl_slist_free_all(list);
 }
 
 void curl_perform(int socket, int actions)
@@ -104,9 +121,9 @@ void curl_perform(int socket, int actions)
     while ((message = curl_multi_info_read(curl_handle, &pending))) {
         switch (message->msg) {
             case CURLMSG_DONE:
-                curl_easy_getinfo(message->easy_handle, CURLINFO_EFFECTIVE_URL,
-                                  &done_url);
-                printf("%s DONE\n", done_url);
+                curl_easy_getinfo(message->easy_handle, CURLINFO_EFFECTIVE_URL, &done_url);
+                CURLcode code = message->data.result;
+                printf("%s DONE %s\n", done_url, curl_easy_strerror(code));
 
                 curl_multi_remove_handle(curl_handle, message->easy_handle);
                 curl_easy_cleanup(message->easy_handle);
@@ -114,7 +131,7 @@ void curl_perform(int socket, int actions)
 
                 break;
             default:
-                fprintf(stderr, "CURLMSG default\n");
+                log_error("CURLMSG default\n");
                 abort();
         }
     }
@@ -127,14 +144,14 @@ const char* action_name(int action)
 
 dispatch_source_t make_source(dispatch_source_type_t type, int socket, int action)
 {
-    fprintf(stderr, "make source socket %d action %s\n", socket, action_name(action));
+    log_detail("make source socket %d action %s\n", socket, action_name(action));
     dispatch_source_t source = dispatch_source_create(type, socket, 0, queue);
     dispatch_source_set_event_handler(source, ^{
-        //        fprintf(stderr, "source event socket %d action %s\n", socket, action_name(action));
+        log_detail("source event socket %d action %s\n", socket, action_name(action));
         curl_perform(socket, action);
     });
     dispatch_source_set_cancel_handler(source, ^{
-        fprintf(stderr, "source cancelled socket %d action %s\n", socket, action_name(action));
+        log_detail("source cancelled socket %d action %s\n", socket, action_name(action));
         dispatch_release(source);
     });
 
@@ -210,7 +227,7 @@ int main(int argc, char **argv)
         return 0;
 
     if (curl_global_init(CURL_GLOBAL_ALL)) {
-        fprintf(stderr, "Could not init cURL\n");
+        log_error("Could not init cURL\n");
         return 1;
     }
 
