@@ -70,6 +70,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 - (void)completeWithCode:(CURLcode)code;
 - (BOOL)hasCompleted;
 - (BOOL)isCancelled;
+- (BOOL)handledByMulti;
 - (void)removedByMulti:(CURLMulti*)multi;
 + (CURLMulti*)standaloneMultiForTestPurposes;
 @end

@@ -33,8 +33,8 @@
 
 @interface CURLMulti : NSObject
 {
+    CURLM* _multiForSocket;
     NSMutableArray* _handles;
-    CURLM* _multi;
     dispatch_queue_t _queue;
     dispatch_source_t _timer;
 }
