@@ -62,20 +62,6 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 @end
 
-#pragma mark - RunLoop Support
-
-@interface CURLHandle(MultiSupport)
-- (CURL *) curl;
-- (void)completeWithMultiCode:(CURLMcode)code;
-- (void)completeWithCode:(CURLcode)code;
-- (BOOL)hasCompleted;
-- (BOOL)isCancelled;
-- (BOOL)handledByMulti;
-- (void)removedByMulti:(CURLMulti*)multi;
-+ (CURLMulti*)standaloneMultiForTestPurposes;
-+ (void)cleanupStandaloneMulti:(CURLMulti*)multi;
-@end
-
 #pragma mark - Old API
 
 @interface CURLHandle(OldAPI)

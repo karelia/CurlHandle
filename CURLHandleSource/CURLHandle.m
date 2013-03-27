@@ -6,6 +6,8 @@
 //
 
 #import "CURLHandle.h"
+#import "CURLHandle+MultiSupport.h"
+#import "CURLHandle+TestingSupport.h"
 #import "CURLMulti.h"
 #import "CURLResponse.h"
 

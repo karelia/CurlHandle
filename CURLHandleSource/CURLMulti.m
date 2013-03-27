@@ -47,6 +47,7 @@
 #import "CURLMulti.h"
 
 #import "CURLHandle.h"
+#import "CURLHandle+MultiSupport.h"
 #import "CURLSocket.h"
 
 @interface CURLMulti()

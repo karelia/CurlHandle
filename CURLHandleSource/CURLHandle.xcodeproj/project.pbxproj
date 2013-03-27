@@ -160,6 +160,8 @@
 		22C9CFD2170364FB004610FE /* libssh2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
 		22C9CFD3170364FB004610FE /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
 		22C9CFD4170364FB004610FE /* libcares.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
+		22C9CFE81703A86D004610FE /* CURLHandle+MultiSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9CFE71703A86D004610FE /* CURLHandle+MultiSupport.h */; };
+		22C9CFEA1703A955004610FE /* CURLHandle+TestingSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9CFE91703A954004610FE /* CURLHandle+TestingSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		22DC488516CC115300211948 /* TestContent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22DC488416CC115300211948 /* TestContent.txt */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
@@ -339,6 +341,8 @@
 		22C9CFBF17035A0A004610FE /* crashtest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = crashtest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22C9CFC117035A0B004610FE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		22C9CFCD17035A86004610FE /* multi-gcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "multi-gcd.c"; sourceTree = "<group>"; };
+		22C9CFE71703A86D004610FE /* CURLHandle+MultiSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+MultiSupport.h"; sourceTree = "<group>"; };
+		22C9CFE91703A954004610FE /* CURLHandle+TestingSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+TestingSupport.h"; sourceTree = "<group>"; };
 		22DC488416CC115300211948 /* TestContent.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestContent.txt; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
@@ -453,6 +457,8 @@
 			children = (
 				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
 				79B96CBC0A6360F90060AC12 /* CURLHandle.m */,
+				22C9CFE71703A86D004610FE /* CURLHandle+MultiSupport.h */,
+				22C9CFE91703A954004610FE /* CURLHandle+TestingSupport.h */,
 				221EAD0F160B167900E4F270 /* CURLMulti.h */,
 				221EAD10160B167900E4F270 /* CURLMulti.m */,
 				22731036161305FF00D6D49E /* CURLSocket.h */,
@@ -606,6 +612,8 @@
 				2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */,
 				22731038161305FF00D6D49E /* CURLSocket.h in Headers */,
 				27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */,
+				22C9CFE81703A86D004610FE /* CURLHandle+MultiSupport.h in Headers */,
+				22C9CFEA1703A955004610FE /* CURLHandle+TestingSupport.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1391,6 +1399,7 @@
 				22C9CFCB17035A0B004610FE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8008030B16696287004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-i386" */ = {
 			isa = XCConfigurationList;
