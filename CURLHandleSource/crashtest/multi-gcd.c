@@ -22,16 +22,13 @@
 
 /* Example application code using the multi socket interface to download
  multiple files at once, but instead of using curl_multi_perform and
- curl_multi_wait, which uses select(), we use libuv.
- It supports epoll, kqueue, etc. on unixes and fast IO completion ports on
- Windows, which means, it should be very fast on all platforms..
+ curl_multi_wait, which uses select(), we use gcd.
 
- Written by Clemens Gruber, based on an outdated example from uvbook and
- some tests from libuv.
+ Written by Sam Deane, based on the multi-uv.c example.
 
- Requires libuv and (of course) libcurl.
+ Requires gcd and (of course) libcurl.
 
- See http://nikhilm.github.com/uvbook/ for more information on libuv.
+ See http://en.wikipedia.org/wiki/Grand_Central_Dispatch for more information on gcd.
  */
 
 #include <stdio.h>
@@ -42,7 +39,7 @@
 #include <dispatch/dispatch.h>
 
 dispatch_queue_t queue;
-
+int remaining = 0;
 CURLM *curl_handle;
 dispatch_source_t timeout;
 
@@ -92,6 +89,7 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_URL, url);
     curl_multi_add_handle(curl_handle, handle);
     fprintf(stderr, "Added download %s -> %s\n", url, filename);
+    ++remaining;
 }
 
 void curl_perform(int socket, int actions)
@@ -112,6 +110,7 @@ void curl_perform(int socket, int actions)
 
                 curl_multi_remove_handle(curl_handle, message->easy_handle);
                 curl_easy_cleanup(message->easy_handle);
+                --remaining;
 
                 break;
             default:
@@ -121,15 +120,21 @@ void curl_perform(int socket, int actions)
     }
 }
 
+const char* action_name(int action)
+{
+    return action == CURL_CSELECT_IN ? "read" : "write";
+}
+
 dispatch_source_t make_source(dispatch_source_type_t type, int socket, int action)
 {
+    fprintf(stderr, "make source socket %d action %s\n", socket, action_name(action));
     dispatch_source_t source = dispatch_source_create(type, socket, 0, queue);
     dispatch_source_set_event_handler(source, ^{
-        fprintf(stderr, "source event socket %d action %d\n", socket, action);
+        //        fprintf(stderr, "source event socket %d action %s\n", socket, action_name(action));
         curl_perform(socket, action);
     });
     dispatch_source_set_cancel_handler(source, ^{
-        fprintf(stderr, "source cancelled socket %d action %d\n", socket, action);
+        fprintf(stderr, "source cancelled socket %d action %s\n", socket, action_name(action));
         dispatch_release(source);
     });
 
@@ -143,6 +148,11 @@ void create_timeout()
     timeout = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
     dispatch_source_set_event_handler(timeout, ^{
         curl_perform(CURL_SOCKET_TIMEOUT, 0);
+        if (remaining == 0)
+        {
+            curl_multi_cleanup(curl_handle);
+            exit(0);
+        }
     });
 
     dispatch_resume(timeout);
@@ -214,10 +224,7 @@ int main(int argc, char **argv)
         add_download(argv[argc], argc);
     }
 
-
-
     dispatch_main();
 
-    curl_multi_cleanup(curl_handle);
     return 0;
 }
