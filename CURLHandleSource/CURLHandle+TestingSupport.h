@@ -13,6 +13,8 @@
  */
 
 @interface CURLHandle(TestingSupport)
+- (BOOL)isCancelled;
+- (BOOL)handledByMulti;
 + (CURLMulti*)standaloneMultiForTestPurposes;
 + (void)cleanupStandaloneMulti:(CURLMulti*)multi;
 @end

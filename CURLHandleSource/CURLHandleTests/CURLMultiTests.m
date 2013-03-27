@@ -7,9 +7,11 @@
 
 #import "CURLMulti.h"
 #import "CURLHandleBasedTest.h"
+#import "CURLHandle+TestingSupport.h"
 
 #import "NSURLRequest+CURLHandle.h"
 #import "KMSServer.h"
+
 
 @interface CURLMultiTests : CURLHandleBasedTest
 

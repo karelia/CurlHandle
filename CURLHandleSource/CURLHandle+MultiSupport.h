@@ -16,8 +16,6 @@
 - (void)completeWithMultiCode:(CURLMcode)code;
 - (void)completeWithCode:(CURLcode)code;
 - (BOOL)hasCompleted;
-- (BOOL)isCancelled;
-- (BOOL)handledByMulti;
 - (void)removedByMulti:(CURLMulti*)multi;
 @end
 
