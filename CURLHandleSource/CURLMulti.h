@@ -13,6 +13,14 @@
 #define CURLMultiLog(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLMultiLog NSLog
 #endif
 
+#ifndef CURLMultiLogError
+#define CURLMultiLogError NSLog
+#endif
+
+#ifndef CURLMultiLogDetail
+#define CURLMultiLogDetail CURLMultiLog
+#endif
+
 @class CURLHandle;
 
 /**
@@ -37,6 +45,7 @@
     NSMutableArray* _handles;
     dispatch_queue_t _queue;
     dispatch_source_t _timer;
+    int64_t _timeout;
 }
 
 /**

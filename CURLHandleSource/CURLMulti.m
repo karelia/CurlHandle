@@ -10,23 +10,37 @@
  is controlled via our internal serial queue. The queue also protects additions to
  and removals from our array of the easy handles that we're managing.
 
- The CURL multi handle is stored in the property self.multi, which is atomic.
- This value is set to nil when we're shutting down.
-
- The only methods that access the multi should all start with the word multi.
-
- In each case they access it via the checkMulti method, which includes an assertion to check
- that it's being called from the our internal queue.
+ The CURL multi handle is generally not stored by the CURLMUlti object. 
+ Instead it is set up when the dispatch timer is created, and it's value is
+ captured by the timer block, which passes it on to everything else that needs it.
+ 
+ The one (annoying) exception to this is that the socket_callback from curl
+ only has one context value, which we use to pass a pointer to the CURLMulti
+ object. Since the code called by this callback needs access to the multi value,
+ we have to store it on CURLMulti - using the multiForSocket property.
+ 
+ However, these callbacks only occur as a result of calling curl_multi_socket_action(),
+ which only happens from within the processMulti: call. Therefore, we only set
+ multiForSocket at the start of the processMulti call, and we clear it again at the end.
 
  The other GCD structures (self.timer and self.queue) should stay valid until they are destroyed
- as part of the shutdown process. Anything that uses them checks their validity first by calling
- [self notShutdown], which actually just checks the value of self.multi. If this returns NO, it indicates
- that the shutdown is in progress (or completed). The queue and timer aren't safe to use after this
- as they will be destroyed at some point. 
+ as part of the shutdown process. 
  
- The timer is cleaned up on the queue.
+ # Shutdown
  
+ Shutdown just cancels the timer, and removes our reference to it. All other cleanup happens
+ in the timer's cancel handler. This removes all easy handles from the multi, cleans it up, and
+ disposes of it. It then releases the queue.
+ 
+ Because the timer and the queue blocks both contain references to self, the object itself
+ should not get deallocated until both the timer and queue have gone away. 
+ 
+ Since the timer block is the only thing that actually causes activity on the multi, 
+ once the timer has been cancelled, nothing else should actually touch the multi,
+ other than the cleanup block.
+
  The queue itself is cleaned up on the main queue, once the rest of the shutdown process has finished.
+ This additional paranoia (using the main queue for the cleanup) is probably not strictly necessary any more.
  */
 
 
@@ -45,9 +59,7 @@
 @property (assign, atomic) CURLM* multiForSocket;
 @property (assign, nonatomic) dispatch_queue_t queue;
 @property (assign, nonatomic) dispatch_source_t timer;
-
-- (void)updateTimeout:(NSInteger)timeout;
-- (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what;
+@property (assign, nonatomic) int64_t timeout;
 
 @end
 
@@ -58,10 +70,10 @@ static int kMaximumTimeoutMilliseconds = 1000;
 NSString *const kActionNames[] =
 {
     @"CURL_SOCKET_TIMEOUT",
-    @"",
     @"CURL_CSELECT_IN",
     @"CURL_CSELECT_OUT",
     @"",
+    @"CURL_CSELECT_ERR",
 };
 
 #pragma mark - Callback Prototypes
@@ -149,7 +161,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
     else
     {
-        CURLMultiLog(@"shutdown called multiple times");
+        CURLMultiLogError(@"shutdown called multiple times");
     }
 }
 
@@ -169,6 +181,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         {
             [self.pendingAdditions addObject:handle];
         }
+        [self fireTimeoutNow];
     });
 }
 
@@ -186,6 +199,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         {
             [self.pendingRemovals addObject:handle];
         }
+        [self fireTimeoutNow];
     });
 }
 
@@ -267,7 +281,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     // process the multi
     int running;
-    CURLMultiLog(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action+1]);
+    CURLMultiLogDetail(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action]);
     CURLMcode result;
     do
     {
@@ -278,7 +292,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     
     if (result == CURLM_OK)
     {
-        CURLMultiLog(@"%d handles reported as running", running);
+        CURLMultiLogDetail(@"%d handles reported as running", running);
         CURLMsg* message;
         int count;
         while ((message = curl_multi_info_read(multi, &count)) != NULL)
@@ -302,25 +316,25 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 else
                 {
                     // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
-                    CURLMultiLog(@"SOMETHING WRONG: done msg result %d for easy without a matching CURLHandle %p", code, easy);
+                    CURLMultiLogError(@"SOMETHING WRONG: done msg result %d for easy without a matching CURLHandle %p", code, easy);
                     result = curl_multi_remove_handle(multi, message->easy_handle);
                     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
                 }
             }
             else
             {
-                CURLMultiLog(@"got unexpected multi message %d", message->msg);
+                CURLMultiLogError(@"got unexpected multi message %d", message->msg);
             }
         }
     }
     else
     {
-        CURLMultiLog(@"curl_multi_socket_action returned error %d", result);
+        CURLMultiLogError(@"curl_multi_socket_action returned error %d", result);
     }
 
     [self performRemovalsWithMulti:multi];
 
-    CURLMultiLog(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action+1]);
+    CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
 }
 
 - (void)performAdditionsWithMulti:(CURLM*)multi
@@ -337,7 +351,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         }
         else
         {
-            CURLMultiLog(@"failed to add handle %@", handle);
+            CURLMultiLogError(@"failed to add handle %@", handle);
             [handle completeWithMultiCode:result];
         }
     }
@@ -459,8 +473,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
 
             dispatch_source_set_event_handler(timer, ^{
-                CURLMultiLog(@"timer fired");
+                CURLMultiLogDetail(@"timer fired");
+
+                // perform processing
                 [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
+
+                // reset the timer to use the current timeout value
+                dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
             });
 
             dispatch_source_set_cancel_handler(timer, ^{
@@ -475,8 +494,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
             // kick things off - this should be enough to get the timer scheduled, but it won't actually start firing again until it is resumed
             dispatch_async(queue, ^{
-                [self updateTimeout:0];
-                //                [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
+                [self fireTimeoutNow];
             });
 
             self.timer = timer;
@@ -503,13 +521,24 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             timeout = kMaximumTimeoutMilliseconds;
         }
 
-        int64_t nano_timeout = timeout * NSEC_PER_MSEC;
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, nano_timeout, nano_timeout / 100);
-
+        // store the actual timeout value we want to use
+        self.timeout = timeout * NSEC_PER_MSEC;
         CURLMultiLog(@"timeout changed to %ldms", (long)timeout);
+
+        [self fireTimeoutNow];
     }
 }
 
+- (void)fireTimeoutNow
+{
+    // fire the timer right away - after it's fired, the timeout value will be reset
+    // to the current value of self.timeout
+    dispatch_source_t timer = self.timer;
+    if (timer)
+    {
+        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 0, 0);
+    }
+}
 
 - (NSString*)nameForType:(dispatch_source_type_t)type
 {
@@ -535,7 +564,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 }
                 else
                 {
-                    CURLMultiLog(@"%@ dispatch source fired  for socket %d on multi that has been shut down", [self nameForType:type], socket);
+                    CURLMultiLogError(@"%@ dispatch source fired  for socket %d on multi that has been shut down", [self nameForType:type], socket);
                 }
             });
 
