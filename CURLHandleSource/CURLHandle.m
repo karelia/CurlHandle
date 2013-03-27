@@ -661,6 +661,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 }
 
+- (BOOL)handledByMulti
+{
+    return self.multi != nil;
+}
+
 - (void)removedByMulti:(CURLMulti*)multi
 {
     if (multi)
