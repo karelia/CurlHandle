@@ -685,6 +685,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return multi;
 }
 
++ (void)cleanupStandaloneMulti:(CURLMulti*)multi
+{
+    [multi shutdown];
+}
+
 - (void)failWithCode:(int)code isMulti:(BOOL)isMultiCode;
 {
     NSError* error = (isMultiCode ?

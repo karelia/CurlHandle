@@ -73,6 +73,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 - (BOOL)handledByMulti;
 - (void)removedByMulti:(CURLMulti*)multi;
 + (CURLMulti*)standaloneMultiForTestPurposes;
++ (void)cleanupStandaloneMulti:(CURLMulti*)multi;
 @end
 
 #pragma mark - Old API
