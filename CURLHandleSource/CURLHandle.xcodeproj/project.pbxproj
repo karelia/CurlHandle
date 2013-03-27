@@ -152,6 +152,14 @@
 		22BF08E216AEEDD9009BE5A3 /* ftp.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08C316AEEDD8009BE5A3 /* ftp.json */; };
 		22BF08E316AEEDD9009BE5A3 /* http.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08C416AEEDD8009BE5A3 /* http.json */; };
 		22BF08F316AEEDD9009BE5A3 /* webdav.json in Resources */ = {isa = PBXBuildFile; fileRef = 22BF08E116AEEDD9009BE5A3 /* webdav.json */; };
+		22C9CFC217035A0B004610FE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C9CFC117035A0B004610FE /* Foundation.framework */; };
+		22C9CFCE17035A86004610FE /* multi-gcd.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9CFCD17035A86004610FE /* multi-gcd.c */; };
+		22C9CFCF170364B8004610FE /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
+		22C9CFD0170364FB004610FE /* libssl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
+		22C9CFD1170364FB004610FE /* libcurl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
+		22C9CFD2170364FB004610FE /* libssh2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
+		22C9CFD3170364FB004610FE /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
+		22C9CFD4170364FB004610FE /* libcares.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
 		22DC488516CC115300211948 /* TestContent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22DC488416CC115300211948 /* TestContent.txt */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
@@ -240,6 +248,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		22C9CFBD17035A0A004610FE /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				22C9CFD0170364FB004610FE /* libssl.dylib in CopyFiles */,
+				22C9CFD1170364FB004610FE /* libcurl.dylib in CopyFiles */,
+				22C9CFD2170364FB004610FE /* libssh2.dylib in CopyFiles */,
+				22C9CFD3170364FB004610FE /* libcrypto.dylib in CopyFiles */,
+				22C9CFD4170364FB004610FE /* libcares.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		809AE1C91602C881001D02E1 /* Copy Files - Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -314,6 +336,9 @@
 		22BF08C316AEEDD8009BE5A3 /* ftp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ftp.json; sourceTree = "<group>"; };
 		22BF08C416AEEDD8009BE5A3 /* http.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = http.json; sourceTree = "<group>"; };
 		22BF08E116AEEDD9009BE5A3 /* webdav.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = webdav.json; sourceTree = "<group>"; };
+		22C9CFBF17035A0A004610FE /* crashtest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = crashtest; sourceTree = BUILT_PRODUCTS_DIR; };
+		22C9CFC117035A0B004610FE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		22C9CFCD17035A86004610FE /* multi-gcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "multi-gcd.c"; sourceTree = "<group>"; };
 		22DC488416CC115300211948 /* TestContent.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestContent.txt; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
@@ -351,6 +376,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		22C9CFBC17035A0A004610FE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22C9CFC217035A0B004610FE /* Foundation.framework in Frameworks */,
+				22C9CFCF170364B8004610FE /* libcurl.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -372,6 +406,7 @@
 			children = (
 				8DC2EF5B0486A6940098B216 /* CURLHandle.framework */,
 				223FD092160B523700BE1C80 /* CURLHandleTests.octest */,
+				22C9CFBF17035A0A004610FE /* crashtest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -384,6 +419,8 @@
 				223FD09C160B523700BE1C80 /* Tests */,
 				22BF08FA16AF09B2009BE5A3 /* Modules */,
 				0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */,
+				22C9CFC317035A0B004610FE /* crashtest */,
+				22C9CFC017035A0A004610FE /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
 			name = CURLHandle;
@@ -537,6 +574,22 @@
 			name = Modules;
 			sourceTree = "<group>";
 		};
+		22C9CFC017035A0A004610FE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				22C9CFC117035A0B004610FE /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		22C9CFC317035A0B004610FE /* crashtest */ = {
+			isa = PBXGroup;
+			children = (
+				22C9CFCD17035A86004610FE /* multi-gcd.c */,
+			);
+			path = crashtest;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -578,6 +631,23 @@
 			productName = CURLHandleTests;
 			productReference = 223FD092160B523700BE1C80 /* CURLHandleTests.octest */;
 			productType = "com.apple.product-type.bundle";
+		};
+		22C9CFBE17035A0A004610FE /* crashtest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22C9CFCC17035A0B004610FE /* Build configuration list for PBXNativeTarget "crashtest" */;
+			buildPhases = (
+				22C9CFBB17035A0A004610FE /* Sources */,
+				22C9CFBC17035A0A004610FE /* Frameworks */,
+				22C9CFBD17035A0A004610FE /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = crashtest;
+			productName = crashtest;
+			productReference = 22C9CFBF17035A0A004610FE /* crashtest */;
+			productType = "com.apple.product-type.tool";
 		};
 		8DC2EF4F0486A6940098B216 /* CURLHandle */ = {
 			isa = PBXNativeTarget;
@@ -630,6 +700,7 @@
 				80080327166A952A004D39F5 /* libcares-i386 */,
 				8008032B166A9535004D39F5 /* libcares-x86_64 */,
 				223FD091160B523700BE1C80 /* CURLHandleTests */,
+				22C9CFBE17035A0A004610FE /* crashtest */,
 			);
 		};
 /* End PBXProject section */
@@ -886,6 +957,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		22C9CFBB17035A0A004610FE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22C9CFCE17035A86004610FE /* multi-gcd.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF540486A6940098B216 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1074,6 +1153,52 @@
 			};
 			name = Release;
 		};
+		22C9CFCA17035A0B004610FE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		22C9CFCB17035A0B004610FE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		8008030C16696287004D39F5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1258,6 +1383,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		22C9CFCC17035A0B004610FE /* Build configuration list for PBXNativeTarget "crashtest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22C9CFCA17035A0B004610FE /* Debug */,
+				22C9CFCB17035A0B004610FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		8008030B16696287004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-i386" */ = {
 			isa = XCConfigurationList;
