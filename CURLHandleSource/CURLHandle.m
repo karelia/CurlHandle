@@ -224,6 +224,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void) dealloc
 {
+    NSAssert(_multi == nil, @"by the time we're thrown away, any multi should be done with us");
+
     [self cleanupIncludingHandle:YES];
 
     [_delegate release];
