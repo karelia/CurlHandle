@@ -182,7 +182,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         {
             [self.pendingAdditions removeObject:handle];
         }
-        else
+        else if ([self.handles containsObject:handle])
         {
             [self.pendingRemovals addObject:handle];
         }
