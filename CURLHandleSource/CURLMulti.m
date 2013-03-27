@@ -244,6 +244,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)cleanupMulti:(CURLM*)multi
 {
+    CURLMultiLog(@"cleaning up");
+
     [self.pendingAdditions removeAllObjects];
     [self.pendingRemovals removeAllObjects];
     [self.pendingRemovals addObjectsFromArray:self.handles];
@@ -423,6 +425,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #endif
 
+    CURLMultiLog(@"created queue");
     return queue;
 }
 
@@ -434,13 +437,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 #if !USE_GLOBAL_QUEUE // if we're using a global queue, we dont want to chuck it away
     // finally chuck away the queue
     dispatch_async(dispatch_get_main_queue(), ^{
+        CURLMultiLog(@"released queue");
         dispatch_release(queue);
     });
 #else
     (void)queue;
 #endif
-
+    CURLMultiLog(@"cleaned up queue");
 }
+
 #pragma mark - Timer Management
 
 - (BOOL)createTimer
