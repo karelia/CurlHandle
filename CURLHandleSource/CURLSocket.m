@@ -17,7 +17,6 @@
 
 @property (assign, nonatomic) dispatch_source_t reader;
 @property (assign, nonatomic) dispatch_source_t writer;
-@property (assign, nonatomic) int socket; // TODO: this is only needed for debugging - could remove eventually
 
 @end
 
@@ -27,26 +26,28 @@
 
 @synthesize reader = _reader;
 @synthesize writer = _writer;
-@synthesize socket = _socket;
 
 #pragma mark - Implementation
 
-- (id)initWithSocket:(int)socket
+- (void)dealloc
 {
-    if ((self = [super init]) != nil)
+    if (self.reader)
     {
-        self.socket = socket;
+        dispatch_source_cancel(self.reader); // the cancel handler will release the source
     }
 
-    return self;
+    if (self.writer)
+    {
+        dispatch_source_cancel(self.writer); // the cancel handler will release the source
+    }
+
+    [super dealloc];
 }
 
 - (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMulti*)multi
 {
     // We call back to the multi to do the actual work - this class really just exists as
     // a place to group together the reader and writer sources corresponding to a socket.
-
-    self.socket = socket; // for debug purposes only
 
     BOOL readerRequired = (mode == CURL_POLL_IN) || (mode == CURL_POLL_INOUT);
     self.reader = [multi updateSource:self.reader type:DISPATCH_SOURCE_TYPE_READ socket:socket required:readerRequired];
@@ -57,8 +58,28 @@
 
 - (NSString*)description
 {
-    NSString* mode = self.reader ? (self.writer ? @"dispatch sources: read, write" : @"dispatch source:read") : (self.writer ? @"dispatch source: write" : @"no dispatch sources");
-    return [NSString stringWithFormat:@"<socket %d %@>", self.socket, mode];
+    NSString* mode;
+    if (self.reader)
+    {
+        if (self.writer)
+        {
+            mode = [NSString stringWithFormat:@"read, write sources for %lu", dispatch_source_get_handle(self.reader)];
+        }
+        else
+        {
+            mode = [NSString stringWithFormat:@"read source for %lu", dispatch_source_get_handle(self.reader)];
+        }
+    }
+    else if (self.writer)
+    {
+        mode = [NSString stringWithFormat:@"write source for %lu", dispatch_source_get_handle(self.writer)];
+    }
+    else
+    {
+        mode = @"no sources";
+    }
+
+    return [NSString stringWithFormat:@"<socket %p %@>", self, mode];
 }
 
 @end

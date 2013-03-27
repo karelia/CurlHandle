@@ -43,6 +43,9 @@
 {
     CURLM* _multiForSocket;
     NSMutableArray* _handles;
+    NSMutableArray* _sockets;
+    NSMutableArray* _pendingAdditions;
+    NSMutableArray* _pendingRemovals;
     dispatch_queue_t _queue;
     dispatch_source_t _timer;
     int64_t _timeout;

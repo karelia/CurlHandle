@@ -56,7 +56,8 @@
 @property (strong, nonatomic) NSMutableArray* pendingAdditions;
 @property (strong, nonatomic) NSMutableArray* pendingRemovals;
 @property (strong, nonatomic) NSMutableArray* handles;
-@property (assign, atomic) CURLM* multiForSocket;
+@property (assign, nonatomic) CURLM* multiForSocket;
+@property (strong, nonatomic) NSMutableArray* sockets;
 @property (assign, nonatomic) dispatch_queue_t queue;
 @property (assign, nonatomic) dispatch_source_t timer;
 @property (assign, nonatomic) int64_t timeout;
@@ -65,7 +66,7 @@
 
 static int kMaximumTimeoutMilliseconds = 1000;
 
-#define USE_GLOBAL_QUEUE 1
+#define USE_GLOBAL_QUEUE 0
 
 NSString *const kActionNames[] =
 {
@@ -89,6 +90,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 @synthesize handles = _handles;
 @synthesize pendingAdditions = _pendingAdditions;
 @synthesize pendingRemovals = _pendingRemovals;
+@synthesize sockets = _sockets;
 @synthesize queue = _queue;
 @synthesize timer = _timer;
 @synthesize multiForSocket = _multiForSocket;
@@ -116,6 +118,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             self.handles = [NSMutableArray array];
             self.pendingAdditions = [NSMutableArray array];
             self.pendingRemovals = [NSMutableArray array];
+            self.sockets = [NSMutableArray array];
         }
         else
         {
@@ -134,6 +137,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     [_handles release];
     [_pendingRemovals release];
     [_pendingAdditions release];
+    [_sockets release];
     
     CURLMultiLog(@"dealloced");
     [super dealloc];
@@ -270,6 +274,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     self.handles = nil;
     self.pendingRemovals = nil;
     self.pendingAdditions = nil;
+    self.sockets = nil;
 
     CURLMcode result = curl_multi_cleanup(multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
@@ -392,11 +397,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         if (!socket)
         {
             NSAssert(what != CURL_POLL_REMOVE, @"shouldn't need to make a socket if we're being asked to remove it");
-#ifndef __clang_analyzer__
-            socket = [[CURLSocket alloc] initWithSocket:raw];
-#endif
+            socket = [[CURLSocket alloc] init];
+            [self.sockets addObject:socket];
             curl_multi_assign(multi, raw, socket);
             CURLMultiLog(@"new socket:%@", socket);
+            [socket release];
         }
 
         [socket updateSourcesForSocket:raw mode:what multi:self];
@@ -406,10 +411,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         {
             NSAssert(socket != nil, @"should have socket");
             CURLMultiLog(@"removed socket:%@", socket);
-#ifndef __clang_analyzer__
-            [socket release];
-            socket = nil;
-#endif
+            [self.sockets removeObject:socket];
             curl_multi_assign(multi, raw, nil);
         }
     }
@@ -431,6 +433,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     });
 
     queue = sGlobalQueue;
+    dispatch_retain(queue);
 #else
 
     // make a new queue for each CURLMulti instance
@@ -443,22 +446,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     return queue;
 }
 
-- (void)cleanupQueue
-{
-    dispatch_queue_t queue = self.queue;
-    self.queue = nil;
-
-#if !USE_GLOBAL_QUEUE // if we're using a global queue, we dont want to chuck it away
-    // finally chuck away the queue
-    dispatch_async(dispatch_get_main_queue(), ^{
-        CURLMultiLog(@"released queue");
-        dispatch_release(queue);
-    });
-#else
-    (void)queue;
-#endif
-    CURLMultiLog(@"cleaned up queue");
-}
 
 #pragma mark - Timer Management
 
@@ -486,10 +473,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
                 [self cleanupMulti:multi];
 
-                CURLMultiLog(@"cancelled timer");
-                dispatch_release(timer);
-
-                [self cleanupQueue];
+                dispatch_queue_t queue = self.queue;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    dispatch_release(timer);
+                    dispatch_release(queue);
+                    CURLMultiLog(@"released queue and timer");
+                });
             });
 
             // kick things off - this should be enough to get the timer scheduled, but it won't actually start firing again until it is resumed
