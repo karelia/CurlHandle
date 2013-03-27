@@ -66,7 +66,13 @@
 
 static int kMaximumTimeoutMilliseconds = 1000;
 
-#define USE_GLOBAL_QUEUE 0
+
+#define USE_GLOBAL_QUEUE YES            // turn this on to share one queue across all instances
+#define COUNT_INSTANCES NO              // turn this on for a bit of debugging to ensure that things are getting cleaned up properly
+
+#if COUNT_INSTANCES
+static NSInteger gInstanceCount = 0;
+#endif
 
 NSString *const kActionNames[] =
 {
@@ -119,6 +125,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             self.pendingAdditions = [NSMutableArray array];
             self.pendingRemovals = [NSMutableArray array];
             self.sockets = [NSMutableArray array];
+#if COUNT_INSTANCES
+            ++gInstanceCount;
+#endif
         }
         else
         {
@@ -132,14 +141,21 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)dealloc
 {
+    CURLMultiLog(@"deallocing");
     NSAssert((_multiForSocket == nil) && (_timer == nil) && (_queue == nil), @"should have been shut down by the time we're dealloced");
 
     [_handles release];
     [_pendingRemovals release];
     [_pendingAdditions release];
     [_sockets release];
-    
+
+#if COUNT_INSTANCES
+    --gInstanceCount;
+    CURLMultiLog(@"dealloced: %ld instances remaining", gInstanceCount);
+#else
     CURLMultiLog(@"dealloced");
+#endif
+    
     [super dealloc];
 }
 
@@ -471,6 +487,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
             dispatch_source_set_cancel_handler(timer, ^{
 
+                NSAssert(self.timer == nil, @"timer property should have been cleared by now");
+
                 [self cleanupMulti:multi];
 
                 dispatch_queue_t queue = self.queue;
@@ -479,6 +497,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                     dispatch_release(queue);
                     CURLMultiLog(@"released queue and timer");
                 });
+
+                self.queue = nil;
             });
 
             // kick things off - this should be enough to get the timer scheduled, but it won't actually start firing again until it is resumed
