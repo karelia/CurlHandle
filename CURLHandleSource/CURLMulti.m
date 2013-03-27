@@ -286,7 +286,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     [self.pendingRemovals addObjectsFromArray:self.handles];
 
     // give handles a last chance to process
-    [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
+    [self timeoutMulti:multi];
 
     self.handles = nil;
     self.pendingRemovals = nil;
@@ -295,6 +295,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     CURLMcode result = curl_multi_cleanup(multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
+}
+
+- (void)timeoutMulti:(CURLM*)multi
+{
+    [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
 }
 
 - (void)processMulti:(CURLM*)multi action:(int)action forSocket:(int)socket
@@ -356,6 +361,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     [self performRemovalsWithMulti:multi];
 
+    // set the next processing time using the timeout value we got from libcurl.
+    // the timer will be forced to fire sooner if something else happens (eg a handle is added/removed)
+    if (self.timer)
+    {
+        dispatch_source_set_timer(self.timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
+    }
+
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
 }
 
@@ -404,6 +416,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
 {
     CURLM* multi = self.multiForSocket;
+    NSAssert(multi != nil, @"should never be called without a multi value");
     if (multi)
     {
         if (what == CURL_POLL_NONE)
@@ -480,7 +493,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 CURLMultiLogDetail(@"timer fired");
 
                 // perform processing
-                [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
+                [self timeoutMulti:multi];
 
                 // reset the timer to use the current timeout value
                 dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
@@ -546,7 +559,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     dispatch_source_t timer = self.timer;
     if (timer)
     {
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 0, 0);
+        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 1, 0);
     }
 }
 
@@ -565,17 +578,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             source = dispatch_source_create(type, socket, 0, self.queue);
 
             CURLM* multi = self.multiForSocket;
+            NSAssert(multi != nil, @"should never be called without a multi value");
             dispatch_source_set_event_handler(source, ^{
-                if ([self notShutdown])
-                {
-                    int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
-                    CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], socket, dispatch_source_get_data(source));
-                    [self processMulti:multi action:action forSocket:socket];
-                }
-                else
-                {
-                    CURLMultiLogError(@"%@ dispatch source fired  for socket %d on multi that has been shut down", [self nameForType:type], socket);
-                }
+                int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
+                CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], socket, dispatch_source_get_data(source));
+                [self processMulti:multi action:action forSocket:socket];
             });
 
             dispatch_source_set_cancel_handler(source, ^{
