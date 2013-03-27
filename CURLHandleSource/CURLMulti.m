@@ -99,6 +99,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 @synthesize sockets = _sockets;
 @synthesize queue = _queue;
 @synthesize timer = _timer;
+@synthesize timeout = _timeout;
 @synthesize multiForSocket = _multiForSocket;
 
 #pragma mark - Object Lifecycle
