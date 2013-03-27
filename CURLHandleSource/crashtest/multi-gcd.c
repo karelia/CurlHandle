@@ -40,8 +40,8 @@
 
 #define log_normal(...) fprintf(stderr, __VA_ARGS__)
 #define log_error(...) fprintf(stderr, "ERROR: " __VA_ARGS__)
-//#define log_detail(...) fprintf(stderr, __VA_ARGS__)
-#define log_detail(...)
+#define log_detail(...) fprintf(stderr, __VA_ARGS__)
+//#define log_detail(...)
 
 dispatch_queue_t queue;
 int remaining = 0;
@@ -76,6 +76,27 @@ void destroy_curl_context(curl_context_t *context)
     free(context);
 }
 
+size_t read_func(void *ptr, size_t size, size_t nmemb, void *userp)
+{
+    log_detail("read");
+    return 0;
+}
+
+size_t header_func(void *ptr, size_t size, size_t nmemb, void *userp)
+{
+    log_detail("header");
+    return 0;
+}
+
+
+int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, void *userp)
+{
+    char* string = strndup(info, infoLength);
+    log_detail("debug %d: %s", infoType, string);
+    free(string);
+    return 0;
+}
+
 void add_download(const char *url, int num)
 {
     char filename[50];
@@ -92,6 +113,14 @@ void add_download(const char *url, int num)
 
     handle = curl_easy_init();
 
+    curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
+    curl_easy_setopt(handle, CURLOPT_FTP_CREATE_MISSING_DIRS, 2);
+
+    //    curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_func);
+    //    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_func);
+    curl_easy_setopt(handle, CURLOPT_DEBUGFUNCTION, debug_func);
+    curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, file);
     curl_easy_setopt(handle, CURLOPT_URL, url);
