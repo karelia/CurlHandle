@@ -41,8 +41,8 @@
 
 #define log_normal(...) fprintf(stderr, __VA_ARGS__)
 #define log_error(...) fprintf(stderr, "ERROR: " __VA_ARGS__)
-#define log_detail(...) fprintf(stderr, __VA_ARGS__)
-//#define log_detail(...)
+//#define log_detail(...) fprintf(stderr, __VA_ARGS__)
+#define log_detail(...)
 
 dispatch_queue_t queue;
 int remaining = 0;
@@ -170,7 +170,7 @@ void create_timeout()
 size_t write_func(void *ptr, size_t size, size_t nmemb, void *userp)
 {
     char* string = strndup(ptr, size * nmemb);
-    log_detail("received bytes\n%s\nend bytes\n", string);
+    log_normal("%s", string);
     free(string);
     return size * nmemb;
 }
@@ -304,7 +304,6 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_DEBUGFUNCTION, debug_func);
     curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_func);
-    curl_easy_setopt(handle, CURLOPT_URL, url);
 
     bool is_sftp = strncmp(url, "sftp:", 5) == 0;
 
@@ -337,12 +336,13 @@ void add_download(const char *url, int num)
         url = newurl;
     }
 
+    curl_easy_setopt(handle, CURLOPT_URL, url);
 
     if (is_sftp)
     {
 
-        sprintf(makecmd, "mkdir %s%s", path, randomname);
-        sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
+        sprintf(makecmd, "*mkdir %s%s", path, randomname);
+        sprintf(chmodcmd, "chmod 0744 %s%s", path, randomname);
         sprintf(delfile1cmd, "*rm %sfile1.txt", path);
         sprintf(delfile2cmd, "*rm %sile2.txt", path);
         sprintf(delcmd, "*rmdir %s%s", path, randomname);
@@ -378,8 +378,8 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
 
 
-    //    curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
-    curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
+        curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
+    //    curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
     //        curl_easy_setopt(handle, CURLOPT_POST, 1);
 
     //        curl_easy_setopt(handle, CURLOPT_INFILESIZE, [uploadData length]);
