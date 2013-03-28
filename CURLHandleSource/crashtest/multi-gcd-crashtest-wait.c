@@ -41,8 +41,11 @@
 #define log_message(...) fprintf(stderr, __VA_ARGS__)
 #define log_error(...) fprintf(stderr, "ERROR: " __VA_ARGS__)
 
+void add_download(const char *url);
+
 dispatch_queue_t queue;
 int remaining = 0;
+int repeats = 20;
 CURLM *curl_handle;
 dispatch_source_t timeout;
 
@@ -78,9 +81,18 @@ void curl_perform_wait()
                 CURLcode code = message->data.result;
                 printf("%s DONE\ncode:%d - %s\n", done_url, code, curl_easy_strerror(code));
 
+                struct curl_slist* list;
+                curl_easy_getinfo(easy, CURLINFO_PRIVATE, &list);
+                curl_slist_free_all(list);
+
                 curl_multi_remove_handle(curl_handle, message->easy_handle);
                 curl_easy_cleanup(message->easy_handle);
                 --remaining;
+
+                if (--repeats)
+                {
+                    add_download(done_url);
+                }
 
                 break;
             }
@@ -90,7 +102,7 @@ void curl_perform_wait()
         }
     }
 
-    if (numrunning == 0)
+    if (remaining == 0)
     {
         curl_multi_cleanup(curl_handle);
         exit(0);
@@ -113,31 +125,45 @@ int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength
 
 #pragma mark - Top Level
 
-void add_download(const char *url, int num)
+void add_download(const char *url)
 {
-    char filename[50];
-    FILE *file;
-    CURL *handle;
-
-    sprintf(filename, "%d.download.txt", num);
-
-    file = fopen(filename, "w");
-    if (file == NULL) {
-        log_error("Error opening %s\n", filename);
-        return;
-    }
-
-    handle = curl_easy_init();
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, file);
+    CURL *handle = curl_easy_init();
     curl_easy_setopt(handle, CURLOPT_URL, url);
     curl_easy_setopt(handle, CURLOPT_DEBUGFUNCTION, debug_func);
     curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
 
+    curl_easy_setopt(handle, CURLOPT_URL, url);
+
+
+    char randomname[CURL_ERROR_SIZE];
+    char makecmd[CURL_ERROR_SIZE];
+    char chmodcmd[CURL_ERROR_SIZE];
+    char delcmd[CURL_ERROR_SIZE];
+
+    sprintf(randomname, "test-%d", rand());
+
+
+    sprintf(makecmd, "*MKD %s", randomname);
+    sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
+    sprintf(delcmd, "DELE %s", randomname);
+
+    struct curl_slist* list = curl_slist_append(NULL, makecmd);
+    list = curl_slist_append(list, chmodcmd);
+    list = curl_slist_append(list, "*DELE file1.txt");
+    list = curl_slist_append(list, "*DELE file2.txt");
+    list = curl_slist_append(list, delcmd);
+    curl_easy_setopt(handle, CURLOPT_PRIVATE, list);
+    curl_easy_setopt(handle, CURLOPT_POSTQUOTE, list);
+
+    long timeout = 60;
+    curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, timeout);
+
+    curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
+
+    ++remaining;
     dispatch_async(queue, ^{
         curl_multi_add_handle(curl_handle, handle);
         log_message("Added download %s\n", url);
-        ++remaining;
     });
 }
 
@@ -157,7 +183,7 @@ int main(int argc, char **argv)
     curl_handle = curl_multi_init();
     
     while (argc-- > 1) {
-        add_download(argv[argc], argc);
+        add_download(argv[argc]);
     }
 
     dispatch_async(queue, ^{
