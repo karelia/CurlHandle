@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <string.h>
+#include <assert.h>
 
 #include <dispatch/dispatch.h>
 
@@ -76,6 +77,14 @@ void destroy_curl_context(curl_context_t *context)
     free(context);
 }
 
+size_t write_func(void *ptr, size_t size, size_t nmemb, void *userp)
+{
+    char* string = strndup(ptr, size * nmemb);
+    log_detail("received bytes\n%s\nend bytes\n", string);
+    free(string);
+    return size * nmemb;
+}
+
 size_t read_func(void *ptr, size_t size, size_t nmemb, void *userp)
 {
     log_detail("read");
@@ -84,8 +93,10 @@ size_t read_func(void *ptr, size_t size, size_t nmemb, void *userp)
 
 size_t header_func(void *ptr, size_t size, size_t nmemb, void *userp)
 {
-    log_detail("header");
-    return 0;
+    char* string = strndup(ptr, size * nmemb);
+    log_detail("header bytes\n%s\nend bytes\n", string);
+    free(string);
+    return size * nmemb;
 }
 
 
@@ -94,6 +105,37 @@ int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength
     char* string = strndup(info, infoLength);
     log_detail("debug %d: %s", infoType, string);
     free(string);
+    return 0;
+}
+
+int socket_func(void *easy, curl_socket_t curlfd, curlsocktype purpose)
+{
+    if (purpose == CURLSOCKTYPE_IPCXN)
+    {
+        char* url = NULL;
+        curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &url);
+
+        if (strncmp(url, "ftp:", 4) == 0)
+        {
+            int keepAlive = 1;
+            socklen_t keepAliveLen = sizeof(keepAlive);
+            int result = setsockopt(curlfd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, keepAliveLen);
+            if (result)
+            {
+                log_error("Unable to set FTP control connection keepalive with error:%i", result);
+            }
+        }
+    }
+
+    return 0;
+}
+
+int known_hosts_func(CURL *easy,     /* easy handle */
+                           const struct curl_khkey *knownkey, /* known */
+                           const struct curl_khkey *foundkey, /* found */
+                           enum curl_khmatch match, /* libcurl's view on the keys */
+                           void *userp) /* custom pointer passed from app */
+{
     return 0;
 }
 
@@ -113,22 +155,32 @@ void add_download(const char *url, int num)
 
     handle = curl_easy_init();
 
+    long timeout = 60;
+    curl_easy_setopt(handle, CURLOPT_NOSIGNAL, timeout != 0);
+    curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, timeout);
+
+    char * error_buffer = malloc(CURL_ERROR_SIZE + 2);
+    error_buffer[0] = 255;
+    error_buffer[CURL_ERROR_SIZE + 1] = 255;
+    curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, error_buffer + 1);
+    curl_easy_setopt(handle, CURLOPT_PRIVATE, error_buffer);
     curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
     curl_easy_setopt(handle, CURLOPT_FTP_CREATE_MISSING_DIRS, 2);
 
-    //    curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_func);
-    //    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_func);
+    curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_func);
+    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_func);
     curl_easy_setopt(handle, CURLOPT_DEBUGFUNCTION, debug_func);
     curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(handle, CURLOPT_WRITEDATA, file);
+    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_func);
     curl_easy_setopt(handle, CURLOPT_URL, url);
     struct curl_slist* list = curl_slist_append(NULL, "*MKD test");
     list = curl_slist_append(list, "*MKD test2");
     list = curl_slist_append(list, "SITE CHMOD 0744 test2");
     list = curl_slist_append(list, "DELE test");
     list = curl_slist_append(list, "DELE test2");
+    list = curl_slist_append(list, "DELE file1.txt");
+    list = curl_slist_append(list, "DELE file2.txt");
     curl_easy_setopt(handle, CURLOPT_POSTQUOTE, list);
 
     curl_multi_add_handle(curl_handle, handle);
@@ -136,6 +188,38 @@ void add_download(const char *url, int num)
     ++remaining;
 
     //curl_slist_free_all(list);
+
+    // send all data to the C function
+    curl_easy_setopt(handle, CURLOPT_SOCKOPTFUNCTION, socket_func);
+    curl_easy_setopt(handle, CURLOPT_SOCKOPTDATA, handle);
+    curl_easy_setopt(handle, CURLOPT_SSH_KNOWNHOSTS, NULL);
+    curl_easy_setopt(handle, CURLOPT_SSH_KEYFUNCTION, known_hosts_func);
+
+
+    //        curl_easy_setopt(handle, CURLOPT_USERNAME, [username UTF8String]);
+    //      curl_easy_setopt(handle, CURLOPT_PASSWORD, [password UTF8String]);
+        curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
+        curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
+        curl_easy_setopt(handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
+
+
+    //    curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
+    curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
+    //        curl_easy_setopt(handle, CURLOPT_POST, 1);
+
+    //        curl_easy_setopt(handle, CURLOPT_INFILESIZE, [uploadData length]);
+    curl_easy_setopt(handle, CURLOPT_UPLOAD, 0);
+
+    curl_easy_setopt(handle, CURLOPT_USE_SSL, 0);
+    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 0);
+
+
+    curl_easy_setopt(handle, CURLOPT_NEW_FILE_PERMS, 0744);
+    curl_easy_setopt(handle, CURLOPT_NEW_DIRECTORY_PERMS, 0744);
+
+
+    curl_easy_setopt(handle, CURLOPT_FTP_USE_EPSV, 0);
+
 }
 
 void curl_perform(int socket, int actions)
@@ -150,15 +234,23 @@ void curl_perform(int socket, int actions)
     while ((message = curl_multi_info_read(curl_handle, &pending))) {
         switch (message->msg) {
             case CURLMSG_DONE:
-                curl_easy_getinfo(message->easy_handle, CURLINFO_EFFECTIVE_URL, &done_url);
+            {
+                CURL* easy = message->easy_handle;
+                curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &done_url);
+                unsigned char* error = NULL;
+                curl_easy_getinfo(easy, CURLINFO_PRIVATE, &error);
+                assert(error[0] == 255);
+                assert(error[CURL_ERROR_SIZE + 1] == 255);
                 CURLcode code = message->data.result;
-                printf("%s DONE %s\n", done_url, curl_easy_strerror(code));
+                printf("%s DONE\ncode:%d - %s\nerror:%s\n", done_url, code, curl_easy_strerror(code), error + 1);
+                free(error);
 
                 curl_multi_remove_handle(curl_handle, message->easy_handle);
                 curl_easy_cleanup(message->easy_handle);
                 --remaining;
 
                 break;
+            }
             default:
                 log_error("CURLMSG default\n");
                 abort();
@@ -267,7 +359,8 @@ int main(int argc, char **argv)
     curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
     
     while (argc-- > 1) {
-        add_download(argv[argc], argc);
+        for (int n = 0; n < 10; ++n)
+            add_download(argv[argc], argc);
     }
 
     dispatch_main();
