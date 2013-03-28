@@ -305,9 +305,17 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)processMulti:(CURLM*)multi action:(int)action forSocket:(int)socket
 {
+    BOOL isTimeout = socket == CURL_SOCKET_TIMEOUT;
+    BOOL gotAdditions = [self.pendingAdditions count] > 0;
+
+    if (isTimeout)
+    {
         [self performAdditionsWithMulti:multi];
+    }
 
     // process the multi
+    if (!isTimeout || !gotAdditions)
+    {
         int running;
         CURLMultiLogDetail(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action]);
         CURLMcode result;
