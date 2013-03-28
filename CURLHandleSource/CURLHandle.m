@@ -300,8 +300,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             self.lists = [NSMutableArray arrayWithObject:values];
         else
             [self.lists addObject:values];
-        
-        [values release];
     }
 
     return result;
