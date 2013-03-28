@@ -7,8 +7,8 @@
 #endif
 
 // #define CURLHandleLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
-#define CURLMultiLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
+//#define CURLMultiLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
+//#define CURLMultiLogError(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
+//#define CURLProtocolLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
+//#define CURLProtocolError(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
 #define CURLMultiLogDetail(...) // comment this definition out to have CURLMultiLogDetail do the same as CURLMultiLog (which will result in more output)
-#define CURLMultiLogError(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
-#define CURLProtocolLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
-#define CURLProtocolError(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
