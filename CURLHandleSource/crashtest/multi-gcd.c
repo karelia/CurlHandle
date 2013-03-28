@@ -306,22 +306,60 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_func);
     curl_easy_setopt(handle, CURLOPT_URL, url);
 
+    bool is_sftp = strncmp(url, "sftp:", 5) == 0;
+
     char randomname[CURL_ERROR_SIZE];
+    char makecmd[CURL_ERROR_SIZE];
+    char chmodcmd[CURL_ERROR_SIZE];
+    char delcmd[CURL_ERROR_SIZE];
+    char delfile1cmd[CURL_ERROR_SIZE];
+    char delfile2cmd[CURL_ERROR_SIZE];
+
     sprintf(randomname, "test-%d", rand());
 
-    char makecmd[CURL_ERROR_SIZE];
-    sprintf(makecmd, "*MKD %s", randomname);
+    char *user = NULL;
+    char *pass = NULL;
+    char *path = strstr(url, "//") + 2;
+    char *at = strstr(path, "@");
+    char *newurl = NULL;
+    if (at)
+    {
+        pass = strstr(path, ":") + 1;
+        size_t passsize =  (at - pass);
+        size_t usersize = (pass - path) - 1;
+        pass = strndup(path, passsize);
+        user = strndup(path, usersize);
+        size_t schemesize = (path - url);
+        path = strstr(at, "/");
+        if (!path) path = "";
+        newurl = strdup(url);
+        strcpy(newurl + schemesize, at + 1);
+        url = newurl;
+    }
+
+
+    if (is_sftp)
+    {
+
+        sprintf(makecmd, "mkdir %s%s", path, randomname);
+        sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
+        sprintf(delfile1cmd, "*rm %sfile1.txt", path);
+        sprintf(delfile2cmd, "*rm %sile2.txt", path);
+        sprintf(delcmd, "*rmdir %s%s", path, randomname);
+    }
+    else
+    {
+        sprintf(makecmd, "*MKD %s", randomname);
+        sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
+        sprintf(delfile1cmd, "*DELE file1.txt");
+        sprintf(delfile2cmd, "*DELE file2.txt");
+        sprintf(delcmd, "DELE %s", randomname);
+    }
+
     context->post_commands = curl_slist_append(context->post_commands, makecmd);
-
-    char chmodcmd[CURL_ERROR_SIZE];
-    sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
     context->post_commands = curl_slist_append(context->post_commands, chmodcmd);
-
-    context->post_commands = curl_slist_append(context->post_commands, "*DELE file1.txt");
-    context->post_commands = curl_slist_append(context->post_commands, "*DELE file2.txt");
-
-    char delcmd[CURL_ERROR_SIZE];
-    sprintf(delcmd, "DELE %s", randomname);
+    context->post_commands = curl_slist_append(context->post_commands, delfile1cmd);
+    context->post_commands = curl_slist_append(context->post_commands, delfile2cmd);
     context->post_commands = curl_slist_append(context->post_commands, delcmd);
 
     curl_easy_setopt(handle, CURLOPT_POSTQUOTE, context->post_commands);
@@ -333,11 +371,11 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_SSH_KEYFUNCTION, known_hosts_func);
 
 
-    //        curl_easy_setopt(handle, CURLOPT_USERNAME, [username UTF8String]);
-    //      curl_easy_setopt(handle, CURLOPT_PASSWORD, [password UTF8String]);
-        curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
-        curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
-        curl_easy_setopt(handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
+    curl_easy_setopt(handle, CURLOPT_USERNAME, user);
+    curl_easy_setopt(handle, CURLOPT_PASSWORD, pass);
+    curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
+    curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
+    curl_easy_setopt(handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
 
 
     //    curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
@@ -361,6 +399,10 @@ void add_download(const char *url, int num)
         curl_multi_add_handle(curl_handle, handle);
         log_normal("Added download %s\n", url);
         ++remaining;
+
+        if (user) free(user);
+        if (pass) free(pass);
+        if (newurl) free(newurl);
     });
 }
 
