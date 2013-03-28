@@ -162,6 +162,7 @@
 		22C9CFD4170364FB004610FE /* libcares.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
 		22C9CFE81703A86D004610FE /* CURLHandle+MultiSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9CFE71703A86D004610FE /* CURLHandle+MultiSupport.h */; };
 		22C9CFEA1703A955004610FE /* CURLHandle+TestingSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9CFE91703A954004610FE /* CURLHandle+TestingSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		22C9CFFF17049975004610FE /* multi-gcd-crashtest.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9CFFE17049975004610FE /* multi-gcd-crashtest.c */; };
 		22DC488516CC115300211948 /* TestContent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22DC488416CC115300211948 /* TestContent.txt */; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
@@ -343,6 +344,7 @@
 		22C9CFCD17035A86004610FE /* multi-gcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "multi-gcd.c"; sourceTree = "<group>"; };
 		22C9CFE71703A86D004610FE /* CURLHandle+MultiSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+MultiSupport.h"; sourceTree = "<group>"; };
 		22C9CFE91703A954004610FE /* CURLHandle+TestingSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+TestingSupport.h"; sourceTree = "<group>"; };
+		22C9CFFE17049975004610FE /* multi-gcd-crashtest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "multi-gcd-crashtest.c"; sourceTree = "<group>"; };
 		22DC488416CC115300211948 /* TestContent.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestContent.txt; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
@@ -592,6 +594,7 @@
 			isa = PBXGroup;
 			children = (
 				22C9CFCD17035A86004610FE /* multi-gcd.c */,
+				22C9CFFE17049975004610FE /* multi-gcd-crashtest.c */,
 			);
 			path = crashtest;
 			sourceTree = "<group>";
@@ -970,6 +973,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22C9CFCE17035A86004610FE /* multi-gcd.c in Sources */,
+				22C9CFFF17049975004610FE /* multi-gcd-crashtest.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
