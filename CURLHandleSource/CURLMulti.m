@@ -420,7 +420,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)multi:(CURLM*)multi removeHandle:(CURLHandle*)handle
 {
     CURLMultiLog(@"removed handle %@", handle);
+    self.multiForSocket = multi;
     CURLMcode result = curl_multi_remove_handle(multi, [handle curl]);
+    self.multiForSocket = nil;
+    
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [self.handles removeObject:handle];
 }
