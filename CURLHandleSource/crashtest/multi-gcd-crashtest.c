@@ -44,8 +44,11 @@
 //#define log_detail(...) fprintf(stderr, __VA_ARGS__)
 #define log_detail(...)
 
+void add_download(const char *url);
+
 dispatch_queue_t queue;
 int remaining = 0;
+int repeats = 20;
 CURLM *curl_handle;
 dispatch_source_t timeout;
 
@@ -55,6 +58,7 @@ typedef struct curl_handle_context_s {
     char error_buffer[CURL_ERROR_SIZE];
     char sentinal2;
     struct curl_slist* post_commands;
+    const char *full_url;
 } curl_handle_context_s;
 
 typedef struct curl_socket_context_s {
@@ -107,13 +111,20 @@ void curl_perform_action(int socket, int actions)
                 assert(context->sentinal1 == 0xC);
                 assert(context->sentinal2 == 0xD);
                 CURLcode code = message->data.result;
-                printf("%s DONE\ncode:%d - %s\nerror:%s\n", done_url, code, curl_easy_strerror(code), context->error_buffer);
+                printf("%s DONE\ncode:%d - %s\nerror:%s\nremaining:%d\n", done_url, code, curl_easy_strerror(code), context->error_buffer, --remaining);
                 curl_slist_free_all(context->post_commands);
+
+                if (--repeats)
+                {
+                    const char* full_url = context->full_url;
+                    add_download(full_url);
+                }
+
                 free(context);
+
 
                 curl_multi_remove_handle(curl_handle, message->easy_handle);
                 curl_easy_cleanup(message->easy_handle);
-                --remaining;
 
                 break;
             }
@@ -277,17 +288,19 @@ int multi_socket_func(CURL *easy, curl_socket_t s, int action, void *userp, void
 
 #pragma mark - Top Level
 
-void add_download(const char *url, int num)
+void add_download(const char *url)
 {
     CURL *handle;
 
     handle = curl_easy_init();
 
     curl_handle_context_s* context = malloc(sizeof *context);
+    memset(context, 0, sizeof *context);
     context->handle = handle;
     context->sentinal1 = 0xC;
     context->sentinal2 = 0xD;
     context->post_commands = NULL;
+    context->full_url = url;
     curl_easy_setopt(handle, CURLOPT_PRIVATE, context);
 
     long timeout = 60;
@@ -378,8 +391,8 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
 
 
-        curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
-    //    curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
+    //    curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
+        curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
     //        curl_easy_setopt(handle, CURLOPT_POST, 1);
 
     //        curl_easy_setopt(handle, CURLOPT_INFILESIZE, [uploadData length]);
@@ -428,8 +441,7 @@ int main(int argc, char **argv)
     curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, timeout_func);
     
     while (argc-- > 1) {
-        for (int n = 0; n < 100; ++n)
-            add_download(argv[argc], argc);
+        add_download(argv[argc]);
     }
 
     dispatch_main();
