@@ -297,7 +297,7 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, context->error_buffer);
     curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
-    curl_easy_setopt(handle, CURLOPT_FTP_CREATE_MISSING_DIRS, 2);
+    curl_easy_setopt(handle, CURLOPT_FTP_CREATE_MISSING_DIRS, 0);
 
     curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_func);
     curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_func);
@@ -386,11 +386,11 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_UPLOAD, 0);
 
     curl_easy_setopt(handle, CURLOPT_USE_SSL, 0);
-    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 1);
 
 
-    curl_easy_setopt(handle, CURLOPT_NEW_FILE_PERMS, 0744);
-    curl_easy_setopt(handle, CURLOPT_NEW_DIRECTORY_PERMS, 0744);
+//    curl_easy_setopt(handle, CURLOPT_NEW_FILE_PERMS, 0744);
+//    curl_easy_setopt(handle, CURLOPT_NEW_DIRECTORY_PERMS, 0744);
 
 
     curl_easy_setopt(handle, CURLOPT_FTP_USE_EPSV, 0);
