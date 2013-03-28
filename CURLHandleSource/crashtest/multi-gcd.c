@@ -409,6 +409,8 @@ void add_download(const char *url, int num)
 
 int main(int argc, char **argv)
 {
+    log_normal("%s\n\n", curl_version());
+    
     queue = dispatch_queue_create("curl queue", 0);
 
     if (argc <= 1)
@@ -426,7 +428,7 @@ int main(int argc, char **argv)
     curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, timeout_func);
     
     while (argc-- > 1) {
-        for (int n = 0; n < 10; ++n)
+        for (int n = 0; n < 100; ++n)
             add_download(argv[argc], argc);
     }
 
