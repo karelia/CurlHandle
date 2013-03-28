@@ -49,7 +49,15 @@ int remaining = 0;
 CURLM *curl_handle;
 dispatch_source_t timeout;
 
-typedef struct curl_context_s {
+typedef struct curl_handle_context_s {
+    CURL *handle;
+    char sentinal1;
+    char error_buffer[CURL_ERROR_SIZE];
+    char sentinal2;
+    struct curl_slist* post_commands;
+} curl_handle_context_s;
+
+typedef struct curl_socket_context_s {
     dispatch_source_t read_source;
     dispatch_source_t write_source;
 } curl_context_t;
@@ -76,6 +84,88 @@ void destroy_curl_context(curl_context_t *context)
     
     free(context);
 }
+
+#pragma mark - socket action support
+
+void curl_perform_action(int socket, int actions)
+{
+    int running_handles;
+    char *done_url;
+    CURLMsg *message;
+    int pending;
+
+    curl_multi_socket_action(curl_handle, socket, actions, &running_handles);
+
+    while ((message = curl_multi_info_read(curl_handle, &pending))) {
+        switch (message->msg) {
+            case CURLMSG_DONE:
+            {
+                CURL* easy = message->easy_handle;
+                curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &done_url);
+                curl_handle_context_s* context = NULL;
+                curl_easy_getinfo(easy, CURLINFO_PRIVATE, &context);
+                assert(context->sentinal1 == 0xC);
+                assert(context->sentinal2 == 0xD);
+                CURLcode code = message->data.result;
+                printf("%s DONE\ncode:%d - %s\nerror:%s\n", done_url, code, curl_easy_strerror(code), context->error_buffer);
+                curl_slist_free_all(context->post_commands);
+                free(context);
+
+                curl_multi_remove_handle(curl_handle, message->easy_handle);
+                curl_easy_cleanup(message->easy_handle);
+                --remaining;
+
+                break;
+            }
+            default:
+                log_error("CURLMSG default\n");
+                abort();
+        }
+    }
+}
+
+const char* action_name(int action)
+{
+    return action == CURL_CSELECT_IN ? "read" : "write";
+}
+
+#pragma mark - GCD utilities
+
+
+dispatch_source_t create_source(dispatch_source_type_t type, int socket, int action)
+{
+    log_detail("make source socket %d action %s\n", socket, action_name(action));
+    dispatch_source_t source = dispatch_source_create(type, socket, 0, queue);
+    dispatch_source_set_event_handler(source, ^{
+        log_detail("source event socket %d action %s\n", socket, action_name(action));
+        curl_perform_action(socket, action);
+    });
+    dispatch_source_set_cancel_handler(source, ^{
+        log_detail("source cancelled socket %d action %s\n", socket, action_name(action));
+        dispatch_release(source);
+    });
+
+    dispatch_resume(source);
+    return source;
+}
+
+void create_timeout()
+{
+    timeout = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+    dispatch_source_set_event_handler(timeout, ^{
+        curl_perform_action(CURL_SOCKET_TIMEOUT, 0);
+        if (remaining == 0)
+        {
+            curl_multi_cleanup(curl_handle);
+            exit(0);
+        }
+    });
+
+    dispatch_resume(timeout);
+}
+
+
+#pragma mark - EASY callbacks
 
 size_t write_func(void *ptr, size_t size, size_t nmemb, void *userp)
 {
@@ -108,12 +198,12 @@ int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength
     return 0;
 }
 
-int socket_func(void *easy, curl_socket_t curlfd, curlsocktype purpose)
+int socket_func(curl_handle_context_s *context, curl_socket_t curlfd, curlsocktype purpose)
 {
     if (purpose == CURLSOCKTYPE_IPCXN)
     {
         char* url = NULL;
-        curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &url);
+        curl_easy_getinfo(context->handle, CURLINFO_EFFECTIVE_URL, &url);
 
         if (strncmp(url, "ftp:", 4) == 0)
         {
@@ -139,31 +229,72 @@ int known_hosts_func(CURL *easy,     /* easy handle */
     return 0;
 }
 
-void add_download(const char *url, int num)
+
+#pragma mark - MULTI callbacks
+
+void timeout_func(CURLM *multi, long timeout_ms, void *userp)
 {
-    char filename[50];
-    FILE *file;
-    CURL *handle;
+    if (timeout_ms <= 0)
+        timeout_ms = 1; /* 0 means directly call socket_action, but we'll do it in
+                         a bit */
 
-    sprintf(filename, "%d.download", num);
+    int64_t timeout_ns = timeout_ms * NSEC_PER_MSEC;
+    dispatch_source_set_timer(timeout, DISPATCH_TIME_NOW, timeout_ns, timeout_ns / 100);
+}
 
-    file = fopen(filename, "w");
-    if (file == NULL) {
-        log_error("Error opening %s\n", filename);
-        return;
+int multi_socket_func(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp)
+{
+    curl_context_t *curl_context = (curl_context_t*) socketp;
+
+    if (action == CURL_POLL_IN || action == CURL_POLL_OUT) {
+        if (!curl_context) {
+            curl_context = create_curl_context();
+            curl_multi_assign(curl_handle, s, (void *) curl_context);
+        }
     }
 
+    switch (action) {
+        case CURL_POLL_IN:
+            curl_context->read_source = create_source(DISPATCH_SOURCE_TYPE_READ, s, CURL_CSELECT_IN);
+            break;
+
+        case CURL_POLL_OUT:
+            curl_context->write_source = create_source(DISPATCH_SOURCE_TYPE_WRITE, s, CURL_CSELECT_OUT);
+            break;
+
+        case CURL_POLL_REMOVE:
+            if (curl_context) {
+                destroy_curl_context(curl_context);
+                curl_multi_assign(curl_handle, s, NULL);
+            }
+            break;
+        default:
+            abort();
+    }
+    
+    return 0;
+}
+
+#pragma mark - Top Level
+
+void add_download(const char *url, int num)
+{
+    CURL *handle;
+
     handle = curl_easy_init();
+
+    curl_handle_context_s* context = malloc(sizeof *context);
+    context->handle = handle;
+    context->sentinal1 = 0xC;
+    context->sentinal2 = 0xD;
+    context->post_commands = NULL;
+    curl_easy_setopt(handle, CURLOPT_PRIVATE, context);
 
     long timeout = 60;
     curl_easy_setopt(handle, CURLOPT_NOSIGNAL, timeout != 0);
     curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, timeout);
 
-    char * error_buffer = malloc(CURL_ERROR_SIZE + 2);
-    error_buffer[0] = 255;
-    error_buffer[CURL_ERROR_SIZE + 1] = 255;
-    curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, error_buffer + 1);
-    curl_easy_setopt(handle, CURLOPT_PRIVATE, error_buffer);
+    curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, context->error_buffer);
     curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
     curl_easy_setopt(handle, CURLOPT_FTP_CREATE_MISSING_DIRS, 2);
@@ -174,20 +305,26 @@ void add_download(const char *url, int num)
     curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_func);
     curl_easy_setopt(handle, CURLOPT_URL, url);
-    struct curl_slist* list = curl_slist_append(NULL, "*MKD test");
-    list = curl_slist_append(list, "*MKD test2");
-    list = curl_slist_append(list, "SITE CHMOD 0744 test2");
-    list = curl_slist_append(list, "DELE test");
-    list = curl_slist_append(list, "DELE test2");
-    list = curl_slist_append(list, "DELE file1.txt");
-    list = curl_slist_append(list, "DELE file2.txt");
-    curl_easy_setopt(handle, CURLOPT_POSTQUOTE, list);
 
-    curl_multi_add_handle(curl_handle, handle);
-    log_normal("Added download %s -> %s\n", url, filename);
-    ++remaining;
+    char randomname[CURL_ERROR_SIZE];
+    sprintf(randomname, "test-%d", rand());
 
-    //curl_slist_free_all(list);
+    char makecmd[CURL_ERROR_SIZE];
+    sprintf(makecmd, "*MKD %s", randomname);
+    context->post_commands = curl_slist_append(context->post_commands, makecmd);
+
+    char chmodcmd[CURL_ERROR_SIZE];
+    sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
+    context->post_commands = curl_slist_append(context->post_commands, chmodcmd);
+
+    context->post_commands = curl_slist_append(context->post_commands, "*DELE file1.txt");
+    context->post_commands = curl_slist_append(context->post_commands, "*DELE file2.txt");
+
+    char delcmd[CURL_ERROR_SIZE];
+    sprintf(delcmd, "DELE %s", randomname);
+    context->post_commands = curl_slist_append(context->post_commands, delcmd);
+
+    curl_easy_setopt(handle, CURLOPT_POSTQUOTE, context->post_commands);
 
     // send all data to the C function
     curl_easy_setopt(handle, CURLOPT_SOCKOPTFUNCTION, socket_func);
@@ -220,125 +357,13 @@ void add_download(const char *url, int num)
 
     curl_easy_setopt(handle, CURLOPT_FTP_USE_EPSV, 0);
 
-}
-
-void curl_perform(int socket, int actions)
-{
-    int running_handles;
-    char *done_url;
-    CURLMsg *message;
-    int pending;
-
-    curl_multi_socket_action(curl_handle, socket, actions, &running_handles);
-
-    while ((message = curl_multi_info_read(curl_handle, &pending))) {
-        switch (message->msg) {
-            case CURLMSG_DONE:
-            {
-                CURL* easy = message->easy_handle;
-                curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &done_url);
-                unsigned char* error = NULL;
-                curl_easy_getinfo(easy, CURLINFO_PRIVATE, &error);
-                assert(error[0] == 255);
-                assert(error[CURL_ERROR_SIZE + 1] == 255);
-                CURLcode code = message->data.result;
-                printf("%s DONE\ncode:%d - %s\nerror:%s\n", done_url, code, curl_easy_strerror(code), error + 1);
-                free(error);
-
-                curl_multi_remove_handle(curl_handle, message->easy_handle);
-                curl_easy_cleanup(message->easy_handle);
-                --remaining;
-
-                break;
-            }
-            default:
-                log_error("CURLMSG default\n");
-                abort();
-        }
-    }
-}
-
-const char* action_name(int action)
-{
-    return action == CURL_CSELECT_IN ? "read" : "write";
-}
-
-dispatch_source_t make_source(dispatch_source_type_t type, int socket, int action)
-{
-    log_detail("make source socket %d action %s\n", socket, action_name(action));
-    dispatch_source_t source = dispatch_source_create(type, socket, 0, queue);
-    dispatch_source_set_event_handler(source, ^{
-        log_detail("source event socket %d action %s\n", socket, action_name(action));
-        curl_perform(socket, action);
+    dispatch_async(queue, ^{
+        curl_multi_add_handle(curl_handle, handle);
+        log_normal("Added download %s\n", url);
+        ++remaining;
     });
-    dispatch_source_set_cancel_handler(source, ^{
-        log_detail("source cancelled socket %d action %s\n", socket, action_name(action));
-        dispatch_release(source);
-    });
-
-    dispatch_resume(source);
-    return source;
 }
 
-
-void create_timeout()
-{
-    timeout = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-    dispatch_source_set_event_handler(timeout, ^{
-        curl_perform(CURL_SOCKET_TIMEOUT, 0);
-        if (remaining == 0)
-        {
-            curl_multi_cleanup(curl_handle);
-            exit(0);
-        }
-    });
-
-    dispatch_resume(timeout);
-}
-
-void start_timeout(CURLM *multi, long timeout_ms, void *userp)
-{
-    if (timeout_ms <= 0)
-        timeout_ms = 1; /* 0 means directly call socket_action, but we'll do it in
-                         a bit */
-
-    int64_t timeout_ns = timeout_ms * NSEC_PER_MSEC;
-    dispatch_source_set_timer(timeout, DISPATCH_TIME_NOW, timeout_ns, timeout_ns / 100);
-}
-
-int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp,
-                  void *socketp)
-{
-    curl_context_t *curl_context = (curl_context_t*) socketp;
-
-    if (action == CURL_POLL_IN || action == CURL_POLL_OUT) {
-        if (!curl_context) {
-            curl_context = create_curl_context();
-            curl_multi_assign(curl_handle, s, (void *) curl_context);
-        }
-    }
-
-    switch (action) {
-        case CURL_POLL_IN:
-            curl_context->read_source = make_source(DISPATCH_SOURCE_TYPE_READ, s, CURL_CSELECT_IN);
-            break;
-
-        case CURL_POLL_OUT:
-            curl_context->write_source = make_source(DISPATCH_SOURCE_TYPE_WRITE, s, CURL_CSELECT_OUT);
-            break;
-
-        case CURL_POLL_REMOVE:
-            if (curl_context) {
-                destroy_curl_context(curl_context);
-                curl_multi_assign(curl_handle, s, NULL);
-            }
-            break;
-        default:
-            abort();
-    }
-
-    return 0;
-}
 
 int main(int argc, char **argv)
 {
@@ -355,8 +380,8 @@ int main(int argc, char **argv)
     create_timeout();
 
     curl_handle = curl_multi_init();
-    curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket);
-    curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
+    curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, multi_socket_func);
+    curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, timeout_func);
     
     while (argc-- > 1) {
         for (int n = 0; n < 10; ++n)
