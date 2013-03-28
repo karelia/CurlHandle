@@ -176,71 +176,6 @@ void create_timeout()
 }
 
 
-#pragma mark - EASY callbacks
-
-size_t write_func(void *ptr, size_t size, size_t nmemb, void *userp)
-{
-    char* string = strndup(ptr, size * nmemb);
-    log_normal("%s", string);
-    free(string);
-    return size * nmemb;
-}
-
-size_t read_func(void *ptr, size_t size, size_t nmemb, void *userp)
-{
-    log_detail("read");
-    return 0;
-}
-
-size_t header_func(void *ptr, size_t size, size_t nmemb, void *userp)
-{
-    char* string = strndup(ptr, size * nmemb);
-    log_detail("header bytes\n%s\nend bytes\n", string);
-    free(string);
-    return size * nmemb;
-}
-
-
-int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, void *userp)
-{
-    char* string = strndup(info, infoLength);
-    log_detail("debug %d: %s", infoType, string);
-    free(string);
-    return 0;
-}
-
-int socket_func(curl_handle_context_s *context, curl_socket_t curlfd, curlsocktype purpose)
-{
-    if (purpose == CURLSOCKTYPE_IPCXN)
-    {
-        char* url = NULL;
-        curl_easy_getinfo(context->handle, CURLINFO_EFFECTIVE_URL, &url);
-
-        if (strncmp(url, "ftp:", 4) == 0)
-        {
-            int keepAlive = 1;
-            socklen_t keepAliveLen = sizeof(keepAlive);
-            int result = setsockopt(curlfd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, keepAliveLen);
-            if (result)
-            {
-                log_error("Unable to set FTP control connection keepalive with error:%i", result);
-            }
-        }
-    }
-
-    return 0;
-}
-
-int known_hosts_func(CURL *easy,     /* easy handle */
-                           const struct curl_khkey *knownkey, /* known */
-                           const struct curl_khkey *foundkey, /* found */
-                           enum curl_khmatch match, /* libcurl's view on the keys */
-                           void *userp) /* custom pointer passed from app */
-{
-    return 0;
-}
-
-
 #pragma mark - MULTI callbacks
 
 void timeout_func(CURLM *multi, long timeout_ms, void *userp)
@@ -307,103 +242,28 @@ void add_download(const char *url)
     curl_easy_setopt(handle, CURLOPT_NOSIGNAL, timeout != 0);
     curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, timeout);
 
-    curl_easy_setopt(handle, CURLOPT_ERRORBUFFER, context->error_buffer);
-    curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1);
-    curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
-    curl_easy_setopt(handle, CURLOPT_FTP_CREATE_MISSING_DIRS, 0);
-
-    curl_easy_setopt(handle, CURLOPT_READFUNCTION, read_func);
-    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, header_func);
-    curl_easy_setopt(handle, CURLOPT_DEBUGFUNCTION, debug_func);
-    curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
-    curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, write_func);
-
-    bool is_sftp = strncmp(url, "sftp:", 5) == 0;
-
     char randomname[CURL_ERROR_SIZE];
     char makecmd[CURL_ERROR_SIZE];
     char chmodcmd[CURL_ERROR_SIZE];
     char delcmd[CURL_ERROR_SIZE];
-    char delfile1cmd[CURL_ERROR_SIZE];
-    char delfile2cmd[CURL_ERROR_SIZE];
 
     sprintf(randomname, "test-%d", rand());
 
-    char *user = NULL;
-    char *pass = NULL;
-    char *path = strstr(url, "//") + 2;
-    char *at = strstr(path, "@");
-    char *newurl = NULL;
-    if (at)
-    {
-        pass = strstr(path, ":") + 1;
-        size_t passsize =  (at - pass);
-        size_t usersize = (pass - path) - 1;
-        pass = strndup(path, passsize);
-        user = strndup(path, usersize);
-        size_t schemesize = (path - url);
-        path = strstr(at, "/");
-        if (!path) path = "";
-        newurl = strdup(url);
-        strcpy(newurl + schemesize, at + 1);
-        url = newurl;
-    }
-
     curl_easy_setopt(handle, CURLOPT_URL, url);
 
-    if (is_sftp)
-    {
-
-        sprintf(makecmd, "*mkdir %s%s", path, randomname);
-        sprintf(chmodcmd, "chmod 0744 %s%s", path, randomname);
-        sprintf(delfile1cmd, "*rm %sfile1.txt", path);
-        sprintf(delfile2cmd, "*rm %sile2.txt", path);
-        sprintf(delcmd, "*rmdir %s%s", path, randomname);
-    }
-    else
-    {
-        sprintf(makecmd, "*MKD %s", randomname);
-        sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
-        sprintf(delfile1cmd, "*DELE file1.txt");
-        sprintf(delfile2cmd, "*DELE file2.txt");
-        sprintf(delcmd, "DELE %s", randomname);
-    }
+    sprintf(makecmd, "*MKD %s", randomname);
+    sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
+    sprintf(delcmd, "DELE %s", randomname);
 
     context->post_commands = curl_slist_append(context->post_commands, makecmd);
     context->post_commands = curl_slist_append(context->post_commands, chmodcmd);
-    context->post_commands = curl_slist_append(context->post_commands, delfile1cmd);
-    context->post_commands = curl_slist_append(context->post_commands, delfile2cmd);
+    context->post_commands = curl_slist_append(context->post_commands, "*DELE file1.txt");
+    context->post_commands = curl_slist_append(context->post_commands, "*DELE file2.txt");
     context->post_commands = curl_slist_append(context->post_commands, delcmd);
 
     curl_easy_setopt(handle, CURLOPT_POSTQUOTE, context->post_commands);
 
-    // send all data to the C function
-    curl_easy_setopt(handle, CURLOPT_SOCKOPTFUNCTION, socket_func);
-    curl_easy_setopt(handle, CURLOPT_SOCKOPTDATA, handle);
-    curl_easy_setopt(handle, CURLOPT_SSH_KNOWNHOSTS, NULL);
-    curl_easy_setopt(handle, CURLOPT_SSH_KEYFUNCTION, known_hosts_func);
-
-
-    curl_easy_setopt(handle, CURLOPT_USERNAME, user);
-    curl_easy_setopt(handle, CURLOPT_PASSWORD, pass);
-    curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
-    curl_easy_setopt(handle, CURLOPT_SSH_PUBLIC_KEYFILE, NULL);
-    curl_easy_setopt(handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD);
-
-
-    //    curl_easy_setopt(handle, CURLOPT_HTTPGET, 1);
-        curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
-    //        curl_easy_setopt(handle, CURLOPT_POST, 1);
-
-    //        curl_easy_setopt(handle, CURLOPT_INFILESIZE, [uploadData length]);
-    curl_easy_setopt(handle, CURLOPT_UPLOAD, 0);
-
-    curl_easy_setopt(handle, CURLOPT_USE_SSL, 0);
-    curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, 1);
-
-
-//    curl_easy_setopt(handle, CURLOPT_NEW_FILE_PERMS, 0744);
-//    curl_easy_setopt(handle, CURLOPT_NEW_DIRECTORY_PERMS, 0744);
+    curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
 
 
     curl_easy_setopt(handle, CURLOPT_FTP_USE_EPSV, 0);
@@ -412,10 +272,6 @@ void add_download(const char *url)
         curl_multi_add_handle(curl_handle, handle);
         log_normal("Added download %s\n", url);
         ++remaining;
-
-        if (user) free(user);
-        if (pass) free(pass);
-        if (newurl) free(newurl);
     });
 }
 
