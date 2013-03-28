@@ -170,7 +170,6 @@ void create_timeout()
     dispatch_resume(timeout);
 }
 
-
 #pragma mark - MULTI callbacks
 
 void timeout_func(CURLM *multi, long timeout_ms, void *userp)
@@ -230,10 +229,8 @@ void add_download(const char *url)
     context->post_commands = NULL;
     context->full_url = url;
     curl_easy_setopt(handle, CURLOPT_PRIVATE, context);
+    curl_easy_setopt(handle, CURLOPT_URL, url);
 
-    long timeout = 60;
-    curl_easy_setopt(handle, CURLOPT_NOSIGNAL, timeout != 0);
-    curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, timeout);
 
     char randomname[CURL_ERROR_SIZE];
     char makecmd[CURL_ERROR_SIZE];
@@ -242,7 +239,6 @@ void add_download(const char *url)
 
     sprintf(randomname, "test-%d", rand());
 
-    curl_easy_setopt(handle, CURLOPT_URL, url);
 
     sprintf(makecmd, "*MKD %s", randomname);
     sprintf(chmodcmd, "SITE CHMOD 0744 %s", randomname);
@@ -255,6 +251,9 @@ void add_download(const char *url)
     context->post_commands = curl_slist_append(context->post_commands, delcmd);
 
     curl_easy_setopt(handle, CURLOPT_POSTQUOTE, context->post_commands);
+
+    long timeout = 60;
+    curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, timeout);
 
     curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
 
