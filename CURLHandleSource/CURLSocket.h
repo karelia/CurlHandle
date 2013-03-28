@@ -24,11 +24,13 @@
  * Create/destroy the dispatch sources, based on the values in the mode parameter.
  * CURLMulti uses this internally - not intended for public consumption.
  *
- * @param socket The raw socket.
+ * @param socket The socket .
  * @param mode Whether we are interested in reads, writes, or both.
  * @param multi The multi that this object is working with.
  */
 
 - (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMulti*)multi;
+
+- (BOOL)ownsSource:(dispatch_source_t)source;
 
 @end

@@ -50,10 +50,10 @@
     // a place to group together the reader and writer sources corresponding to a socket.
 
     BOOL readerRequired = (mode == CURL_POLL_IN) || (mode == CURL_POLL_INOUT);
-    self.reader = [multi updateSource:self.reader type:DISPATCH_SOURCE_TYPE_READ socket:socket required:readerRequired];
+    self.reader = [multi updateSource:self.reader type:DISPATCH_SOURCE_TYPE_READ socket:self raw:socket required:readerRequired];
 
     BOOL writerRequired = (mode == CURL_POLL_OUT) || (mode == CURL_POLL_INOUT);
-    self.writer = [multi updateSource:self.writer type:DISPATCH_SOURCE_TYPE_WRITE socket:socket required:writerRequired];
+    self.writer = [multi updateSource:self.writer type:DISPATCH_SOURCE_TYPE_WRITE socket:self raw:socket required:writerRequired];
 }
 
 - (NSString*)description
@@ -80,6 +80,11 @@
     }
 
     return [NSString stringWithFormat:@"<socket %p %@>", self, mode];
+}
+
+- (BOOL)ownsSource:(dispatch_source_t)source
+{
+    return (self.reader == source) || (self.writer == source);
 }
 
 @end

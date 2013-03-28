@@ -22,6 +22,7 @@
 #endif
 
 @class CURLHandle;
+@class CURLSocket;
 
 /**
  * Wrapper for a curl_multi handle.
@@ -99,6 +100,6 @@
 
 - (void)stopManagingHandle:(CURLHandle*)handle;
 
-- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket required:(BOOL)required;
+- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(CURLSocket*)socket raw:(int)raw required:(BOOL)required;
 
 @end
