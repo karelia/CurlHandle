@@ -345,10 +345,19 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                         curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &url);
                         CURLMultiLog(@"done msg result %d for %@ %s", code, handle, url);
                         [handle retain];
+
+                        // the order is important here - we remove the handle from the multi first...
                         [self multi:multi removeHandle:handle];
-                        [handle completeWithCode:code];
+
+                        // ...then tell the easy handle to complete, which can cause curl_easy_cleanup to be called
+                        [handle completeWithCode:code isMulti:NO];
+
+                        // ...then tell it that it's no longer in use by the multi, which breaks the reference cycle between us
                         [handle removedByMulti:self];
-                        [self.pendingRemovals removeObject:handle]; // just in case it was already scheduled for removal
+
+                        // also need to make sure that it's not already on the removal list
+                        [self.pendingRemovals removeObject:handle];
+
                         [handle autorelease];
                     }
                     else
@@ -398,7 +407,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         else
         {
             CURLMultiLogError(@"failed to add handle %@", handle);
-            [handle completeWithMultiCode:result];
+            [handle completeWithCode:result isMulti:YES];
         }
     }
     

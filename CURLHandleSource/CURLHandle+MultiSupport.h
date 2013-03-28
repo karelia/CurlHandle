@@ -13,8 +13,7 @@
 
 @interface CURLHandle(MultiSupport)
 - (CURL *) curl;
-- (void)completeWithMultiCode:(CURLMcode)code;
-- (void)completeWithCode:(CURLcode)code;
+- (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
 - (BOOL)hasCompleted;
 - (void)removedByMulti:(CURLMulti*)multi;
 @end
