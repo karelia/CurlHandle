@@ -54,9 +54,6 @@ dispatch_source_t timeout;
 
 typedef struct curl_handle_context_s {
     CURL *handle;
-    char sentinal1;
-    char error_buffer[CURL_ERROR_SIZE];
-    char sentinal2;
     struct curl_slist* post_commands;
     const char *full_url;
 } curl_handle_context_s;
@@ -108,10 +105,8 @@ void curl_perform_action(int socket, int actions)
                 curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &done_url);
                 curl_handle_context_s* context = NULL;
                 curl_easy_getinfo(easy, CURLINFO_PRIVATE, &context);
-                assert(context->sentinal1 == 0xC);
-                assert(context->sentinal2 == 0xD);
                 CURLcode code = message->data.result;
-                printf("%s DONE\ncode:%d - %s\nerror:%s\nremaining:%d\n", done_url, code, curl_easy_strerror(code), context->error_buffer, --remaining);
+                printf("%s DONE\ncode:%d - %s\nremaining:%d\n", done_url, code, curl_easy_strerror(code), --remaining);
                 curl_slist_free_all(context->post_commands);
 
                 if (--repeats)
@@ -232,8 +227,6 @@ void add_download(const char *url)
     curl_handle_context_s* context = malloc(sizeof *context);
     memset(context, 0, sizeof *context);
     context->handle = handle;
-    context->sentinal1 = 0xC;
-    context->sentinal2 = 0xD;
     context->post_commands = NULL;
     context->full_url = url;
     curl_easy_setopt(handle, CURLOPT_PRIVATE, context);
@@ -264,9 +257,6 @@ void add_download(const char *url)
     curl_easy_setopt(handle, CURLOPT_POSTQUOTE, context->post_commands);
 
     curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
-
-
-    curl_easy_setopt(handle, CURLOPT_FTP_USE_EPSV, 0);
 
     dispatch_async(queue, ^{
         curl_multi_add_handle(curl_handle, handle);
