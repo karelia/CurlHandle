@@ -63,14 +63,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                                   enum curl_khmatch, /* libcurl's view on the keys */
                                   CURLHandle *self); /* custom pointer passed from app */
 
-@interface CURLHandle()
+#pragma mark - Private API
 
-#pragma mark - Private Methods
+@interface CURLHandle()
 
 - (size_t) curlReceiveDataFrom:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 - (size_t) curlSendDataTo:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
-
-#pragma mark - Private Properties
 
 @property (strong, nonatomic) NSMutableArray* lists;
 @property (strong, nonatomic) id <CURLHandleDelegate> delegate; // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
