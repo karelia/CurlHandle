@@ -21,14 +21,7 @@
  ***************************************************************************/
 
 /* Example application code using the multi socket interface to download
- multiple files at once, but instead of using curl_multi_perform and
- curl_multi_wait, which uses select(), we use gcd.
-
- Written by Sam Deane, based on the multi-uv.c example.
-
- Requires gcd and (of course) libcurl.
-
- See http://en.wikipedia.org/wiki/Grand_Central_Dispatch for more information on gcd.
+ multiple files at once.
  */
 
 #include <stdio.h>
@@ -36,22 +29,15 @@
 #include <curl/curl.h>
 #include <string.h>
 
-#include <dispatch/dispatch.h>
-
 #define log_message(...) fprintf(stderr, __VA_ARGS__)
 #define log_error(...) fprintf(stderr, "ERROR: " __VA_ARGS__)
 
 void add_download(const char *url);
 
-dispatch_queue_t queue;
+
 int remaining = 0;
 int repeats = 20;
 CURLM *curl_handle;
-dispatch_source_t timeout;
-
-
-
-#pragma mark - Socket Action
 
 void curl_perform_wait()
 {
@@ -79,7 +65,8 @@ void curl_perform_wait()
                 CURL* easy = message->easy_handle;
                 curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &done_url);
                 CURLcode code = message->data.result;
-                printf("%s DONE\ncode:%d - %s\n", done_url, code, curl_easy_strerror(code));
+                printf("%s DONE\ncode:%d - %s\n", done_url, code,
+                       curl_easy_strerror(code));
 
                 struct curl_slist* list;
                 curl_easy_getinfo(easy, CURLINFO_PRIVATE, &list);
@@ -90,9 +77,9 @@ void curl_perform_wait()
                 {
                     add_download(done_url);
                 }
-
-                curl_multi_remove_handle(curl_handle, message->easy_handle);
-                curl_easy_cleanup(message->easy_handle);
+                
+                curl_multi_remove_handle(curl_handle, easy);
+                curl_easy_cleanup(easy);
                 curl_slist_free_all(list);
 
                 break;
@@ -108,10 +95,6 @@ void curl_perform_wait()
         curl_multi_cleanup(curl_handle);
         exit(0);
     }
-
-    dispatch_async(queue, ^{
-        curl_perform_wait();
-    });
 }
 
 
@@ -122,9 +105,6 @@ int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength
     free(string);
     return 0;
 }
-
-
-#pragma mark - Top Level
 
 void add_download(const char *url)
 {
@@ -155,24 +135,20 @@ void add_download(const char *url)
     list = curl_slist_append(list, delcmd);
     curl_easy_setopt(handle, CURLOPT_PRIVATE, list);
     curl_easy_setopt(handle, CURLOPT_POSTQUOTE, list);
-
+    
     long timeout = 60;
     curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, timeout);
 
     curl_easy_setopt(handle, CURLOPT_NOBODY, 1);
 
     ++remaining;
-    dispatch_async(queue, ^{
-        curl_multi_add_handle(curl_handle, handle);
-        log_message("Added download %s\n", url);
-    });
+    curl_multi_add_handle(curl_handle, handle);
+    log_message("Added download %s\n", url);
 }
 
 
 int main(int argc, char **argv)
 {
-    queue = dispatch_queue_create("curl queue", 0);
-
     if (argc <= 1)
         return 0;
 
@@ -186,14 +162,9 @@ int main(int argc, char **argv)
     while (argc-- > 1) {
         add_download(argv[argc]);
     }
-
-    dispatch_async(queue, ^{
-        int numrunning = 0;
-        curl_multi_perform(curl_handle, &numrunning);
-        curl_perform_wait();
-    });
     
-    dispatch_main();
+    while(1)
+        curl_perform_wait();
     
     return 0;
 }
