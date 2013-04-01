@@ -137,16 +137,19 @@ static dispatch_source_t create_source(dispatch_source_type_t type, int socket, 
     return source;
 }
 
-static void create_timeout()
+static void create_timeout(StandaloneGCDTest* test)
 {
     timeout = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
     dispatch_source_set_event_handler(timeout, ^{
         curl_perform_action(CURL_SOCKET_TIMEOUT, 0);
         if (remaining == 0)
         {
-            curl_multi_cleanup(curl_handle);
-            exit(0);
+            dispatch_source_cancel(timeout);
         }
+    });
+
+    dispatch_source_set_cancel_handler(timeout, ^{
+        [test pause];
     });
 
     dispatch_resume(timeout);
@@ -260,6 +263,10 @@ static void add_download(const char *url)
     add_download([[url absoluteString] UTF8String]);
     
     [self runUntilPaused];
+
+
+    log_normal("cleaning up");
+    curl_multi_cleanup(curl_handle);
 }
 
 @end

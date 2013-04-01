@@ -85,13 +85,14 @@ static void curl_perform_wait(StandaloneGCDWaitTest* test)
 
     if (remaining == 0)
     {
-        curl_multi_cleanup(curl_handle);
         [test pause];
     }
-
-    dispatch_async(queue, ^{
-        curl_perform_wait(test);
-    });
+    else
+    {
+        dispatch_async(queue, ^{
+            curl_perform_wait(test);
+        });
+    }
 }
 
 
@@ -167,6 +168,9 @@ static void add_download(const char *url)
         });
 
         [self runUntilPaused];
+
+        log_message("cleaning up");
+        curl_multi_cleanup(curl_handle);
     }
 }
 

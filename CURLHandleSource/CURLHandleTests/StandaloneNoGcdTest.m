@@ -23,14 +23,14 @@
 #define log_message(...) fprintf(stderr, __VA_ARGS__)
 #define log_error(...) fprintf(stderr, "ERROR: " __VA_ARGS__)
 
-void add_download(const char *url);
+static void add_download(const char *url);
 
 
-int remaining = 0;
-int repeats = 20;
-CURLM *curl_handle;
+static int remaining = 0;
+static int repeats = 20;
+static CURLM *curl_handle;
 
-void curl_perform_wait()
+static void curl_perform_wait()
 {
     long timeout_ms = -1;
     CURLMcode result = curl_multi_timeout(curl_handle, &timeout_ms);
@@ -83,7 +83,7 @@ void curl_perform_wait()
 }
 
 
-int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, void *userp)
+static int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, void *userp)
 {
     char* string = strndup(info, infoLength);
     fprintf(stderr, "debug %d: %s", infoType, string);
@@ -91,7 +91,7 @@ int debug_func(CURL *curl, curl_infotype infoType, char *info, size_t infoLength
     return 0;
 }
 
-void add_download(const char *url)
+static void add_download(const char *url)
 {
     CURL *handle = curl_easy_init();
     curl_easy_setopt(handle, CURLOPT_URL, url);
@@ -143,6 +143,7 @@ void add_download(const char *url)
         while(remaining > 0)
             curl_perform_wait(self);
 
+        log_message("cleaning up");
         curl_multi_cleanup(curl_handle);
     }
 }
