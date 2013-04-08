@@ -374,7 +374,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     else
     {
         RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD));
-        RETURN_IF_FAILED([self setOption:CURLOPT_KEYPASSWD string:password]);
+        RETURN_IF_FAILED([self setOption:CURLOPT_PASSWORD string:password]);
     }
 
     return code;
