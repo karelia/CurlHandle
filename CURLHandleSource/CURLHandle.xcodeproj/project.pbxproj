@@ -1186,14 +1186,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
-				GCC_PREFIX_HEADER = "CURLHandleTests/CURLHandleTests-Prefix.pch";
+				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/built/include/curl-x86_64\"";
-				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
+				INFOPLIST_FILE = "Tests/CURLHandleTests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks @loader_path/../Frameworks/CURLHandle.framework/Versions/A/Frameworks @loader_path/../Libraries";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/built\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
@@ -1204,13 +1204,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
-				GCC_PREFIX_HEADER = "CURLHandleTests/CURLHandleTests-Prefix.pch";
+				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/built/include/curl-x86_64\"";
-				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
+				INFOPLIST_FILE = "Tests/CURLHandleTests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks @loader_path/../Frameworks/CURLHandle.framework/Versions/A/Frameworks @loader_path/../Libraries";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/built\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
