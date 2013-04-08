@@ -1104,7 +1104,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/built\"",
 					"\"$(SRCROOT)/../SFTP\"",
 				);
 				PRODUCT_NAME = CURLHandle;
@@ -1124,7 +1124,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/built\"",
 					"\"$(SRCROOT)/../SFTP\"",
 				);
 				PRODUCT_NAME = CURLHandle;
