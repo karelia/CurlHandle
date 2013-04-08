@@ -116,7 +116,6 @@
 		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
 		223FD0A4160B523700BE1C80 /* CURLMultiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLMultiTests.m */; };
 		223FD0AC160B5F1200BE1C80 /* CURLHandleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */; };
-		223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 223FD0B1160B63F800BE1C80 /* DevNotes.txt */; };
 		226B358D16ADAA6D004780A7 /* CURLHandle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; };
 		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4A5161090AB009B6F98 /* CURLResponse.h */; };
@@ -310,7 +309,6 @@
 		223FD0A3160B523700BE1C80 /* CURLMultiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLMultiTests.m; sourceTree = "<group>"; };
 		223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CURLHandleTests-Prefix.pch"; sourceTree = "<group>"; };
 		223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLHandleTests.m; sourceTree = "<group>"; };
-		223FD0B1160B63F800BE1C80 /* DevNotes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = DevNotes.txt; path = ../../DevNotes.txt; sourceTree = "<group>"; };
 		2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLRequest+CURLHandle.h"; sourceTree = "<group>"; };
 		2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+CURLHandle.m"; sourceTree = "<group>"; };
 		2270F4A5161090AB009B6F98 /* CURLResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLResponse.h; sourceTree = "<group>"; };
@@ -548,7 +546,6 @@
 			isa = PBXGroup;
 			children = (
 				22DC488416CC115300211948 /* TestContent.txt */,
-				223FD0B1160B63F800BE1C80 /* DevNotes.txt */,
 				223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */,
 				223FD09F160B523700BE1C80 /* InfoPlist.strings */,
 				223FD0A5160B523700BE1C80 /* CURLHandleTests-Prefix.pch */,
@@ -760,7 +757,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */,
-				223FD0B2160B63F800BE1C80 /* DevNotes.txt in Resources */,
 				22BF08E216AEEDD9009BE5A3 /* ftp.json in Resources */,
 				22BF08E316AEEDD9009BE5A3 /* http.json in Resources */,
 				22BF08F316AEEDD9009BE5A3 /* webdav.json in Resources */,
