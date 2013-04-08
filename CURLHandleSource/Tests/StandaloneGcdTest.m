@@ -149,6 +149,8 @@ static void create_timeout(StandaloneGCDTest* test)
     });
 
     dispatch_source_set_cancel_handler(timeout, ^{
+        log_normal("cleaning up");
+        curl_multi_cleanup(curl_handle);
         [test pause];
     });
 
@@ -265,8 +267,8 @@ static void add_download(const char *url)
     [self runUntilPaused];
 
 
-    log_normal("cleaning up");
-    curl_multi_cleanup(curl_handle);
+    log_normal("cleaned up");
+    dispatch_release(queue);
 }
 
 @end
