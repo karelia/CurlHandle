@@ -453,7 +453,6 @@
 				223FD09C160B523700BE1C80 /* Tests */,
 				22BF08FA16AF09B2009BE5A3 /* Modules */,
 				0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */,
-				22C9CFC317035A0B004610FE /* crashtest */,
 				22C9CFC017035A0A004610FE /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
@@ -530,6 +529,7 @@
 		223FD09C160B523700BE1C80 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				22C9CFC317035A0B004610FE /* crashtest */,
 				229748FA1610C1AE0042A51A /* CURLHandleBasedTest.h */,
 				229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */,
 				223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */,
@@ -541,8 +541,7 @@
 				22BF085916AEECEC009BE5A3 /* MockServer */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
-			name = Tests;
-			path = CURLHandleTests;
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		223FD09D160B523700BE1C80 /* Supporting Files */ = {
@@ -632,7 +631,8 @@
 				22C9D0041704B36F004610FE /* multi-gcd-crashtest-wait.c */,
 				22EC9D981705A7E7009DDAAA /* multi-nogcd-crashtest.c */,
 			);
-			path = crashtest;
+			name = crashtest;
+			path = ../Tests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -868,7 +868,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Create final dylibs.\ncd \"${OBJROOT}\"\nlipo -create -arch i386 cares-i386/.libs/libcares-i386.dylib  -arch x86_64 cares-x86_64/.libs/libcares-x86_64.dylib  -output libcares.dylib\n\n# Create dSYMs\ndsymutil libcares.dylib\n\n# Strip dylibs\nstrip -x libcares.dylib\n\n# Final output to project dir, not build dir.\nOUTDIR=\"${SRCROOT}/built\"\nmkdir -p \"${OUTDIR}\"\ncp -f  libcares.dylib      \"${OUTDIR}\"\ncp -Rf libcares.dylib.dSYM \"${OUTDIR}\"\ncp -f cares-i386/ares_build-i386.h \"${OUTDIR}/include\"\ncp -f cares-x86_64/ares_build-x86_64.h \"${OUTDIR}/include\"\n\n# Remove build dirs.\n#rm -Rf \"${OBJROOT}/cares-i386\"\n#rm -Rf \"${OBJROOT}/cares-x86_64\"\n\n# Display results.\nlipo -detailed_info \"${OUTDIR}/libcares.dylib\"\nexit 0\n";
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Create final dylibs.\ncd \"${OBJROOT}\"\nlipo -create -arch i386 cares-i386/.libs/libcares-i386.dylib  -arch x86_64 cares-x86_64/.libs/libcares-x86_64.dylib  -output libcares.dylib\n\n# Create dSYMs\ndsymutil libcares.dylib\n\n# Strip dylibs\nstrip -x libcares.dylib\n\n# Final output to project dir, not build dir.\nOUTDIR=\"${SRCROOT}/built\"\nmkdir -p \"${OUTDIR}\"\nmkdir -p \"${OUTDIR}/include\"\ncp -f  libcares.dylib      \"${OUTDIR}\"\ncp -Rf libcares.dylib.dSYM \"${OUTDIR}\"\ncp -f cares-i386/ares_build-i386.h \"${OUTDIR}/include/\"\ncp -f cares-x86_64/ares_build-x86_64.h \"${OUTDIR}/include/\"\n\n# Remove build dirs.\n#rm -Rf \"${OBJROOT}/cares-i386\"\n#rm -Rf \"${OBJROOT}/cares-x86_64\"\n\n# Display results.\nlipo -detailed_info \"${OUTDIR}/libcares.dylib\"\nexit 0\n";
 			showEnvVarsInLog = 0;
 		};
 		80080338166A9661004D39F5 /* Run Script - remove previous product dylibs */ = {
@@ -960,7 +960,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Create final dylibs.\ncd \"${OBJROOT}\"\nlipo -create -arch i386 curl-i386/lib/.libs/libcurl-i386.dylib  -arch x86_64 curl-x86_64/lib/.libs/libcurl-x86_64.dylib  -output libcurl.dylib\n\n# Create dSYMs\ndsymutil libcurl.dylib\n\n# Strip dylibs\nstrip -x libcurl.dylib\n\n# Final output to project dir, not source/build dir.\nOUTDIR=\"${SRCROOT}/built\"\nmkdir -p \"${OUTDIR}\"\ncp -f  libcurl.dylib      \"${OUTDIR}\"\ncp -Rf libcurl.dylib.dSYM \"${OUTDIR}\"\ncp -Rf curl-i386/include \"${OUTDIR}/include/curl-i386\"\ncp -Rf curl-i386/include \"${OUTDIR}/include/curl-x86_64\"\n\n# Remove build dirs.\n#rm -Rf \"${OBJROOT}/curl-i386\"\n#rm -Rf \"${OBJROOT}/curl-x86_64\"\n#rm -Rf \"${OBJROOT}/libssh2\"\n#rm -Rf \"${OBJROOT}/c-ares-i386\"\n#rm -Rf \"${OBJROOT}/c-ares-x86_64\"\n\n# Display results.\nlipo -detailed_info \"${OUTDIR}/libcurl.dylib\"\nexit 0\n";
+			shellScript = "# glibtoolize (and maybe other tools) are not supplied with OS X.\n# Add default macports & homebrew paths in attempt to find them.\nexport PATH=${PATH}:/opt/local/bin:/usr/local/bin\n\n# Create final dylibs.\ncd \"${OBJROOT}\"\nlipo -create -arch i386 curl-i386/lib/.libs/libcurl-i386.dylib  -arch x86_64 curl-x86_64/lib/.libs/libcurl-x86_64.dylib  -output libcurl.dylib\n\n# Create dSYMs\ndsymutil libcurl.dylib\n\n# Strip dylibs\nstrip -x libcurl.dylib\n\n# Final output to project dir, not source/build dir.\nOUTDIR=\"${SRCROOT}/built\"\nmkdir -p \"${OUTDIR}\"\nmkdir -p \"${OUTDIR}/include\"\ncp -f  libcurl.dylib      \"${OUTDIR}\"\ncp -Rf libcurl.dylib.dSYM \"${OUTDIR}\"\ncp -Rf curl-i386/include \"${OUTDIR}/include/curl-i386\"\ncp -Rf curl-x86_64/include \"${OUTDIR}/include/curl-x86_64\"\n\n# Remove build dirs.\n#rm -Rf \"${OBJROOT}/curl-i386\"\n#rm -Rf \"${OBJROOT}/curl-x86_64\"\n#rm -Rf \"${OBJROOT}/libssh2\"\n#rm -Rf \"${OBJROOT}/c-ares-i386\"\n#rm -Rf \"${OBJROOT}/c-ares-x86_64\"\n\n# Display results.\nlipo -detailed_info \"${OUTDIR}/libcurl.dylib\"\nexit 0\n";
 			showEnvVarsInLog = 0;
 		};
 		809AE1C31602BEF5001D02E1 /* Run Script - remove previous product dylibs */ = {
