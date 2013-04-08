@@ -37,7 +37,8 @@ static void curl_perform_wait()
     if (result != CURLM_OK) log_error("curl_multi_timeout error %d", result);
 
     if (timeout_ms < 1) timeout_ms = 1;
-
+    if (timeout_ms > 100) timeout_ms = 100; // for the purposes of the test, keep the timeout time to a minimum
+    
     int numfds = 0;
     result = curl_multi_wait(curl_handle, NULL, 0, (int)timeout_ms, &numfds);
     if (result != CURLM_OK) log_error("curl_multi_wait error %d", result);
@@ -133,18 +134,25 @@ static void add_download(const char *url)
 
 - (void)test_multi_no_gcd
 {
-    if ([self setupServerWithResponseFileNamed:@"ftp"])
+    if (!self.usingMockServer)
     {
-        curl_handle = curl_multi_init();
+        // can't run this test with MockServer. It will deadlock, since everything is happening on the main loop.
+        if ([self setupServerWithResponseFileNamed:@"ftp"])
+        {
+            curl_handle = curl_multi_init();
 
-        NSURL* url = [[self ftpTestServer] URLByAppendingPathComponent:@"multinogcd"];
-        add_download([[url absoluteString] UTF8String]);
+            NSURL* url = [[self ftpTestServer] URLByAppendingPathComponent:@"multinogcd"];
+            add_download([[url absoluteString] UTF8String]);
 
-        while(remaining > 0)
-            curl_perform_wait(self);
+            while(remaining > 0)
+            {
+                curl_perform_wait(self);
+                [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
+            }
 
-        log_message("cleaning up");
-        curl_multi_cleanup(curl_handle);
+            log_message("cleaning up");
+            curl_multi_cleanup(curl_handle);
+        }
     }
 }
 
