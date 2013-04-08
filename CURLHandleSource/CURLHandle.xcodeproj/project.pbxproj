@@ -165,6 +165,7 @@
 		22C9D0091704C627004610FE /* CURLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0071704C627004610FE /* CURLList.m */; };
 		22C9D00A1704C627004610FE /* CURLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0071704C627004610FE /* CURLList.m */; };
 		22DC488516CC115300211948 /* TestContent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22DC488416CC115300211948 /* TestContent.txt */; };
+		22E67F091712C598001ECE34 /* CURLHandle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; };
 		22EC9D9A1705AAA3009DDAAA /* multi-gcd-crashtest-wait.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0041704B36F004610FE /* multi-gcd-crashtest-wait.c */; };
 		22F9473E1709BF1100F0E6E1 /* StandaloneGcdTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */; };
 		22F9473F1709C00000F0E6E1 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
@@ -249,8 +250,8 @@
 		22BCCE2F16ADD63000DFFE8D /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 16;
+			dstPath = Contents/Libraries;
+			dstSubfolderSpec = 1;
 			files = (
 				22BCCE3016ADD63500DFFE8D /* libssh2.dylib in CopyFiles */,
 				22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */,
@@ -269,6 +270,16 @@
 				22C9CFD2170364FB004610FE /* libssh2.dylib in CopyFiles */,
 				22C9CFD3170364FB004610FE /* libcrypto.dylib in CopyFiles */,
 				22C9CFD4170364FB004610FE /* libcares.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22E67F081712C583001ECE34 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				22E67F091712C598001ECE34 /* CURLHandle.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -657,6 +668,7 @@
 				223FD08E160B523700BE1C80 /* Frameworks */,
 				223FD08F160B523700BE1C80 /* Resources */,
 				22BCCE2F16ADD63000DFFE8D /* CopyFiles */,
+				22E67F081712C583001ECE34 /* CopyFiles */,
 				223FD090160B523700BE1C80 /* ShellScript */,
 			);
 			buildRules = (
@@ -1178,7 +1190,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "build/curl-x86_64/include";
 				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks @loader_path/../Frameworks/CURLHandle.framework/Versions/A/Frameworks @loader_path/../Libraries";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -1195,7 +1207,7 @@
 				GCC_PREFIX_HEADER = "CURLHandleTests/CURLHandleTests-Prefix.pch";
 				HEADER_SEARCH_PATHS = "build/curl-x86_64/include";
 				INFOPLIST_FILE = "CURLHandleTests/CURLHandleTests-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks @loader_path/../Frameworks @loader_path/../Frameworks/CURLHandle.framework/Versions/A/Frameworks @loader_path/../Libraries";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
