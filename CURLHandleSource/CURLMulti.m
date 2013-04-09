@@ -178,8 +178,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     if (timer)
     {
         CURLMultiLog(@"shutdown");
-        dispatch_source_cancel(timer);
         self.timer = nil;
+        dispatch_source_cancel(timer);
     }
     else
     {
