@@ -304,7 +304,6 @@
 		220C11A2171606310086F199 /* Documentation */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Documentation; path = ../Documentation; sourceTree = "<group>"; };
 		220C11A5171606A90086F199 /* .appledoc.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = .appledoc.plist; path = ../.appledoc.plist; sourceTree = "<group>"; };
 		220C11A617160E250086F199 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		220C11A717160E250086F199 /* ReleaseNotes.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = ReleaseNotes.txt; path = ../ReleaseNotes.txt; sourceTree = "<group>"; };
 		2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StandaloneGcdTest.m; sourceTree = "<group>"; };
 		221EAD0F160B167900E4F270 /* CURLMulti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMulti.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
@@ -535,7 +534,6 @@
 			isa = PBXGroup;
 			children = (
 				220C11A617160E250086F199 /* README.md */,
-				220C11A717160E250086F199 /* ReleaseNotes.txt */,
 				220C11A5171606A90086F199 /* .appledoc.plist */,
 				220C11A2171606310086F199 /* Documentation */,
 			);

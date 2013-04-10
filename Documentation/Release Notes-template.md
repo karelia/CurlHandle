@@ -1,15 +1,15 @@
 
-Version 3.1, November 24, 2012
+## Version 3.1, November 24, 2012
 
 Well look at that, we're back to building our own libcurl again. Partly because it's nice to have control, but mostly because OS X v10.7 Lion's built-in libcurl crashes when checking certificates for FTPS. libcurl 7.28.0 is included pre-built as a dylib.
 
 Michael Robinson added FTP support for deleting directories, and moving items.
 
-Version 3.0
+## Version 3.0
 
 For explicit SSL/TLS, specify NSURLRequest.curl_shouldVerifySSLCertificate. For implicit FTPS, use the ftps: URL scheme
 
-Version 2.0, December 10, 2008
+## Version 2.0, December 10, 2008
 
 Yes, I know it's been 4 years.  But I figured I'd collect the various intel-compatible modifications out there and bring them "home."
 
@@ -19,7 +19,7 @@ And it's an Xcode project, and builds fat binary.
 
 I have taken out references to building your own CURL, and being 10.1-compatible.
 
-Version 1.9, 1 April 2004
+## Version 1.9, 1 April 2004
 
 • Wraps around curl 7.11.1
 
@@ -39,7 +39,7 @@ Version 1.9, 1 April 2004
 
 • Put in timeout methods and method to get the version of underlying curl (Thanks to Alan Pinstein)
 
-Version 1.8, 2 July 2003 (Never Released)
+## Version 1.8, 2 July 2003 (Never Released)
 
 • Changed the runloop mode for threading from NSDefaultRunLoop to kCFRunLoopCommonModes so it will work in a modal dialog box (thanks to Quentin D. Carnicelli)
 
@@ -53,7 +53,7 @@ Version 1.8, 2 July 2003 (Never Released)
 
 • Tester:  Added Find panel (thanks to Stephen Steiner).  Note that the tester now contains software copyright Apple Computer.
 
-Version 1.7, 26 November 2002
+## Version 1.7, 26 November 2002
 
 • Wraps around curl 7.10.2.
 
@@ -72,7 +72,7 @@ Version 1.7, 26 November 2002
 • Got SSL working, as long as you are building curl and CURLHandle under 10.2.  Well, it was working all along, but now you can go to an https: URL in CURLHandleTester.  Please see the notes at <http://curl.haxx.se/lxr/source/UPGRADE> -- by default, curl will complain if it couldn't verify the remote certificate from the default CA cert bundle that gets installed with curl.  You may need to provide your own CA cert bundle using the CURLOPT_CAPATH.  (Presently, there is no convenience method for this defined in CURLHandle.)
 
 
-Version 1.6, 5 July 2002
+## Version 1.6, 5 July 2002
 
 • Wraps around curl 7.9.8.
 
@@ -86,11 +86,11 @@ Version 1.6, 5 July 2002
 
 • Add a script in the project for the framework to eliminate the "MH_DYLIB" error message people were getting.
 
-Version 1.5.2, 29 April 2002
+## Version 1.5.2, 29 April 2002
 
 • Fix to cookie handling.  The category method -[NSArray parsedCookies] returns a dictionary with the keys being the cookie names and the value being another dictionary of attributes (including value) of the cookie.  -[CURLHandle setRequestCookies:] take a dictionary of either that form, or a simple { name1 = value1; name2 = value2; } form.
 
-Version 1.5.1, 25 April 2002
+## Version 1.5.1, 25 April 2002
 
 • This will likely be the last version with Mac OS X 10.0 support.  We mean it this time!
 
@@ -114,7 +114,7 @@ http://quote.yahoo.com/
 
 and verify that it shows your personalized information.
 
-Version 1.5, 11 April 2002
+## Version 1.5, 11 April 2002
 
 • Packaged CURLHandle as a standalone framework.  There are now two projects -- CURLHandle.pbproj, which is used for building the framework, and CURLHandleTester.pbproj, which builds the testing application.  
 
@@ -157,7 +157,7 @@ Version 1.5, 11 April 2002
 
 
 
-Version 1.2, 12 December 2001
+## Version 1.2, 12 December 2001
 
 •  setProgressIndicator: to allow for indeterminate progress indicators in foreground loading. See the tester application for how to do a progress indicator from a background load.
 •  Support for proxy settings from System Preferences, and authenticated proxy support as well.
@@ -170,7 +170,7 @@ Version 1.2, 12 December 2001
 •  Updated bundled libcurl to be in sync with curl 7.9.2.
 
 
-Version 1.1, 11 November 2001
+## Version 1.1, 11 November 2001
 
 •  Fixed a lot of synchronization problems so that background cancelling now works. If the cancel flag has been set, and the foreground thread is messaged of more data (from a pending block from before the cancel), it isn't passed on.
 •  Fixed caching; it now works (but be sure to use cachedHandleForURL to actually get the cached data on subsequent loads).
@@ -178,7 +178,7 @@ Version 1.1, 11 November 2001
 •  Make sure we don't attempt to kick off a background load if one is already in progress.
 
 
-Version 1.0, 14 October 2001
+## Version 1.0, 14 October 2001
 
 •  curlThreadBackgroundLoad Don't send DONE/BAD after an abort
 •  beginLoadInBackground sets status to NSURLHandleLoadInProgress
@@ -189,14 +189,14 @@ Version 1.0, 14 October 2001
 •  - (void)flushCachedData implemented for 10.0
 •  Remove implicit ftp workings; not actually tested at all so I don't know what to expect. It still tries to handle https, though I don't know if that will work.
 
-Version 0.31, 8 Oct 2001
+## Version 0.31, 8 Oct 2001
 
 • Doesn't access NSURLHandle's private _data in Mac OS X 10.0; uses private ivar
 
-Version 0.3, 7 Oct 2001
+## Version 0.3, 7 Oct 2001
 
 • Major cleanup; works on Mac OS X 10.0
 
-Version 0.2, 2 Oct 2001
+## Version 0.2, 2 Oct 2001
 
 • First actual release; works on Mac OS X 10.1 only
