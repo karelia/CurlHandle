@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "22C9CFBE17035A0A004610FE"
-               BuildableName = "crashtest"
+               BuildableName = "Standalone Test"
                BlueprintName = "Standalone Test"
                ReferencedContainer = "container:CURLHandle.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "22C9CFBE17035A0A004610FE"
-            BuildableName = "crashtest"
+            BuildableName = "Standalone Test"
             BlueprintName = "Standalone Test"
             ReferencedContainer = "container:CURLHandle.xcodeproj">
          </BuildableReference>
@@ -52,7 +52,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "22C9CFBE17035A0A004610FE"
-            BuildableName = "crashtest"
+            BuildableName = "Standalone Test"
             BlueprintName = "Standalone Test"
             ReferencedContainer = "container:CURLHandle.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "22C9CFBE17035A0A004610FE"
-            BuildableName = "crashtest"
+            BuildableName = "Standalone Test"
             BlueprintName = "Standalone Test"
             ReferencedContainer = "container:CURLHandle.xcodeproj">
          </BuildableReference>
