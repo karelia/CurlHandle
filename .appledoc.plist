@@ -6,6 +6,12 @@
 	<array>
 		<string>Documentation</string>
 	</array>
+	<key>--ignore</key>
+	<array>
+		<string>curl</string>
+		<string>c-ares</string>
+		<string>CURLHandleSource/Tests/MockServer</string>
+	</array>
 	<key>--index-desc</key>
 	<array>
 		<string>README.md</string>
