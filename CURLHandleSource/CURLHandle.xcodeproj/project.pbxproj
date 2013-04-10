@@ -111,6 +111,7 @@
 /* Begin PBXBuildFile section */
 		22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22002EDC161097EC00464D33 /* CURLProtocolTests.m */; };
 		220C118E1715A1CB0086F199 /* upload-root.c in Sources */ = {isa = PBXBuildFile; fileRef = 220C118D1715A1CB0086F199 /* upload-root.c */; };
+		220C11A3171606310086F199 /* Documentation in Resources */ = {isa = PBXBuildFile; fileRef = 220C11A2171606310086F199 /* Documentation */; };
 		221EAD11160B167900E4F270 /* CURLMulti.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMulti.h */; };
 		221EAD12160B167900E4F270 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
 		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
@@ -300,6 +301,8 @@
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		22002EDC161097EC00464D33 /* CURLProtocolTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocolTests.m; sourceTree = "<group>"; };
 		220C118D1715A1CB0086F199 /* upload-root.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "upload-root.c"; sourceTree = "<group>"; };
+		220C11A2171606310086F199 /* Documentation */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Documentation; path = ../Documentation; sourceTree = "<group>"; };
+		220C11A5171606A90086F199 /* .appledoc.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = .appledoc.plist; path = ../.appledoc.plist; sourceTree = "<group>"; };
 		2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StandaloneGcdTest.m; sourceTree = "<group>"; };
 		221EAD0F160B167900E4F270 /* CURLMulti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMulti.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
@@ -357,7 +360,7 @@
 		22BF08C316AEEDD8009BE5A3 /* ftp.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ftp.json; sourceTree = "<group>"; };
 		22BF08C416AEEDD8009BE5A3 /* http.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = http.json; sourceTree = "<group>"; };
 		22BF08E116AEEDD9009BE5A3 /* webdav.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = webdav.json; sourceTree = "<group>"; };
-		22C9CFBF17035A0A004610FE /* crashtest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = crashtest; sourceTree = BUILT_PRODUCTS_DIR; };
+		22C9CFBF17035A0A004610FE /* crashtest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = crashtest; path = "Standalone Test"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22C9CFC117035A0B004610FE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		22C9CFCD17035A86004610FE /* multi-gcd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "multi-gcd.c"; sourceTree = "<group>"; };
 		22C9CFE71703A86D004610FE /* CURLHandle+MultiSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+MultiSupport.h"; sourceTree = "<group>"; };
@@ -452,6 +455,7 @@
 				223FD09C160B523700BE1C80 /* Tests */,
 				22BF08FA16AF09B2009BE5A3 /* Modules */,
 				0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */,
+				220C11A41716067E0086F199 /* Documentation */,
 				22C9CFC017035A0A004610FE /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
@@ -525,10 +529,18 @@
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
 		};
+		220C11A41716067E0086F199 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				220C11A5171606A90086F199 /* .appledoc.plist */,
+				220C11A2171606310086F199 /* Documentation */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
 		223FD09C160B523700BE1C80 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				22C9CFC317035A0B004610FE /* crashtest */,
 				229748FA1610C1AE0042A51A /* CURLHandleBasedTest.h */,
 				229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */,
 				223FD0AB160B5F1200BE1C80 /* CURLHandleTests.m */,
@@ -537,6 +549,7 @@
 				2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */,
 				22F947431709C59C00F0E6E1 /* StandaloneNoGcdTest.m */,
 				22F947411709C11A00F0E6E1 /* StandaloneGcdWaitTest.m */,
+				22C9CFC317035A0B004610FE /* Standalone Tests */,
 				22BF085916AEECEC009BE5A3 /* MockServer */,
 				223FD09D160B523700BE1C80 /* Supporting Files */,
 			);
@@ -620,7 +633,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		22C9CFC317035A0B004610FE /* crashtest */ = {
+		22C9CFC317035A0B004610FE /* Standalone Tests */ = {
 			isa = PBXGroup;
 			children = (
 				220C118D1715A1CB0086F199 /* upload-root.c */,
@@ -630,7 +643,7 @@
 				22C9D0041704B36F004610FE /* multi-gcd-crashtest-wait.c */,
 				22EC9D981705A7E7009DDAAA /* multi-nogcd-crashtest.c */,
 			);
-			name = crashtest;
+			name = "Standalone Tests";
 			path = ../Tests;
 			sourceTree = "<group>";
 		};
@@ -770,6 +783,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				220C11A3171606310086F199 /* Documentation in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1156,6 +1170,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
+				WARNING_CFLAGS = "-Wdocumentation";
 			};
 			name = Debug;
 		};
@@ -1177,6 +1192,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx;
+				WARNING_CFLAGS = "-Wdocumentation";
 			};
 			name = Release;
 		};

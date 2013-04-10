@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>--include</key>
+	<array>
+		<string>Documentation</string>
+	</array>
+	<key>--index-desc</key>
+	<array>
+		<string>README.md</string>
+	</array>
+	<key>--logformat</key>
+	<string>xcode</string>
+	<key>--exit-threshold</key>
+	<integer>2</integer>
+	<key>--explicit-crossref</key>
+	<true/>
+</dict>
+</plist>

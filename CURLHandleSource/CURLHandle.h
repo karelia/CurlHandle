@@ -20,6 +20,10 @@ extern NSString * const CURLcodeErrorDomain;
 extern NSString * const CURLMcodeErrorDomain;
 extern NSString * const CURLSHcodeErrorDomain;
 
+/**
+ Wrapper for a CURL easy handle.
+ */
+
 @interface CURLHandle : NSObject
 {
 	CURL                    *_curl;                         /*" Pointer to the actual CURL object that does all the hard work "*/
@@ -51,10 +55,19 @@ extern NSString * const CURLSHcodeErrorDomain;
 //  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
 
-// Stops the request Ñ and delivery of delegate messages Ñ as quickly as possible
+/**
+ Stops the request Ñ and delivery of delegate messages Ñ as quickly as possible
+ */
+
 - (void)cancel;
 
-- (NSString *)initialFTPPath;    // CURLINFO_FTP_ENTRY_PATH. Only suitable once handle has finished
+/**
+ CURLINFO_FTP_ENTRY_PATH. Only suitable once handle has finished.
+ 
+ @return The value of CURLINFO_FTP_ENTRY_PATH.
+ */
+
+- (NSString *)initialFTPPath;
 + (NSString *)curlVersion;
 + (NSString*)nameForType:(curl_infotype)type;
 
@@ -64,9 +77,18 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 @interface CURLHandle(OldAPI)
 
-// Please don't use this unless you have to!
-// To use, -init a handle, and then call this method, as many times as you like. Delegate messages will be delivered fairly normally during the request
-// To cancel a synchronous request, call -cancel on a different thread and this method will return as soon as it can
+/**
+ Perform a request synchronously.
+
+ Please don't use this unless you have to!
+ To use, -init a handle, and then call this method, as many times as you like. Delegate messages will be delivered fairly normally during the request
+ To cancel a synchronous request, call -cancel on a different thread and this method will return as soon as it can
+ 
+ @param request The request to perform.
+ @param credential A credential to use for the request.
+ @param delegate An object to use as the delegate.
+ */
+
 - (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
 
 + (void) setProxyUserIDAndPassword:(NSString *)inString;
