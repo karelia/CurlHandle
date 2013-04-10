@@ -1,8 +1,8 @@
 CURLHandle is an Objective-C wrapper for the libcurl.
 
-It was originally created by Dan Wood, way back in the mists of time, when dinosaurs still roamed the earth (ok, sometime around 2001).
+It was originally created by Dan Wood of [Karelia Software](http://karelia.com), way back in the mists of time, when dinosaurs still roamed the earth (ok, sometime around 2001).
 
-It is now mostly maintained by Mike Abdullah, with guest appearances by Sam Deane.
+It is now mostly maintained by [Mike Abdullah](http://twitter.com/mikeabdullah) (also of Karelia), with guest appearances by [Sam Deane](http://bornsleepy.com/sam).
 
 ## Documentation
 
