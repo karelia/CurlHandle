@@ -680,9 +680,9 @@
 			productReference = 223FD092160B523700BE1C80 /* CURLHandleTests.octest */;
 			productType = "com.apple.product-type.bundle";
 		};
-		22C9CFBE17035A0A004610FE /* crashtest */ = {
+		22C9CFBE17035A0A004610FE /* Standalone Test */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 22C9CFCC17035A0B004610FE /* Build configuration list for PBXNativeTarget "crashtest" */;
+			buildConfigurationList = 22C9CFCC17035A0B004610FE /* Build configuration list for PBXNativeTarget "Standalone Test" */;
 			buildPhases = (
 				22C9CFBB17035A0A004610FE /* Sources */,
 				22C9CFBC17035A0A004610FE /* Frameworks */,
@@ -692,7 +692,7 @@
 			);
 			dependencies = (
 			);
-			name = crashtest;
+			name = "Standalone Test";
 			productName = crashtest;
 			productReference = 22C9CFBF17035A0A004610FE /* crashtest */;
 			productType = "com.apple.product-type.tool";
@@ -748,7 +748,7 @@
 				80080327166A952A004D39F5 /* libcares-i386 */,
 				8008032B166A9535004D39F5 /* libcares-x86_64 */,
 				223FD091160B523700BE1C80 /* CURLHandleTests */,
-				22C9CFBE17035A0A004610FE /* crashtest */,
+				22C9CFBE17035A0A004610FE /* Standalone Test */,
 			);
 		};
 /* End PBXProject section */
@@ -1446,7 +1446,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		22C9CFCC17035A0B004610FE /* Build configuration list for PBXNativeTarget "crashtest" */ = {
+		22C9CFCC17035A0B004610FE /* Build configuration list for PBXNativeTarget "Standalone Test" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				22C9CFCA17035A0B004610FE /* Debug */,

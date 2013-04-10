@@ -13,8 +13,12 @@
 #endif
 
 /*
- * This example shows an FTP upload to an absolute path at the root of the server.
- * The file is incorrectly uploaded to the home directory instead.
+ * This example shows an FTP upload to an absolute path at the root of the server,
+ * e.g: /test.txt
+ *
+ * If the server's root and the user's home directories are different (ie, the result of 
+ * PWD is not "/"), the file is incorrectly uploaded to the root of the home directory,
+ * instead of the root of the server.
  */
 
 /* NOTE: if you want this example to work on Windows with libcurl as a
