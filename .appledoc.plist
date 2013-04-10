@@ -35,7 +35,7 @@
 	<key>--keep-undocumented-objects</key>
 	<false/>
 	<key>--merge-categories</key>
-	<false/>
+	<true/>
 	<key>--keep-merged-sections</key>
 	<true/>
 	<key>--prefix-merged-sections</key>
