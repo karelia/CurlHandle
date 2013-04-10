@@ -110,6 +110,7 @@
 
 /* Begin PBXBuildFile section */
 		22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22002EDC161097EC00464D33 /* CURLProtocolTests.m */; };
+		220C118E1715A1CB0086F199 /* upload-root.c in Sources */ = {isa = PBXBuildFile; fileRef = 220C118D1715A1CB0086F199 /* upload-root.c */; };
 		221EAD11160B167900E4F270 /* CURLMulti.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMulti.h */; };
 		221EAD12160B167900E4F270 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
 		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
@@ -165,7 +166,6 @@
 		22C9D00A1704C627004610FE /* CURLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0071704C627004610FE /* CURLList.m */; };
 		22DC488516CC115300211948 /* TestContent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22DC488416CC115300211948 /* TestContent.txt */; };
 		22E67F091712C598001ECE34 /* CURLHandle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; };
-		22EC9D9A1705AAA3009DDAAA /* multi-gcd-crashtest-wait.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0041704B36F004610FE /* multi-gcd-crashtest-wait.c */; };
 		22F9473E1709BF1100F0E6E1 /* StandaloneGcdTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */; };
 		22F9473F1709C00000F0E6E1 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
 		22F947401709C00B00F0E6E1 /* libcares.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
@@ -299,6 +299,7 @@
 /* Begin PBXFileReference section */
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		22002EDC161097EC00464D33 /* CURLProtocolTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocolTests.m; sourceTree = "<group>"; };
+		220C118D1715A1CB0086F199 /* upload-root.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "upload-root.c"; sourceTree = "<group>"; };
 		2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StandaloneGcdTest.m; sourceTree = "<group>"; };
 		221EAD0F160B167900E4F270 /* CURLMulti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMulti.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
@@ -622,6 +623,7 @@
 		22C9CFC317035A0B004610FE /* crashtest */ = {
 			isa = PBXGroup;
 			children = (
+				220C118D1715A1CB0086F199 /* upload-root.c */,
 				22C9CFCD17035A86004610FE /* multi-gcd.c */,
 				22C9D0011704ABBF004610FE /* multi-gcd-wait.c */,
 				22C9CFFE17049975004610FE /* multi-gcd-crashtest.c */,
@@ -1010,7 +1012,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22C9D00A1704C627004610FE /* CURLList.m in Sources */,
-				22EC9D9A1705AAA3009DDAAA /* multi-gcd-crashtest-wait.c in Sources */,
+				220C118E1715A1CB0086F199 /* upload-root.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
