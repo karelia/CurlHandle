@@ -56,7 +56,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
 
 /**
- Stops the request Ñ and delivery of delegate messages Ñ as quickly as possible
+ Stops the request â€” and delivery of delegate messages â€” as quickly as possible
  */
 
 - (void)cancel;

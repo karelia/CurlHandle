@@ -11,6 +11,10 @@
 		<string>curl</string>
 		<string>c-ares</string>
 		<string>CURLHandleSource/Tests/MockServer</string>
+		<string>test-build</string>
+		<string>.git</string>
+		<string>.gitmodules</string>
+		<string>.gitignore</string>
 	</array>
 	<key>--index-desc</key>
 	<array>
@@ -21,6 +25,20 @@
 	<key>--exit-threshold</key>
 	<integer>2</integer>
 	<key>--explicit-crossref</key>
+	<true/>
+	<key>--project-company</key>
+	<string>Karelia Systems</string>
+	<key>--company-id</key>
+	<string>com.karelia</string>
+	<key>--keep-undocumented-members</key>
+	<false/>
+	<key>--keep-undocumented-objects</key>
+	<false/>
+	<key>--merge-categories</key>
+	<false/>
+	<key>--keep-merged-sections</key>
+	<true/>
+	<key>--prefix-merged-sections</key>
 	<true/>
 </dict>
 </plist>

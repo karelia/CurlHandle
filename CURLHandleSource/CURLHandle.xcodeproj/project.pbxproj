@@ -384,7 +384,7 @@
 		795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResumableHTTPUploader.h; sourceTree = "<group>"; };
 		7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResumableHTTPUploader.m; sourceTree = "<group>"; };
 		79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
-		79B96CBB0A6360F90060AC12 /* CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CURLHandle.h; sourceTree = "<group>"; };
+		79B96CBB0A6360F90060AC12 /* CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLHandle.h; sourceTree = "<group>"; };
 		79B96CBC0A6360F90060AC12 /* CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CURLHandle.m; sourceTree = "<group>"; };
 		79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "CURLHandle+extras.h"; sourceTree = "<group>"; };
 		79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = "CURLHandle+extras.m"; sourceTree = "<group>"; };
