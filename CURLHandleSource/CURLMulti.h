@@ -108,6 +108,7 @@
  @param source The current dispatch source for the given type
  @param type Is this the source for reading or writing?
  @param socket The <CURLSocket> object that owns the source.
+ @param raw The raw system socket that the dispatch source should be monitoring.
  @param required Is the source required? If not, an existing source will be cancelled. If required and the source parameter is nil, and new one will be created.
  @return The new/updated dispatch source.
 */

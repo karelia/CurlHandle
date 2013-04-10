@@ -77,6 +77,8 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 @interface CURLHandle(OldAPI)
 
+/** @name Synchronous Methods */
+
 /**
  Perform a request synchronously.
 
@@ -97,26 +99,93 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 #pragma mark - Delegate
 
+/**
+ Protocol that should be implemented by delegates of CURLHandle.
+ */
+
 @protocol CURLHandleDelegate <NSObject>
+
+/**
+ Required protocol method, called when data is received.
+ 
+ @param handle The handle receiving the data.
+ @param data The new data.
+ */
 
 - (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
 
 @optional
+
+/**
+ Optional method, called when a response is received.
+ 
+ @param handle The handle receiving the response.
+ @param response The response.
+ */
+
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
+
+/** 
+ Optional method, called when the handle has successfully completed.
+ 
+ @param handle The handle that has completed.
+ */
+
 - (void)handleDidFinish:(CURLHandle *)handle;
 
-// Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. There will generally be a CURLcodeErrorDomain error present; either directly, or as an underlying error (KSError <https://github.com/karelia/KSError> is handy for querying underlying errors)
-// The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate
-// At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
+/**
+ Optional method, called when the handle has failed.
+
+ Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. 
+ 
+ There will generally be a CURLcodeErrorDomain error present; either directly, or as an underlying 
+ error (KSError <https://github.com/karelia/KSError> is handy for querying underlying errors).
+
+ The key CURLINFO_RESPONSE_CODE (as an NSNumber) will be filled out with HTTP/FTP status code if appropriate.
+
+ At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even
+ though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
+ 
+ @param handle The handle that has failed.
+ @param error The error that it failed with.
+ */
+
 - (void)handle:(CURLHandle*)handle didFailWithError:(NSError*)error;
 
-// Reply to tell CURLHandle/libcurl how to handle the fingerprint
-// If not implemented, only matching keys are accepted; all else is rejected
-// I've found that CURLKHSTAT_FINE_ADD_TO_FILE only bothers appending to the file if not already present
+/**
+ Optional method, called to ask how to handle a host fingerprint.
+
+ If not implemented, only matching keys are accepted; all else is rejected
+ I've found that CURLKHSTAT_FINE_ADD_TO_FILE only bothers appending to the file if not already present
+
+ @param handle The handle that's found the fingerprint
+ @param foundKey The fingerprint.
+ @param knownkey The known fingerprint for the host.
+ @param match Whether the fingerprints matched.
+ @return A status value indicating what to do.
+
+ */
+
 - (enum curl_khstat)handle:(CURLHandle *)handle didFindHostFingerprint:(const struct curl_khkey *)foundKey knownFingerprint:(const struct curl_khkey *)knownkey match:(enum curl_khmatch)match;
 
-// When sending data to the server, this reports just before it goes out on the wire. Reports a length of 0 when the end of the data is written so you can get a nice heads up that an upload is about to complete
+/**
+ Optional method, called just before a handle sends some data.
+
+ Reports a length of 0 when the end of the data is written so you can get a nice heads up that an upload is about to complete.
+ 
+ @param handle The handle that is sending data.
+ @param bytesWritten The amount of data to be sent. This will be zero when the last data has been written.
+ */
+
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten;
+
+/**
+ Optional method, called to report debug/status information to the delegate.
+ 
+ @param handle The handle that the information relates to.
+ @param string The information string.
+ @param type The type of information.
+ */
 
 - (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type;
 
@@ -128,7 +197,18 @@ extern NSString * const CURLcodeErrorDomain;
 extern NSString * const CURLMcodeErrorDomain;
 extern NSString * const CURLSHcodeErrorDomain;
 
+/** 
+ CURLHandle support.
+ */
+
 @interface NSError(CURLHandle)
+
+/**
+ Returns the response code from CURL, if one was set on the error.
+ 
+ @return The response code, or zero if there is no error or no response code was set.
+ */
+
 - (NSUInteger)curlResponseCode;
 @end
 
