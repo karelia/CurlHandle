@@ -11,6 +11,11 @@
 #define CURLProtocolLog(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLHandleLog NSLog
 #endif
 
+/**
+ NSURLProtocol support for CURLHandle.
+ 
+ This allows you to use NSURLConnection and have it work via a CURLHandle behind the scenes.
+ */
 
 @interface CURLProtocol : NSURLProtocol <CURLHandleDelegate, NSURLAuthenticationChallengeSender>
 {

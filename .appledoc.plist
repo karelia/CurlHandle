@@ -25,7 +25,7 @@
 	<key>--exit-threshold</key>
 	<integer>2</integer>
 	<key>--explicit-crossref</key>
-	<true/>
+	<false/>
 	<key>--project-company</key>
 	<string>Karelia Systems</string>
 	<key>--company-id</key>
