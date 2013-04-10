@@ -19,7 +19,9 @@
 
 /**
  Has cancel been called on this handle?
- 
+
+ @warning Not intended for general use.
+
  @return YES if the handle has been cancelled.
  */
 
@@ -27,7 +29,9 @@
 
 /**
  Is this handle managed by a multi?
- 
+
+ @warning Not intended for general use.
+
  @return YES if the handle is managed by a multi.
  */
 
@@ -35,11 +39,14 @@
 
 /**
  Returns a new CURLMulti, for use in testing.
- 
- Generally multi's are an internal implementation detail, but it's useful to be able to make new ones for unit tests
- (since sharing multis between tests can create dependencies).
- 
- @return A new CURLMulti object. [CURLMulti startup] will have been called on it already.
+
+ Generally multi's are an internal implementation detail, 
+ but it's useful to be able to make new ones for unit tests
+ since sharing multis between tests can create dependencies.
+
+ @warning Not intended for general use.
+
+ @return A new CURLMulti object.
  */
 
 + (CURLMulti*)standaloneMultiForTestPurposes;
@@ -47,6 +54,8 @@
 /**
  Clean up a multi that was created by standaloneMultiForTestPurposes.
  
+ @warning Not intended for general use.
+
  @param multi The multi to clean up.
  */
 

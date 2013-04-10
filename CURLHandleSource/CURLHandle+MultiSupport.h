@@ -18,6 +18,11 @@
 
 /**
  The CURL handle managed by this object.
+
+ @warning Not intended for general use.
+
+ @return The curl handle.
+
  */
 
 - (CURL*)curl;
@@ -27,6 +32,9 @@
  
  @param code The completion code.
  @param isMultiCode Is the code a result from the handle itself, or the multi managing it?
+ 
+ @warning Not intended for general use.
+
  */
 
 - (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
@@ -35,6 +43,9 @@
  Has the handle completed?
  
  @return YES if the handle has completed.
+ 
+ @warning Not intended for general use.
+
  */
 
 - (BOOL)hasCompleted;
@@ -43,6 +54,9 @@
  Called by <CURLMulti> when it stops managing the handle.
  
  @param multi The multi object that was managing this handle.
+ 
+ @warning Not intended for general use.
+
  */
 
 - (void)removedByMulti:(CURLMulti*)multi;
