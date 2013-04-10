@@ -31,6 +31,13 @@
 
 - (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMulti*)multi;
 
+/**
+ Indicates whether a given source is owned by this socket.
+
+ @param source The source to check.
+ @return Returns YES if the source is owned by this socket.
+ */
+
 - (BOOL)ownsSource:(dispatch_source_t)source;
 
 @end
