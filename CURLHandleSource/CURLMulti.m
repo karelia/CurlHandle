@@ -384,9 +384,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     // set the next processing time using the timeout value we got from libcurl.
     // the timer will be forced to fire sooner if something else happens (eg a handle is added/removed)
-    if (self.timer)
+    dispatch_source_t timer = self.timer;
+    if (timer)
     {
-        dispatch_source_set_timer(self.timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
+        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
     }
 
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
