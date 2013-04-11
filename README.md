@@ -1,4 +1,4 @@
-CURLHandle is an Objective-C wrapper for the libcurl.
+CURLHandle is a high level Objective-C interface to the libcurl library.
 
 It was originally created by Dan Wood of [Karelia Software](http://karelia.com), way back in the mists of time, when dinosaurs still roamed the earth (ok, sometime around 2001).
 
