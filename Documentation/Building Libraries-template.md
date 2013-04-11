@@ -26,7 +26,7 @@ Homebrew
 ## Fetch Code
 
 git
-	git checkout "sam/async"
+	git checkout "v4.x-beta"
 	git submodule update --recursive
 		(new commits in CurlHandle and SFTP leave the library build dirs in place to allow debugging)
 

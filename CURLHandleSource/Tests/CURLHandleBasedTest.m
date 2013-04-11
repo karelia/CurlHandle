@@ -20,7 +20,7 @@
 
 - (NSURL*)testFileRemoteURL
 {
-    NSURL* testFileURL = [NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/sam/async/CURLHandleSource/Tests/TestContent.txt"];
+    NSURL* testFileURL = [NSURL URLWithString:@"https://raw.github.com/karelia/CurlHandle/v4.x-beta/CURLHandleSource/Tests/TestContent.txt"];
 
     return testFileURL;
 }
