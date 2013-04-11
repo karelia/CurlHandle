@@ -1,5 +1,8 @@
 //
-// Prefix header for all source files of the 'CURLHandle' target in the 'CURLHandle' project.
+//  CURLHandle
+//
+//  Prefix header for all source files of the 'CURLHandle' target in the 'CURLHandle' project.
+//  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
 #ifdef __OBJC__

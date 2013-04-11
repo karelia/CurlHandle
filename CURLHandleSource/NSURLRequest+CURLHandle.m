@@ -1,8 +1,9 @@
 //
 //  NSURLRequest+CURLHandle.m
+//  CURLHandle
 //
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
-//  This is in the public domain, but please report any improvements back to the author.
+//  Copyright (c) 2013 Karelia Software. All rights reserved.
 
 #import "NSURLRequest+CURLHandle.h"
 #import "CURLProtocol.h"

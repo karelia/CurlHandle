@@ -1,8 +1,9 @@
 //
 //  CURLSocket.h
+//  CURLHandle
 //
 //  Created by Sam Deane on 26/09/2012.
-//  Copyright (c) 2012 Karelia Software. All rights reserved.
+//  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

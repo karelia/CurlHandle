@@ -1,5 +1,6 @@
 //
 //  CURLHandle+TestingSupport.h
+//  CURLHandle
 //
 //  Created by Sam Deane on 27/03/2013.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.

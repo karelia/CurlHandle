@@ -1,8 +1,9 @@
 //
 //  CURLHandle+extras.h
+//  CURLHandle
 //
 //  Created by Dan Wood <dwood@karelia.com> on Mon Oct 01 2001.
-//  This is in the public domain, but please report any improvements back to the author.
+//  Copyright (c) 2013 Karelia Software. All rights reserved.
 
 #import "CURLHandle.h"
 

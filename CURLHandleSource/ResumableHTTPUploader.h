@@ -1,5 +1,6 @@
 //
 //  ResumableHTTPUploader.m
+//  CURLHandle
 //
 //  Created by Jonathan 'Wolf' Rentzsch on 9/1/06.
 //  This is in the public domain, but please report any improvements back to the author.
