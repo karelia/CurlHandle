@@ -488,6 +488,7 @@
 			isa = PBXGroup;
 			children = (
 				2298FF5B1716C3FF0001EBC7 /* Public */,
+				2298FF5E1716C9DC0001EBC7 /* Obsolete? */,
 				2298FF5C1716C40D0001EBC7 /* Private */,
 			);
 			name = Source;
@@ -558,12 +559,8 @@
 				27229B3914C83905007D0FF1 /* CURLProtocol.m */,
 				2270F4A5161090AB009B6F98 /* CURLResponse.h */,
 				2270F4A6161090AB009B6F98 /* CURLResponse.m */,
-				22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */,
-				22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */,
 				2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */,
 				2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */,
-				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
-				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
 			);
 			name = Public;
 			sourceTree = "<group>";
@@ -581,8 +578,19 @@
 				2270F4AB16109133009B6F98 /* CURLRequest.m */,
 				22731036161305FF00D6D49E /* CURLSocket.h */,
 				22731037161305FF00D6D49E /* CURLSocket.m */,
+				22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */,
+				22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */,
 			);
 			name = Private;
+			sourceTree = "<group>";
+		};
+		2298FF5E1716C9DC0001EBC7 /* Obsolete? */ = {
+			isa = PBXGroup;
+			children = (
+				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
+				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
+			);
+			name = "Obsolete?";
 			sourceTree = "<group>";
 		};
 		22BF085916AEECEC009BE5A3 /* MockServer */ = {
