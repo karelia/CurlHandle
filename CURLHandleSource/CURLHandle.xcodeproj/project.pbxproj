@@ -867,10 +867,10 @@
 			);
 			name = "Run Script - lipo multi-arch dylib";
 			outputPaths = (
-				"${SRCROOT}/libcares.dylib",
-				"${SRCROOT}/libcares.dylib.dSYM",
-				"${SRCROOT}/ares_build-i386.h",
-				"${SRCROOT}/ares_build-x86_64.h",
+				"${SRCROOT}/built/libcares.dylib",
+				"${SRCROOT}/built/libcares.dylib.dSYM",
+				"${SRCROOT}/built/include/ares_build-i386.h",
+				"${SRCROOT}/built/include/ares_build-x86_64.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
@@ -931,8 +931,10 @@
 			);
 			name = "Run Script - lipo multi-arch dylib";
 			outputPaths = (
-				"${SRCROOT}/libcurl.dylib",
-				"${SRCROOT}/libcurl.dylib.dSYM",
+				"${SRCROOT}/built/libcurl.dylib",
+				"${SRCROOT}/built/libcurl.dylib.dSYM",
+				"${SRCROOT}/built/include/curl-i386",
+				"${SRCROOT}/built/include/curl-x86_64",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
