@@ -1,3 +1,5 @@
+MODE=$1
+
 # glibtoolize (and maybe other tools) are not supplied with OS X.
 # Add default macports & homebrew paths in attempt to find them.
 export PATH=${PATH}:/opt/local/bin:/usr/local/bin
@@ -5,7 +7,7 @@ export PATH=${PATH}:/opt/local/bin:/usr/local/bin
 # Copy source to a new location to build.
 cd "${SRCROOT}/.."
 mkdir -p "${OBJROOT}"
-cp -af curl "${OBJROOT}/curl-x86_64"
+cp -af curl "${OBJROOT}/curl-$MODE"
 
 # Copy libssh2 (we depend on it) headers & dylibs.
 cd "${SRCROOT}/../SFTP"
@@ -21,15 +23,15 @@ cp -f libssl.dylib "${OBJROOT}/libssh2/Frameworks"
 
 # Copy libcares (we depend on it) headers & dylibs.
 cd "${SRCROOT}"
-mkdir -p "${OBJROOT}/c-ares-x86_64/include"
-mkdir -p "${OBJROOT}/c-ares-x86_64/lib"
-cp -f ../c-ares/ares*.h "${OBJROOT}/c-ares-x86_64/include"
+mkdir -p "${OBJROOT}/c-ares-$MODE/include"
+mkdir -p "${OBJROOT}/c-ares-$MODE/lib"
+cp -f ../c-ares/ares*.h "${OBJROOT}/c-ares-$MODE/include"
 # Overwrite generic ares_build.h with the one from our actual build.
-cp -f built/include/ares_build-x86_64.h "${OBJROOT}/c-ares-x86_64/include/ares_build.h"
-cp -f built/libcares.dylib "${OBJROOT}/c-ares-x86_64/lib"
+cp -f built/include/ares_build-$MODE.h "${OBJROOT}/c-ares-$MODE/include/ares_build.h"
+cp -f built/libcares.dylib "${OBJROOT}/c-ares-$MODE/lib"
 
 # Buildconf
-cd "${OBJROOT}/curl-x86_64"
+cd "${OBJROOT}/curl-$MODE"
 echo "Please ignore any messages about \"No rule to make target distclean.\" That just means the build dir is already clean."
 make distclean
 echo "***"
@@ -42,12 +44,12 @@ echo "***"
 # Configure
 ./configure \
 CC="clang" \
-CFLAGS="-isysroot ${SDKROOT} -arch x86_64 -g -w -mmacosx-version-min=10.6" \
---host=x86_64-apple-darwin10 \
+CFLAGS="-isysroot ${SDKROOT} -arch $MODE -g -w -mmacosx-version-min=10.6" \
+--host=$MODE-apple-darwin10 \
 --with-sysroot="${SDKROOT}" \
 --with-darwinssl \
 --with-libssh2="${OBJROOT}/libssh2" \
---enable-ares="${OBJROOT}/c-ares-x86_64" \
+--enable-ares="${OBJROOT}/c-ares-$MODE" \
 --without-libidn \
 --enable-debug \
 --enable-optimize \
