@@ -840,7 +840,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"curl\"";
+			shellScript = "../Scripts/curl-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"curl\" \"lib/.libs\"";
 			showEnvVarsInLog = 0;
 		};
 		8008031B16696675004D39F5 /* Run Script - Configure + make */ = {
@@ -855,7 +855,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\"";
+			shellScript = "../Scripts/curl-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\" \"lib/.libs\"";
 			showEnvVarsInLog = 0;
 		};
 		80080337166A9651004D39F5 /* Run Script - lipo multi-arch dylib */ = {
@@ -869,8 +869,8 @@
 			outputPaths = (
 				"${SRCROOT}/built/libcares.dylib",
 				"${SRCROOT}/built/libcares.dylib.dSYM",
-				"${SRCROOT}/built/include/ares_build-i386.h",
-				"${SRCROOT}/built/include/ares_build-x86_64.h",
+				"${SRCROOT}/built/include/cares-i386/ares_build.h",
+				"${SRCROOT}/built/include/cares-x86_64/ares_build.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
@@ -904,7 +904,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/c-ares-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"cares\"\n../Scripts/c-ares-copy-built.sh \"i386\"\n";
+			shellScript = "../Scripts/c-ares-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"cares\" \".libs\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8008033B166A9682004D39F5 /* Run Script - Configure + make */ = {
@@ -919,7 +919,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/c-ares-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\"\n../Scripts/c-ares-copy-built.sh \"x86_64\"\n";
+			shellScript = "../Scripts/c-ares-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\" \".libs\"\n";
 			showEnvVarsInLog = 0;
 		};
 		809AE1BC1602BE6C001D02E1 /* Run Script - lipo multi-arch dylib */ = {

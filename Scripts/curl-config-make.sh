@@ -28,7 +28,7 @@ mkdir -p "${OBJROOT}/c-ares-$MODE/include"
 mkdir -p "${OBJROOT}/c-ares-$MODE/lib"
 cp -f ../c-ares/ares*.h "${OBJROOT}/c-ares-$MODE/include"
 # Overwrite generic ares_build.h with the one from our actual build.
-cp -f built/include/ares_build-$MODE.h "${OBJROOT}/c-ares-$MODE/include/ares_build.h"
+cp -f built/include/cares-$MODE/ares_build.h "${OBJROOT}/c-ares-$MODE/include/ares_build.h"
 cp -f built/libcares.dylib "${OBJROOT}/c-ares-$MODE/lib"
 
 # Buildconf

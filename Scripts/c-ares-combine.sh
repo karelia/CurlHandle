@@ -14,16 +14,12 @@ strip -x libcares.dylib
 
 # Final output to project dir, not build dir.
 OUTDIR="${SRCROOT}/built"
-mkdir -p "${OUTDIR}"
-mkdir -p "${OUTDIR}/include"
+mkdir -p "${OUTDIR}/include/cares-i386"
+mkdir -p "${OUTDIR}/include/cares-x86_64"
 cp -f  libcares.dylib      "${OUTDIR}"
 cp -Rf libcares.dylib.dSYM "${OUTDIR}"
-cp -f cares-i386/ares_build-i386.h "${OUTDIR}/include/"
-cp -f cares-x86_64/ares_build-x86_64.h "${OUTDIR}/include/"
-
-# Remove build dirs.
-#rm -Rf "${OBJROOT}/cares-i386"
-#rm -Rf "${OBJROOT}/cares-x86_64"
+cp -f cares-i386/ares_build.h "${OUTDIR}/include/cares-i386"
+cp -f cares-x86_64/ares_build.h "${OUTDIR}/include/cares-x86_64"
 
 # Display results.
 lipo -detailed_info "${OUTDIR}/libcares.dylib"
