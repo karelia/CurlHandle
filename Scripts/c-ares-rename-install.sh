@@ -1,3 +1,6 @@
+# First parameter should be "i386" or "x86_64"
+MODE=$1
+
 # glibtoolize (and maybe other tools) are not supplied with OS X.
 # Add default macports & homebrew paths in attempt to find them.
 export PATH=${PATH}:/opt/local/bin:/usr/local/bin
@@ -15,8 +18,8 @@ install_name_tool -id @rpath/libcares.dylib ${LONG_DYLIB}
 #install_name_tool -add_rpath @loader_path/../Frameworks ${LONG_DYLIB}
 
 # Copy dylibs to have arch in name.
-cp -f ${LONG_DYLIB} libcares-x86_64.dylib
+cp -f ${LONG_DYLIB} libcares-$MODE.dylib
 
 # Copy ares_build.h for use by libcurl compile.
-cd "${OBJROOT}/cares-x86_64"
-cp -f ares_build.h ares_build-x86_64.h
+cd "${OBJROOT}/cares-$MODE"
+cp -f ares_build.h ares_build-$MODE.h
