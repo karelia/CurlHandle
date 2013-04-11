@@ -840,7 +840,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"i386\"\n../Scripts/curl-rename-install.sh \"i386\"";
+			shellScript = "../Scripts/curl-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"curl\"";
 			showEnvVarsInLog = 0;
 		};
 		8008031B16696675004D39F5 /* Run Script - Configure + make */ = {
@@ -855,7 +855,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"x86_64\"\n../Scripts/curl-rename-install.sh \"x86_64\"";
+			shellScript = "../Scripts/curl-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\"";
 			showEnvVarsInLog = 0;
 		};
 		80080337166A9651004D39F5 /* Run Script - lipo multi-arch dylib */ = {
@@ -904,7 +904,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/c-ares-config-make.sh \"i386\"\n../Scripts/c-ares-rename-install.sh \"i386\"";
+			shellScript = "../Scripts/c-ares-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"cares\"\n../Scripts/c-ares-copy-built.sh \"i386\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8008033B166A9682004D39F5 /* Run Script - Configure + make */ = {
@@ -919,7 +919,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/c-ares-config-make.sh \"x86_64\"\n../Scripts/c-ares-rename-install.sh \"x86_64\"";
+			shellScript = "../Scripts/c-ares-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\"\n../Scripts/c-ares-copy-built.sh \"x86_64\"\n";
 			showEnvVarsInLog = 0;
 		};
 		809AE1BC1602BE6C001D02E1 /* Run Script - lipo multi-arch dylib */ = {
