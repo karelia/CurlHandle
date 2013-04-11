@@ -16,9 +16,15 @@ build() {
 
 }
 
-cd SFTP
-build OpenSSL openssl
-build libssh2 libssh2
+if [ $1 == "--curl-only" ];
+then
+    echo "Skipping SFTP libraries"
+else
+    cd SFTP
+    build OpenSSL openssl
+    build libssh2 libssh2
+    cd ..
+fi
 
-cd ../CURLHandleSource
+cd CURLHandleSource
 build CURLHandle libcurl
