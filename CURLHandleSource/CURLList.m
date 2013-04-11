@@ -14,28 +14,28 @@
 
 @synthesize list = _list;
 
-+ (CURLList*)listWithContentsOfArray:(NSArray *)array
++ (CURLList*)listWithArray:(NSArray *)array
 {
     CURLList* list = [[CURLList alloc] init];
-    for (NSString* string in array)
+    for (id<NSObject> object in array)
     {
-        [list appendString:string];
+        [list addObject:object];
     }
 
     return [list autorelease];
 }
 
-+ (CURLList*)listWithString:(NSString *)string
++ (CURLList*)listWithObject:(id<NSObject>)object
 {
     CURLList* list = [[CURLList alloc] init];
-    [list appendString:string];
+    [list addObject:object];
 
     return [list autorelease];
 }
 
-- (void)appendString:(NSString *)string
+- (void)addObject:(id<NSObject>)object
 {
-    _list = curl_slist_append(_list, [string UTF8String]);
+    _list = curl_slist_append(_list, [[object description] UTF8String]);
 }
 
 - (void)dealloc

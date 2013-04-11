@@ -11,10 +11,13 @@
 /**
  Wrapper for the curl_slist structure.
  
- You can make a list from an array or a single string, using listWithContentsOrArray: or listWithString:.
- You can then append items to it with appendString:
+ You can make a list from an array or a single object, using listWithContentsOrArray: or listWithString:.
+ You can then append items to it with appendObject:
  
  There is no way to remove or re-order items, and the only way to empty it is to release it.
+ 
+ The curl_slist type is only designed to contain strings. When you add something to CURLList,
+ it calls description on it to get a textual representation.
  */
 
 @interface CURLList : NSObject
@@ -29,29 +32,35 @@
 @property (readonly, nonatomic) struct curl_slist* list;
 
 /**
- Create a list from an array of strings.
+ Create a list from an array of objects.
  
+ We will call [NSObject description] on each object to obtain a textual representation, which is what will actually be added to the list.
+
  @param array The items for the list - must contain only NSString objects.
  @return The new list.
  */
 
-+ (CURLList*)listWithContentsOfArray:(NSArray*)array;
++ (CURLList*)listWithArray:(NSArray*)array;
 
 /**
- Create a list with a single string.
+ Create a list with a single object.
  
- @param string A string to add to the new list.
+ We will call [NSObject description] on the object to obtain a textual representation, which is what will actually be added to the list.
+
+ @param object An object to add to the new list.
  @return The new list.
  */
 
-+ (CURLList*)listWithString:(NSString*)string;
++ (CURLList*)listWithObject:(id<NSObject>)object;
 
 /**
- Append a string to the list.
+ Add an object to the list.
  
- @param string The string to append.
+ We will call [NSObject description] on the object to obtain a textual representation, which is what will actually be added to the list.
+
+ @param object The object to add.
 */
 
-- (void)appendString:(NSString*)string;
+- (void)addObject:(id<NSObject>)object;
 
 @end

@@ -286,7 +286,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if ([array count])
     {
         // make a curl list with the values in the array
-        CURLList* values = [CURLList listWithContentsOfArray:array];
+        CURLList* values = [CURLList listWithArray:array];
         result = curl_easy_setopt(_curl, option, values.list);
 
         // hang on to the list until the handle is done
