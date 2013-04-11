@@ -840,7 +840,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-configure-make.sh \"i386\"\n../Scripts/curl-rename-install-i386.sh \"i386\"";
+			shellScript = "../Scripts/curl-configure-make.sh \"i386\"\n../Scripts/curl-rename-install.sh \"i386\"";
 			showEnvVarsInLog = 0;
 		};
 		8008031B16696675004D39F5 /* Run Script - Configure + make */ = {
@@ -855,7 +855,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"x86_64\"\n../Scripts/curl-rename-install-x64.sh \"x86_64\"";
+			shellScript = "../Scripts/curl-config-make.sh \"x86_64\"\n../Scripts/curl-rename-install.sh \"x86_64\"";
 			showEnvVarsInLog = 0;
 		};
 		80080337166A9651004D39F5 /* Run Script - lipo multi-arch dylib */ = {
