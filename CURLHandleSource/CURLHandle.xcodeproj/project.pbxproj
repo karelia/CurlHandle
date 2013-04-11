@@ -122,8 +122,8 @@
 		2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4A5161090AB009B6F98 /* CURLResponse.h */; };
 		2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A6161090AB009B6F98 /* CURLResponse.m */; };
-		2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */; };
-		2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */; };
+		2270F4AC16109133009B6F98 /* CURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 2270F4AA16109133009B6F98 /* CURLRequest.h */; };
+		2270F4AD16109133009B6F98 /* CURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4AB16109133009B6F98 /* CURLRequest.m */; };
 		22731038161305FF00D6D49E /* CURLSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 22731036161305FF00D6D49E /* CURLSocket.h */; };
 		22731039161305FF00D6D49E /* CURLSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22731037161305FF00D6D49E /* CURLSocket.m */; };
 		22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */; };
@@ -318,8 +318,8 @@
 		2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLRequest+CURLHandle.m"; sourceTree = "<group>"; };
 		2270F4A5161090AB009B6F98 /* CURLResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLResponse.h; sourceTree = "<group>"; };
 		2270F4A6161090AB009B6F98 /* CURLResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLResponse.m; sourceTree = "<group>"; };
-		2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+CURLHandle.h"; sourceTree = "<group>"; };
-		2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+CURLHandle.m"; sourceTree = "<group>"; };
+		2270F4AA16109133009B6F98 /* CURLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLRequest.h; sourceTree = "<group>"; };
+		2270F4AB16109133009B6F98 /* CURLRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLRequest.m; sourceTree = "<group>"; };
 		22731036161305FF00D6D49E /* CURLSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLSocket.h; sourceTree = "<group>"; };
 		22731037161305FF00D6D49E /* CURLSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLSocket.m; sourceTree = "<group>"; };
 		22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+CURLHandle.h"; sourceTree = "<group>"; };
@@ -547,21 +547,23 @@
 		2298FF5B1716C3FF0001EBC7 /* Public */ = {
 			isa = PBXGroup;
 			children = (
-				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
-				22C9CFE91703A954004610FE /* CURLHandle+TestingSupport.h */,
-				79B96CBC0A6360F90060AC12 /* CURLHandle.m */,
-				79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */,
-				79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */,
 				27D77E111672BBB50091EF91 /* CK2SSHCredential.h */,
 				27D77E121672BBB50091EF91 /* CK2SSHCredential.m */,
-				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
-				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
+				79B96CBD0A6360F90060AC12 /* CURLHandle+extras.h */,
+				79B96CBE0A6360F90060AC12 /* CURLHandle+extras.m */,
+				22C9CFE91703A954004610FE /* CURLHandle+TestingSupport.h */,
+				79B96CBB0A6360F90060AC12 /* CURLHandle.h */,
+				79B96CBC0A6360F90060AC12 /* CURLHandle.m */,
+				27229B3814C83905007D0FF1 /* CURLProtocol.h */,
+				27229B3914C83905007D0FF1 /* CURLProtocol.m */,
+				2270F4A5161090AB009B6F98 /* CURLResponse.h */,
+				2270F4A6161090AB009B6F98 /* CURLResponse.m */,
 				22767ED7161078F1008D0848 /* NSDictionary+CURLHandle.h */,
 				22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */,
-				2270F4AA16109133009B6F98 /* NSString+CURLHandle.h */,
-				2270F4AB16109133009B6F98 /* NSString+CURLHandle.m */,
 				2270F49F16108D44009B6F98 /* NSURLRequest+CURLHandle.h */,
 				2270F4A016108D44009B6F98 /* NSURLRequest+CURLHandle.m */,
+				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
+				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
 			);
 			name = Public;
 			sourceTree = "<group>";
@@ -569,16 +571,14 @@
 		2298FF5C1716C40D0001EBC7 /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */,
 				22C9CFE71703A86D004610FE /* CURLHandle+MultiSupport.h */,
+				32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */,
 				22C9D0061704C627004610FE /* CURLList.h */,
 				22C9D0071704C627004610FE /* CURLList.m */,
 				221EAD0F160B167900E4F270 /* CURLMulti.h */,
 				221EAD10160B167900E4F270 /* CURLMulti.m */,
-				27229B3814C83905007D0FF1 /* CURLProtocol.h */,
-				27229B3914C83905007D0FF1 /* CURLProtocol.m */,
-				2270F4A5161090AB009B6F98 /* CURLResponse.h */,
-				2270F4A6161090AB009B6F98 /* CURLResponse.m */,
+				2270F4AA16109133009B6F98 /* CURLRequest.h */,
+				2270F4AB16109133009B6F98 /* CURLRequest.m */,
 				22731036161305FF00D6D49E /* CURLSocket.h */,
 				22731037161305FF00D6D49E /* CURLSocket.m */,
 			);
@@ -678,7 +678,7 @@
 				22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */,
 				2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */,
 				2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */,
-				2270F4AC16109133009B6F98 /* NSString+CURLHandle.h in Headers */,
+				2270F4AC16109133009B6F98 /* CURLRequest.h in Headers */,
 				22731038161305FF00D6D49E /* CURLSocket.h in Headers */,
 				27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */,
 				22C9CFE81703A86D004610FE /* CURLHandle+MultiSupport.h in Headers */,
@@ -1057,7 +1057,7 @@
 				221EAD12160B167900E4F270 /* CURLMulti.m in Sources */,
 				22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,
-				2270F4AD16109133009B6F98 /* NSString+CURLHandle.m in Sources */,
+				2270F4AD16109133009B6F98 /* CURLRequest.m in Sources */,
 				22731039161305FF00D6D49E /* CURLSocket.m in Sources */,
 				22BF085516AEAA76009BE5A3 /* NSURLRequest+CURLHandle.m in Sources */,
 				22BF085616AEAA7A009BE5A3 /* CK2SSHCredential.m in Sources */,
