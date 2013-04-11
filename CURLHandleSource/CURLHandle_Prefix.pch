@@ -9,9 +9,15 @@
     #import <Cocoa/Cocoa.h>
 #endif
 
-// #define CURLHandleLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
+// Comment/uncomment these to control logging for various aspects of CurlHandle.
+
+//#define CURLHandleLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
 //#define CURLMultiLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
 //#define CURLMultiLogError(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
 //#define CURLProtocolLog(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
 //#define CURLProtocolError(...) NSLog(@"%@: %@", self, [NSString stringWithFormat:__VA_ARGS__])
-#define CURLMultiLogDetail(...) // comment this definition out to have CURLMultiLogDetail do the same as CURLMultiLog (which will result in more output)
+
+
+// Comment this definition out to have CURLMultiLogDetail do the same as CURLMultiLog (which will result in more output assuming that CURLMultiLog is enabled)
+
+#define CURLMultiLogDetail(...) 
