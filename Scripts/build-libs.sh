@@ -16,7 +16,12 @@ build() {
 
 }
 
-if [ $1 == "--curl-only" ];
+# remove old versions
+rm -rf CURLHandleSource/built
+
+# build SFTP libraries too?
+
+if [ "$1" == "--curl-only" ];
 then
     echo "Skipping SFTP libraries"
 else
@@ -26,5 +31,9 @@ else
     cd ..
 fi
 
+# build libcurl and libcares
 cd CURLHandleSource
 build CURLHandle libcurl
+
+echo "Done"
+open "built"
