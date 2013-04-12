@@ -10,7 +10,9 @@
 	<array>
 		<string>curl</string>
 		<string>c-ares</string>
-		<string>SFTP</string>
+		<string>SFTP/libssh2</string>
+		<string>SFTP/openssl</string>
+		<string>SFTP/build</string>
 		<string>CURLHandleSource/Tests/MockServer</string>
 		<string>CURLHandleTesterSource</string>
 		<string>test-build</string>
