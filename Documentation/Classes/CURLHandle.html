@@ -1,0 +1,959 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>CURLHandle Class Reference</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../css/stylesPrint.css" />
+		<meta name="generator" content="appledoc 2.1 (build 858)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">CurlHandle </a></h1>
+				<a id="developerHome" href="../index.html">Karelia Systems</a>
+			</div>
+			
+			<div id="title" role="banner">
+				<h1 class="hideInXcode">CURLHandle Class Reference</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar">
+				<li id="toc_button">
+					<button aria-label="Show Table of Contents" role="checkbox" class="open" id="table_of_contents"><span class="disclosure"></span>Table of Contents</button>
+				</li>
+				<li id="jumpto_button" role="navigation">
+					<select id="jumpTo">
+	<option value="top">Jump To&#133;</option>
+	
+	<option value="overview">Overview</option>
+	
+	
+	
+	
+	<option value="tasks">Tasks</option>
+	
+	
+	
+	
+	
+	
+	
+	<option value="class_methods">Class Methods</option>
+	
+	<option value="//api/name/cleanupStandaloneMulti:">&nbsp;&nbsp;&nbsp;&nbsp;+ cleanupStandaloneMulti:</option>
+	
+	<option value="//api/name/standaloneMultiForTestPurposes">&nbsp;&nbsp;&nbsp;&nbsp;+ standaloneMultiForTestPurposes</option>
+	
+	
+	
+	
+	<option value="instance_methods">Instance Methods</option>
+	
+	<option value="//api/name/cancel">&nbsp;&nbsp;&nbsp;&nbsp;- cancel</option>
+	
+	<option value="//api/name/completeWithCode:isMulti:">&nbsp;&nbsp;&nbsp;&nbsp;- completeWithCode:isMulti:</option>
+	
+	<option value="//api/name/curl">&nbsp;&nbsp;&nbsp;&nbsp;- curl</option>
+	
+	<option value="//api/name/handledByMulti">&nbsp;&nbsp;&nbsp;&nbsp;- handledByMulti</option>
+	
+	<option value="//api/name/hasCompleted">&nbsp;&nbsp;&nbsp;&nbsp;- hasCompleted</option>
+	
+	<option value="//api/name/initialFTPPath">&nbsp;&nbsp;&nbsp;&nbsp;- initialFTPPath</option>
+	
+	<option value="//api/name/isCancelled">&nbsp;&nbsp;&nbsp;&nbsp;- isCancelled</option>
+	
+	<option value="//api/name/removedByMulti:">&nbsp;&nbsp;&nbsp;&nbsp;- removedByMulti:</option>
+	
+	<option value="//api/name/sendSynchronousRequest:credential:delegate:">&nbsp;&nbsp;&nbsp;&nbsp;- sendSynchronousRequest:credential:delegate:</option>
+	
+	
+	
+</select>
+				</li>
+			</ul>
+		</header>
+		<nav id="tocContainer" class="isShowingTOC">
+			<ul id="toc" role="tree">
+				
+<li role="treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#overview">Overview</a></span></li>
+
+
+
+
+<li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Testing Methods from TestingSupport">Testing Methods from TestingSupport</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Synchronous Methods from OldAPI">Synchronous Methods from OldAPI</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Internal Methods from MultiSupport">Internal Methods from MultiSupport</a></span></li>
+	
+</ul></li>
+
+
+
+
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#class_methods">Class Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/cleanupStandaloneMulti:">cleanupStandaloneMulti:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/standaloneMultiForTestPurposes">standaloneMultiForTestPurposes</a></span></li>
+	
+</ul></li>
+
+
+
+<li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/cancel">cancel</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/completeWithCode:isMulti:">completeWithCode:isMulti:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/curl">curl</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/handledByMulti">handledByMulti</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/hasCompleted">hasCompleted</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/initialFTPPath">initialFTPPath</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/isCancelled">isCancelled</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/removedByMulti:">removedByMulti:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/sendSynchronousRequest:credential:delegate:">sendSynchronousRequest:credential:delegate:</a></span></li>
+	
+</ul></li>
+
+
+			</ul>
+		</nav>
+		<article>
+			<div id="contents" class="isShowingTOC" role="main">
+				<a title="CURLHandle Class Reference" name="top"></a>
+				<div class="main-navigation navigation-top">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="header">
+					<div class="section-header">
+						<h1 class="title title-header">CURLHandle Class Reference</h1>
+					</div>		
+				</div>
+				<div id="container">	
+					
+					<div class="section section-specification"><table cellspacing="0"><tbody>
+						<tr>
+	<td class="specification-title">Inherits from</td>
+	<td class="specification-value">NSObject</td>
+</tr><tr>
+	<td class="specification-title">Declared in</td>
+	<td class="specification-value">CURLHandle.h</td>
+</tr>
+						</tbody></table></div>
+					
+					
+					
+					
+					<div class="section section-overview">
+						<a title="Overview" name="overview"></a>
+						<h2 class="subtitle subtitle-overview">Overview</h2>
+						<p>Wrapper for a CURL easy handle.</p>
+
+<p>This functionality is only provided for unit tests, and isn&rsquo;t intended for general use.
+It is included in the framework, so that frameworks that build on this one (eg ConnectionKit) can
+use these functions in their unit tests.</p>
+
+<p>Private API used by CURLMulti.
+Not exported in the framework, and not recommended for general use.</p>
+					</div>
+					
+					
+					
+					
+					
+					<div class="section section-tasks">
+						<a title="Tasks" name="tasks"></a>
+						<h2 class="subtitle subtitle-tasks">Tasks</h2>
+						
+						
+						
+						<h3 class="subsubtitle task-title">Other Methods</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/cancel">&ndash;&nbsp;cancel</a></code>
+		<span class="tooltip"><p>Stops the request — and delivery of delegate messages — as quickly as possible</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/initialFTPPath">&ndash;&nbsp;initialFTPPath</a></code>
+		<span class="tooltip"><p>CURLINFO_FTP_ENTRY_PATH. Only suitable once handle has finished.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+						
+						<a title="Testing Methods from TestingSupport" name="task_Testing Methods from TestingSupport"></a>
+						<h3 class="subsubtitle task-title">Testing Methods from TestingSupport</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/isCancelled">&ndash;&nbsp;isCancelled</a></code>
+		<span class="tooltip"><p>Has cancel been called on this handle?</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/handledByMulti">&ndash;&nbsp;handledByMulti</a></code>
+		<span class="tooltip"><p>Is this handle managed by a multi?</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/standaloneMultiForTestPurposes">+&nbsp;standaloneMultiForTestPurposes</a></code>
+		<span class="tooltip"><p>Returns a new CURLMulti, for use in testing.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/cleanupStandaloneMulti:">+&nbsp;cleanupStandaloneMulti:</a></code>
+		<span class="tooltip"><p>Clean up a multi that was created by standaloneMultiForTestPurposes.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+						
+						<a title="Synchronous Methods from OldAPI" name="task_Synchronous Methods from OldAPI"></a>
+						<h3 class="subsubtitle task-title">Synchronous Methods from OldAPI</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/sendSynchronousRequest:credential:delegate:">&ndash;&nbsp;sendSynchronousRequest:credential:delegate:</a></code>
+		<span class="tooltip"><p>Perform a request synchronously.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+						
+						<a title="Internal Methods from MultiSupport" name="task_Internal Methods from MultiSupport"></a>
+						<h3 class="subsubtitle task-title">Internal Methods from MultiSupport</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/curl">&ndash;&nbsp;curl</a></code>
+		<span class="tooltip"><p>The CURL handle managed by this object.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/completeWithCode:isMulti:">&ndash;&nbsp;completeWithCode:isMulti:</a></code>
+		<span class="tooltip"><p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> to tell the handle that it has completed.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/hasCompleted">&ndash;&nbsp;hasCompleted</a></code>
+		<span class="tooltip"><p>Has the handle completed?</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/removedByMulti:">&ndash;&nbsp;removedByMulti:</a></code>
+		<span class="tooltip"><p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> when it stops managing the handle.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+					</div>
+					
+					
+					
+					
+					
+					
+					
+					<div class="section section-methods">
+						<a title="Class Methods" name="class_methods"></a>
+						<h2 class="subtitle subtitle-methods">Class Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/cleanupStandaloneMulti:" title="cleanupStandaloneMulti:"></a>
+	<h3 class="subsubtitle method-title">cleanupStandaloneMulti:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Clean up a multi that was created by standaloneMultiForTestPurposes.</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>+ (void)cleanupStandaloneMulti:(CURLMulti *)<em>multi</em></code></div>
+
+    
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>multi</em></dt>
+			<dd><p>The multi to clean up.</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+TestingSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/standaloneMultiForTestPurposes" title="standaloneMultiForTestPurposes"></a>
+	<h3 class="subsubtitle method-title">standaloneMultiForTestPurposes</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Returns a new CURLMulti, for use in testing.</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>+ (CURLMulti *)standaloneMultiForTestPurposes</code></div>
+
+    
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>A new CURLMulti object.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Generally multi&rsquo;s are an internal implementation detail,
+but it&rsquo;s useful to be able to make new ones for unit tests
+since sharing multis between tests can create dependencies.</p><div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+TestingSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+					</div>
+					
+					
+					
+					<div class="section section-methods">
+						<a title="Instance Methods" name="instance_methods"></a>
+						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
+						
+						<div class="section-method">
+	<a name="//api/name/cancel" title="cancel"></a>
+	<h3 class="subsubtitle method-title">cancel</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Stops the request — and delivery of delegate messages — as quickly as possible</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (void)cancel</code></div>
+
+    
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/completeWithCode:isMulti:" title="completeWithCode:isMulti:"></a>
+	<h3 class="subsubtitle method-title">completeWithCode:isMulti:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> to tell the handle that it has completed.</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (void)completeWithCode:(NSInteger)<em>code</em> isMulti:(BOOL)<em>isMultiCode</em></code></div>
+
+    
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>code</em></dt>
+			<dd><p>The completion code.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>isMultiCode</em></dt>
+			<dd><p>Is the code a result from the handle itself, or the multi managing it?</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+MultiSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/curl" title="curl"></a>
+	<h3 class="subsubtitle method-title">curl</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>The CURL handle managed by this object.</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (CURL *)curl</code></div>
+
+    
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The curl handle.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+MultiSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/handledByMulti" title="handledByMulti"></a>
+	<h3 class="subsubtitle method-title">handledByMulti</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Is this handle managed by a multi?</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)handledByMulti</code></div>
+
+    
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the handle is managed by a multi.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+TestingSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/hasCompleted" title="hasCompleted"></a>
+	<h3 class="subsubtitle method-title">hasCompleted</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Has the handle completed?</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)hasCompleted</code></div>
+
+    
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the handle has completed.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+MultiSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/initialFTPPath" title="initialFTPPath"></a>
+	<h3 class="subsubtitle method-title">initialFTPPath</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>CURLINFO_FTP_ENTRY_PATH. Only suitable once handle has finished.</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (NSString *)initialFTPPath</code></div>
+
+    
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>The value of CURLINFO_FTP_ENTRY_PATH.</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/isCancelled" title="isCancelled"></a>
+	<h3 class="subsubtitle method-title">isCancelled</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Has cancel been called on this handle?</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (BOOL)isCancelled</code></div>
+
+    
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>YES if the handle has been cancelled.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+TestingSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/removedByMulti:" title="removedByMulti:"></a>
+	<h3 class="subsubtitle method-title">removedByMulti:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> when it stops managing the handle.</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (void)removedByMulti:(CURLMulti *)<em>multi</em></code></div>
+
+    
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>multi</em></dt>
+			<dd><p>The multi object that was managing this handle.</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<div class="warning"><p><strong>Warning:</strong> Not intended for general use.</p></div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle+MultiSupport.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/sendSynchronousRequest:credential:delegate:" title="sendSynchronousRequest:credential:delegate:"></a>
+	<h3 class="subsubtitle method-title">sendSynchronousRequest:credential:delegate:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Perform a request synchronously.</p>
+	</div>		
+	
+    
+
+	<div class="method-subsection method-declaration"><code>- (void)sendSynchronousRequest:(NSURLRequest *)<em>request</em> credential:(NSURLCredential *)<em>credential</em> delegate:(id&lt;CURLHandleDelegate&gt;)<em>delegate</em></code></div>
+
+    
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>request</em></dt>
+			<dd><p>The request to perform.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>credential</em></dt>
+			<dd><p>A credential to use for the request.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>delegate</em></dt>
+			<dd><p>An object to use as the delegate.</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Please don&rsquo;t use this unless you have to!
+To use, -init a handle, and then call this method, as many times as you like. Delegate messages will be delivered fairly normally during the request
+To cancel a synchronous request, call -cancel on a different thread and this method will return as soon as it can</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">CURLHandle.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+					</div>
+					
+					
+				</div>
+				<div class="main-navigation navigation-bottom">
+					<ul>
+	<li><a href="../index.html">Index</a></li>
+	<li><a href="../hierarchy.html">Hierarchy</a></li>
+</ul>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2013 Karelia Systems. All rights reserved. (Last updated: 2013-04-12)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.1 (build 858)</a>.</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</article>
+		<script type="text/javascript">
+			function jumpToChange()
+			{
+				window.location.hash = this.options[this.selectedIndex].value;
+			}
+			
+			function toggleTOC()
+			{
+				var contents = document.getElementById('contents');
+				var tocContainer = document.getElementById('tocContainer');
+				
+				if (this.getAttribute('class') == 'open')
+				{
+					this.setAttribute('class', '');
+					contents.setAttribute('class', '');
+					tocContainer.setAttribute('class', '');
+					
+					window.name = "hideTOC";
+				}
+				else
+				{
+					this.setAttribute('class', 'open');
+					contents.setAttribute('class', 'isShowingTOC');
+					tocContainer.setAttribute('class', 'isShowingTOC');
+					
+					window.name = "";
+				}
+				return false;
+			}
+			
+			function toggleTOCEntryChildren(e)
+			{
+				e.stopPropagation();
+				var currentClass = this.getAttribute('class');
+				if (currentClass == 'children') {
+					this.setAttribute('class', 'children open');
+				}
+				else if (currentClass == 'children open') {
+					this.setAttribute('class', 'children');
+				}
+				return false;
+			}
+			
+			function tocEntryClick(e)
+			{
+				e.stopPropagation();
+				return true;
+			}
+			
+			function init()
+			{
+				var selectElement = document.getElementById('jumpTo');
+				selectElement.addEventListener('change', jumpToChange, false);
+				
+				var tocButton = document.getElementById('table_of_contents');
+				tocButton.addEventListener('click', toggleTOC, false);
+				
+				var taskTreeItem = document.getElementById('task_treeitem');
+				if (taskTreeItem.getElementsByTagName('li').length > 0)
+				{
+					taskTreeItem.setAttribute('class', 'children');
+					taskTreeItem.firstChild.setAttribute('class', 'disclosure');
+				}
+				
+				var tocList = document.getElementById('toc');
+				
+				var tocEntries = tocList.getElementsByTagName('li');
+				for (var i = 0; i < tocEntries.length; i++) {
+					tocEntries[i].addEventListener('click', toggleTOCEntryChildren, false);
+				}
+				
+				var tocLinks = tocList.getElementsByTagName('a');
+				for (var i = 0; i < tocLinks.length; i++) {
+					tocLinks[i].addEventListener('click', tocEntryClick, false);
+				}
+				
+				if (window.name == "hideTOC") {
+					toggleTOC.call(tocButton);
+				}
+			}
+			
+			window.onload = init;
+			
+			// If showing in Xcode, hide the TOC and Header
+			if (navigator.userAgent.match(/xcode/i)) {
+				document.getElementById("contents").className = "hideInXcode"
+				document.getElementById("tocContainer").className = "hideInXcode"
+				document.getElementById("top_header").className = "hideInXcode"
+			}
+			
+		</script>
+	</body>
+</html>

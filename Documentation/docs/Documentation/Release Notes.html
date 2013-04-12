@@ -1,0 +1,240 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="html/html; charset=utf-8" />
+		<title>Release Notes Document</title>
+		<meta id="xcode-display" name="xcode-display" content="render"/>
+		<meta name="viewport" content="width=550" />
+		<link rel="stylesheet" type="text/css" href="../../css/styles.css" media="all" />
+		<link rel="stylesheet" type="text/css" media="print" href="../../css/stylesPrint.css" />	
+		<meta name="generator" content="appledoc 2.1 (build 858)" />
+	</head>
+	<body>
+		<header id="top_header">
+			<div id="library" class="hideInXcode">
+				<h1><a id="libraryTitle" href="../index.html">CurlHandle </a></h1>
+				<a id="developerHome" href="../index.html">Karelia Systems</a>
+			</div>
+			
+			<div id="title" role="banner">
+				<h1 class="hideInXcode" id="pageTitleHeader">Release Notes Document</h1>
+			</div>
+			<ul id="headerButtons" role="toolbar"></ul>
+		</header>
+		<article>
+			<a title="Release Notes Document" name="top"></a>
+			<div id="overview_contents" role="main">
+				<div id="container">	
+					<h2>Version 3.1, November 24, 2012</h2>
+
+<p>Well look at that, we&rsquo;re back to building our own libcurl again. Partly because it&rsquo;s nice to have control, but mostly because OS X v10.7 Lion&rsquo;s built-in libcurl crashes when checking certificates for FTPS. libcurl 7.28.0 is included pre-built as a dylib.</p>
+
+<p>Michael Robinson added FTP support for deleting directories, and moving items.</p>
+
+<h2>Version 3.0</h2>
+
+<p>For explicit SSL/TLS, specify NSURLRequest.curl_shouldVerifySSLCertificate. For implicit FTPS, use the ftps: URL scheme</p>
+
+<h2>Version 2.0, December 10, 2008</h2>
+
+<p>Yes, I know it&rsquo;s been 4 years.  But I figured I&rsquo;d collect the various intel-compatible modifications out there and bring them &ldquo;home.&rdquo;</p>
+
+<p>This version incorporates some goodies from Jonathan &ldquo;Wolf&rdquo; Rentzsch: -setPutFile:resumeUploadFromOffset: and the class ResumableHTTPUploader.</p>
+
+<p>And it&rsquo;s an Xcode project, and builds fat binary.</p>
+
+<p>I have taken out references to building your own CURL, and being 10.1-compatible.</p>
+
+<h2>Version 1.9, 1 April 2004</h2>
+
+<p>• Wraps around curl 7.11.1</p>
+
+<p>• Remove setProxy:port: method since CURLHandle uses the system proxy settings</p>
+
+<p>• Retain proxy information retrieved with SCDynamicStoreCopyProxies until the CURLHandle is released.  (Thanks Eric Fung and others for discovery of problems)</p>
+
+<p>• Added multipart post operations. (Thanks Andrew @ Kavasoft, http://www.kavasoft.com/)</p>
+
+<p>• Refactor methods to access the response&rsquo;s HTTP Header as categories on NSString.  New methods to access header information:  headerString to cache and retrieve the entire header as a 7-bit string; headerMatchingKey: and headersMatchingKey:; allHTTPHeaderDicts, etc.</p>
+
+<p>• Add HTTP Reason strings support, which were never implemented before.  Modified Tester to show the new values we support.  (Thanks to Quentin Hill)</p>
+
+<p>• Get proxy information from system preferences for https &amp; ftp as well as http (Thanks to Chris Silverberg)</p>
+
+<p>• Fix HTTP header setting so that it&rsquo;s sent as Key: Value instead of Key:Value (Thanks to Chris Silverberg)</p>
+
+<p>• Put in timeout methods and method to get the version of underlying curl (Thanks to Alan Pinstein)</p>
+
+<h2>Version 1.8, 2 July 2003 (Never Released)</h2>
+
+<p>• Changed the runloop mode for threading from NSDefaultRunLoop to kCFRunLoopCommonModes so it will work in a modal dialog box (thanks to Quentin D. Carnicelli)</p>
+
+<p>• Added setAcceptEncoding: and setAcceptCompression: (thanks to David Remahl) to CURLHandle+extras</p>
+
+<p>• formatForHTTPUsingEncoding: now escapes ;:@&amp;=/ characters that are found in the dictionaries; previously it was possible to make an incorrect URL if the keys or values in the dictionaries had characters that are part of the URL syntax.</p>
+
+<p>• formatForHTTPUsingEncoding: now handles properly if the value for a key is a collection, e.g. responds to @selector(objectEnumerator).  (thanks to Doc O'Leary)</p>
+
+<p>• release proxies created with SCDynamicStoreCopyProxies (thanks to Matt Reda)</p>
+
+<p>• Tester:  Added Find panel (thanks to Stephen Steiner).  Note that the tester now contains software copyright Apple Computer.</p>
+
+<h2>Version 1.7, 26 November 2002</h2>
+
+<p>• Wraps around curl 7.10.2.</p>
+
+<p>• Add setStringOrNumberObject:forKey: so that you can specify an integer NSNumber as well as an NSString.  Retained setString:forKey: for backward compatibility.</p>
+
+<p>• Adjust project for building under Mac OS X 10.2.  (Project needs to link to a few more libraries).  However, you will need to build curl under 10.1 if you wish your application to run under 10.1; see &ldquo;DevNotes.txt&rdquo;.</p>
+
+<p>• Added &ldquo;curl_easy_setopt([self curl], CURLOPT_UPLOAD, 1L);&rdquo; to setPutFile: to make FTP PUT easier (thanks to Mike Schrag).  Now you&rsquo;d do something like this:</p>
+
+<pre><code>NSURL *url = [NSURL URLWithString:@"ftp://username:password@192.168.1.4/remoteFileName.xxx"];
+CURLHandle *urlHandle = (CURLHandle *)[url URLHandleUsingCache:NO];
+[urlHandle setPutFile:@"/localFileName.yyy"];
+[urlHandle prepareAndPerformCurl];
+</code></pre>
+
+<p>• Added setLowSpeedTime, setLowSpeedLimit methods to deal with timeout issues (thanks to Steven W. Schuldt).</p>
+
+<p>• Got SSL working, as long as you are building curl and CURLHandle under 10.2.  Well, it was working all along, but now you can go to an https: URL in CURLHandleTester.  Please see the notes at <a href="http://curl.haxx.se/lxr/source/UPGRADE">http://curl.haxx.se/lxr/source/UPGRADE</a> &mdash; by default, curl will complain if it couldn&rsquo;t verify the remote certificate from the default CA cert bundle that gets installed with curl.  You may need to provide your own CA cert bundle using the CURLOPT_CAPATH.  (Presently, there is no convenience method for this defined in CURLHandle.)</p>
+
+<h2>Version 1.6, 5 July 2002</h2>
+
+<p>• Wraps around curl 7.9.8.</p>
+
+<p>• Fix a bug in the tester project that failed to copy the framework into the application bundle, forcing the user to install the framework before running the tester.</p>
+
+<p>• Remove Mac OS X 10.0.x support</p>
+
+<p>• Stopped overriding failureReason; this caused problems in some cases.</p>
+
+<p>• Removed carbon APIs, using system configuration framework instead.   This requires a change to curlHelloSignature:acceptAll:.  Thanks to Dominik Westner for this change.</p>
+
+<p>• Add a script in the project for the framework to eliminate the &ldquo;MH_DYLIB&rdquo; error message people were getting.</p>
+
+<h2>Version 1.5.2, 29 April 2002</h2>
+
+<p>• Fix to cookie handling.  The category method &ndash;[NSArray parsedCookies] returns a dictionary with the keys being the cookie names and the value being another dictionary of attributes (including value) of the cookie.  &ndash;[CURLHandle setRequestCookies:] take a dictionary of either that form, or a simple { name1 = value1; name2 = value2; } form.</p>
+
+<h2>Version 1.5.1, 25 April 2002</h2>
+
+<p>• This will likely be the last version with Mac OS X 10.0 support.  We mean it this time!</p>
+
+<p>• Wraps around curl-7.9.6.</p>
+
+<p>• Significant Browser Cookie support improvement, thanks to Daniel Jalkut.</p>
+
+<p>• dictionaryWithHTTPHeaders: has been replaced by arrayWithHTTPHeaders: to better handle multiple header lines with the same key.</p>
+
+<p>• setHTTPHeaders: now adds to the dictionary of HTTP request headers, rather than replacing them.</p>
+
+<p>• Tester program now works with cookies.</p>
+
+<p>You can try it out if you have a Yahoo! account, for instance.  Check &ldquo;Attempt to parse cookies&rdquo;, turn off the &ldquo;Follow&rdquo; checkbox, and enter the following URL (replacing your own account &amp; password):</p>
+
+<p>http://login.yahoo.com/config/login?login=[yahooAcct]&amp;passwd=[yahooPass]</p>
+
+<p>Copy the &ldquo;Response Cookies&rdquo; text and paste into the &ldquo;Cookie Dict&rdquo; field.  Then go to a regular Yahoo page URL; you may want to check &ldquo;Render HTML&rdquo;:</p>
+
+<p>http://quote.yahoo.com/</p>
+
+<p>and verify that it shows your personalized information.</p>
+
+<h2>Version 1.5, 11 April 2002</h2>
+
+<p>• Packaged CURLHandle as a standalone framework.  There are now two projects &mdash; CURLHandle.pbproj, which is used for building the framework, and CURLHandleTester.pbproj, which builds the testing application.</p>
+
+<p>• The process for building an application that uses CURLHandle, and the process for building the framework itself, have changed; see the DevNotes.txt file.</p>
+
+<p>• added CURLHandleCreatedNotification.  Post a notification when a CURLHandle is created.  That way, your app can be notified when a CURLHandle is created behind your back &mdash; this is handy if you want to load and display a Web page that has images&hellip;.</p>
+
+<p>• added url method to get the NSURL from the CURLHandle</p>
+
+<p>• Updated the DevNotes.txt file significantly to make it easier to build CURLHandleTester</p>
+
+<p>• Added setPostString: in case your post isn&rsquo;t in dictionary form.</p>
+
+<p>• Added a variation of setPostDictionary where you can specify the string encoding for the POST.</p>
+
+<p>• added setAllowsProxy, whether to use the proxy settings or not</p>
+
+<p>• Some leak cleanup (though there seems to be a leak with ports and run loops; this has been reported to Apple)</p>
+
+<p>• Added setRange, setNoBody, setIfModSince to CURLHandle+Extras (thanks to Tom Waters)</p>
+
+<p>• Added PUT abilities (thanks to Tom Waters) &mdash; Here&rsquo;s a code sample; in URLHandleResourceDidFinishLoading you&rsquo;ll get an httpCode of 204 if it was successful.</p>
+
+<pre><code>- (id)init:(NSString *)url
+{
+    NSDate *filemod;
+    mUrl = [[NSURL URLWithString:url] retain];
+    mLocalPath = [[NSString stringWithFormat:@"%@%@", mDocumentRoot, [mUrl path]] retain];
+    mHandle = [(CURLHandle *)[mUrl URLHandleUsingCache:NO] retain];
+    [mHandle setUserAgent:@"MyApp/0.1 (Mac OS X)"];
+    if (filemod = [[NSFileManager defaultManager] lastModTime:mLocalPath]) {
+        [mHandle setIfModSince:filemod];
+    }
+    [mHandle setPutFile:mLocalPath];
+    [mHandle setConnectionTimeout:4];
+    [mHandle addClient:self];
+    [mHandle loadInBackground];
+}
+</code></pre>
+
+<h2>Version 1.2, 12 December 2001</h2>
+
+<p>•  setProgressIndicator: to allow for indeterminate progress indicators in foreground loading. See the tester application for how to do a progress indicator from a background load.
+•  Support for proxy settings from System Preferences, and authenticated proxy support as well.
+•  curlHello now takes signature of app as parameter
+•  setHTTPHeaders for setting custom HTTP request headers
+•  setProxyUserIDAndPassword for proxy servers
+•  New method for formatting a dictionary as an HTTP get/post request in a particular order or parameters
+•  Rudimentary support for ftp:// URLs
+•  Fixed a couple of crashing bugs, one where the data was strangely being released prematurely, another where the background thread would try to send a message to the foreground thread after it had been dealloc&rsquo;d.
+•  Updated bundled libcurl to be in sync with curl 7.9.2.</p>
+
+<h2>Version 1.1, 11 November 2001</h2>
+
+<p>•  Fixed a lot of synchronization problems so that background cancelling now works. If the cancel flag has been set, and the foreground thread is messaged of more data (from a pending block from before the cancel), it isn&rsquo;t passed on.
+•  Fixed caching; it now works (but be sure to use cachedHandleForURL to actually get the cached data on subsequent loads).
+•  Took out the locks, which weren&rsquo;t needed
+•  Make sure we don&rsquo;t attempt to kick off a background load if one is already in progress.</p>
+
+<h2>Version 1.0, 14 October 2001</h2>
+
+<p>•  curlThreadBackgroundLoad Don&rsquo;t send DONE/BAD after an abort
+•  beginLoadInBackground sets status to NSURLHandleLoadInProgress
+•  Various debugging tests to make sure mStatus = status
+•  initWithURL now sets result from some option calls that were being ignored before
+•  prepareAndPerformCurl now clears the header buffer before loading
+•  AutoDoc'ing
+•  &ndash; (void)flushCachedData implemented for 10.0
+•  Remove implicit ftp workings; not actually tested at all so I don&rsquo;t know what to expect. It still tries to handle https, though I don&rsquo;t know if that will work.</p>
+
+<h2>Version 0.31, 8 Oct 2001</h2>
+
+<p>• Doesn&rsquo;t access NSURLHandle&rsquo;s private _data in Mac OS X 10.0; uses private ivar</p>
+
+<h2>Version 0.3, 7 Oct 2001</h2>
+
+<p>• Major cleanup; works on Mac OS X 10.0</p>
+
+<h2>Version 0.2, 2 Oct 2001</h2>
+
+<p>• First actual release; works on Mac OS X 10.1 only</p>
+				</div>
+				<div id="footer">
+					<hr />
+					<div class="footer-copyright">
+						<p><span class="copyright">&copy; 2013 Karelia Systems. All rights reserved. (Last updated: 2013-04-12)</span><br />
+						
+						<span class="generator">Generated by <a href="http://appledoc.gentlebytes.com">appledoc 2.1 (build 858)</a>.</span></p>
+						
+					
+					</div>
+				</div>
+			</div>
+		</article>
+	</body>
+</html>
