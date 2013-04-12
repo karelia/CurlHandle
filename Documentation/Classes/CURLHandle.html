@@ -85,11 +85,11 @@
 
 <li role="treeitem" id="task_treeitem"><span class="nodisclosure"></span><span class="sectionName"><a href="#tasks">Tasks</a></span><ul>
 	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Internal Methods from MultiSupport">Internal Methods from MultiSupport</a></span></li>
+	
 	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Testing Methods from TestingSupport">Testing Methods from TestingSupport</a></span></li>
 	
 	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Synchronous Methods from OldAPI">Synchronous Methods from OldAPI</a></span></li>
-	
-	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Internal Methods from MultiSupport">Internal Methods from MultiSupport</a></span></li>
 	
 </ul></li>
 
@@ -168,12 +168,12 @@
 						<h2 class="subtitle subtitle-overview">Overview</h2>
 						<p>Wrapper for a CURL easy handle.</p>
 
+<p>Private API used by CURLMulti.
+Not exported in the framework, and not recommended for general use.</p>
+
 <p>This functionality is only provided for unit tests, and isn&rsquo;t intended for general use.
 It is included in the framework, so that frameworks that build on this one (eg ConnectionKit) can
 use these functions in their unit tests.</p>
-
-<p>Private API used by CURLMulti.
-Not exported in the framework, and not recommended for general use.</p>
 					</div>
 					
 					
@@ -200,6 +200,42 @@ Not exported in the framework, and not recommended for general use.</p>
 	<span class="tooltip">
 		<code><a href="#//api/name/initialFTPPath">&ndash;&nbsp;initialFTPPath</a></code>
 		<span class="tooltip"><p>CURLINFO_FTP_ENTRY_PATH. Only suitable once handle has finished.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+						
+						<a title="Internal Methods from MultiSupport" name="task_Internal Methods from MultiSupport"></a>
+						<h3 class="subsubtitle task-title">Internal Methods from MultiSupport</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/curl">&ndash;&nbsp;curl</a></code>
+		<span class="tooltip"><p>The CURL handle managed by this object.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/completeWithCode:isMulti:">&ndash;&nbsp;completeWithCode:isMulti:</a></code>
+		<span class="tooltip"><p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> to tell the handle that it has completed.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/hasCompleted">&ndash;&nbsp;hasCompleted</a></code>
+		<span class="tooltip"><p>Has the handle completed?</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/removedByMulti:">&ndash;&nbsp;removedByMulti:</a></code>
+		<span class="tooltip"><p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> when it stops managing the handle.</p></span>
 	</span>
 	
 	
@@ -251,42 +287,6 @@ Not exported in the framework, and not recommended for general use.</p>
 	<span class="tooltip">
 		<code><a href="#//api/name/sendSynchronousRequest:credential:delegate:">&ndash;&nbsp;sendSynchronousRequest:credential:delegate:</a></code>
 		<span class="tooltip"><p>Perform a request synchronously.</p></span>
-	</span>
-	
-	
-</li>
-						</ul>
-						
-						
-						<a title="Internal Methods from MultiSupport" name="task_Internal Methods from MultiSupport"></a>
-						<h3 class="subsubtitle task-title">Internal Methods from MultiSupport</h3>
-
-						<ul class="task-list">
-							<li>
-	<span class="tooltip">
-		<code><a href="#//api/name/curl">&ndash;&nbsp;curl</a></code>
-		<span class="tooltip"><p>The CURL handle managed by this object.</p></span>
-	</span>
-	
-	
-</li><li>
-	<span class="tooltip">
-		<code><a href="#//api/name/completeWithCode:isMulti:">&ndash;&nbsp;completeWithCode:isMulti:</a></code>
-		<span class="tooltip"><p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> to tell the handle that it has completed.</p></span>
-	</span>
-	
-	
-</li><li>
-	<span class="tooltip">
-		<code><a href="#//api/name/hasCompleted">&ndash;&nbsp;hasCompleted</a></code>
-		<span class="tooltip"><p>Has the handle completed?</p></span>
-	</span>
-	
-	
-</li><li>
-	<span class="tooltip">
-		<code><a href="#//api/name/removedByMulti:">&ndash;&nbsp;removedByMulti:</a></code>
-		<span class="tooltip"><p>Called by <a href="../Classes/CURLMulti.html">CURLMulti</a> when it stops managing the handle.</p></span>
 	</span>
 	
 	
