@@ -1044,6 +1044,7 @@ int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype p
     if (purpose == CURLSOCKTYPE_IPCXN)
     {
         // FTP control connections should be kept alive. However, I'm fairly sure this is unlikely to have a real effect in practice since OS X's default time before it starts sending keep alive packets is 2 hours :(
+        // TODO: Looks like we could adopt CURLOPT_TCP_KEEPINTVL instead
         if ([[[self valueForKey:@"_URL"] scheme] isEqualToString:@"ftp"])
         {
             int keepAlive = 1;

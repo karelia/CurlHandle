@@ -171,7 +171,7 @@
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
 		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
-		277D77E2160380AF00906915 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 277D77E1160380AF00906915 /* CFNetwork.framework */; };
+		50ED7E2816EED8D000723020 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50ED7E2716EED8D000723020 /* CoreServices.framework */; };
 		27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D77E111672BBB50091EF91 /* CK2SSHCredential.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
@@ -374,7 +374,7 @@
 		22F947431709C59C00F0E6E1 /* StandaloneNoGcdTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StandaloneNoGcdTest.m; sourceTree = "<group>"; };
 		27229B3814C83905007D0FF1 /* CURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLProtocol.h; sourceTree = "<group>"; };
 		27229B3914C83905007D0FF1 /* CURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLProtocol.m; sourceTree = "<group>"; };
-		277D77E1160380AF00906915 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		50ED7E2716EED8D000723020 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		27D77E111672BBB50091EF91 /* CK2SSHCredential.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CK2SSHCredential.h; path = ../SFTP/CK2SSHCredential.h; sourceTree = "<group>"; };
 		27D77E121672BBB50091EF91 /* CK2SSHCredential.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CK2SSHCredential.m; path = ../SFTP/CK2SSHCredential.m; sourceTree = "<group>"; };
 		27D77E151672BD9B0091EF91 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -426,7 +426,7 @@
 				8008037E166C5BF4004D39F5 /* libcurl.dylib in Frameworks */,
 				8008037F166C5BF9004D39F5 /* libcares.dylib in Frameworks */,
 				277D77E01603804900906915 /* Foundation.framework in Frameworks */,
-				277D77E2160380AF00906915 /* CFNetwork.framework in Frameworks */,
+				50ED7E2816EED8D000723020 /* CoreServices.framework in Frameworks */,
 				79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */,
 				27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */,
 			);
