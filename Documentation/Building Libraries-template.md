@@ -21,6 +21,10 @@ Homebrew
 	brew install automake (should show ver 1.12.6 installing)
 	(also note the cool beer mug emoji when brew is done :-P )
 
+    brew install pkg-config
+    brew install libtool
+
+There is a script {{Scripts/install-tools.sh}} which you can run to perform these steps.
 
 
 ## Fetch Code
