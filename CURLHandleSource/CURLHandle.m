@@ -712,10 +712,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost underlyingError:result];
             break;
             
-        case CURLE_REMOTE_ACCESS_DENIED:
-            result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorNoPermissionsToReadFile underlyingError:result];
-            break;
-            
         case CURLE_WRITE_ERROR:
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotWriteToFile underlyingError:result];
             break;
@@ -777,6 +773,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             
             break;
         }
+            
+        /*
+         CURLE_REMOTE_ACCESS_DENIED would seem to translate to NSURLErrorNoPermissionsToReadFile quite
+         well. However, in practice it also happens when an FTP server rejected a CWD command because
+         the directory doesn't exist. Seems best to leave it alone
+         */
+            
         default:
             break;
     }
