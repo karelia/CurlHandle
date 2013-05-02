@@ -525,6 +525,9 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
         
         // Do the transfer
         code = curl_easy_perform(mCURL);
+        
+        // The transfer may have had a header but not body data. In which case, still need to report the response
+        [self reportResponseIfNeeded];
     }
     @finally
     {
