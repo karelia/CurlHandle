@@ -709,40 +709,7 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
 		else
 		{
             // Once the body starts arriving, we know we have the full header, so can report that
-            if ([_headerBuffer length])
-            {
-                NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
-                [_headerBuffer setLength:0];
-                
-                long code;
-                if (curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
-                {
-                    char *urlBuffer;
-                    if (curl_easy_getinfo(mCURL, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
-                    {
-                        NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
-                        if (urlString)
-                        {
-                            NSURL *url = [[NSURL alloc] initWithString:urlString];
-                            if (url)
-                            {
-                                NSURLResponse *response = [[CURLResponse alloc] initWithURL:url
-                                                                                 statusCode:code
-                                                                               headerString:headerString];
-                                
-                                [[self delegate] handle:self didReceiveResponse:response];
-                                [response release];
-                                [url release];
-                            }
-                            
-                            [urlString release];
-                        }
-                        
-                    }
-                }
-				[headerString release];
-            }
-            
+            [self reportResponseIfNeeded];
             
             // Report regular body data
 			[[self delegate] handle:self didReceiveData:data];
@@ -776,6 +743,43 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
     }
     
     return result;
+}
+
+- (void)reportResponseIfNeeded;
+{
+    if ([_headerBuffer length])
+    {
+        NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
+        [_headerBuffer setLength:0];
+        
+        long code;
+        if (curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
+        {
+            char *urlBuffer;
+            if (curl_easy_getinfo(mCURL, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
+            {
+                NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
+                if (urlString)
+                {
+                    NSURL *url = [[NSURL alloc] initWithString:urlString];
+                    if (url)
+                    {
+                        NSURLResponse *response = [[CURLResponse alloc] initWithURL:url
+                                                                         statusCode:code
+                                                                       headerString:headerString];
+                        
+                        [[self delegate] handle:self didReceiveResponse:response];
+                        [response release];
+                        [url release];
+                    }
+                    
+                    [urlString release];
+                }
+                
+            }
+        }
+        [headerString release];
+    }
 }
 
 @synthesize delegate = _delegate;
