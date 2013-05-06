@@ -1002,13 +1002,14 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
         {
             // the length we're passed seems to be unreliable; we use strnlen to ensure that we never go past the infoLength we were given,
             // but often it seems that the string is *much* shorter
-            NSUInteger actualLength = strnlen(info, infoLength);
+            // Going to start trusting infoLength again after Daniel's patch. Also because strnlen() isn't actually available on 10.6
+            //NSUInteger actualLength = strnlen(info, infoLength);
 
-            NSString *string = [[NSString alloc] initWithBytes:info length:actualLength encoding:NSUTF8StringEncoding];
+            NSString *string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSUTF8StringEncoding];
             if (!string)
             {
                 // FTP servers are fairly free to use whatever encoding they like. We've run into one that appears to be Hungarian; as far as I can tell ISO Latin 2 is the best compromise for that
-                string = [[NSString alloc] initWithBytes:info length:actualLength encoding:NSISOLatin2StringEncoding];
+                string = [[NSString alloc] initWithBytes:info length:infoLength encoding:NSISOLatin2StringEncoding];
             }
 
             if (!string)
