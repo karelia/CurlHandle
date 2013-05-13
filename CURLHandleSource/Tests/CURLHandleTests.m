@@ -242,7 +242,7 @@ static TestMode gModeToUse;
 {
     NSString* version = [CURLHandle curlVersion];
     NSLog(@"curl version %@", version);
-    STAssertTrue([version isEqualToString:@"libcurl/7.30.1-DEV SecureTransport zlib/1.2.5 c-ares/1.9.0-DEV libssh2/1.4.3_DEV"], @"version was \n\n%@\n\n", version);
+    STAssertTrue([version isEqualToString:@"libcurl/7.31.0-DEV SecureTransport zlib/1.2.5 c-ares/1.10.0-DEV libssh2/1.4.3_DEV"], @"version was \n\n%@\n\n", version);
 }
 
 - (void)testHTTPDownload
@@ -318,6 +318,7 @@ static TestMode gModeToUse;
             NSUInteger count = [handles count];
             while (self.error == nil && (self.finishedCount < count))
             {
+                NSLog(@"%ld handles finished", self.finishedCount);
                 [self runUntilPaused];
             }
         }
