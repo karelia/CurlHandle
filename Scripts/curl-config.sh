@@ -62,6 +62,3 @@ CFLAGS="-isysroot ${SDKROOT} -arch $MODE -g -w -mmacosx-version-min=10.6" \
 --disable-static \
 --enable-proxy
 ##--enable-threaded-resolver [either this or c-ares, this is heavy-uses a thread for every resolve call]
-
-# Make
-make

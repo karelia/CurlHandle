@@ -36,6 +36,3 @@ CFLAGS="-isysroot ${SDKROOT} -arch $MODE -g -w -mmacosx-version-min=10.6" \
 --enable-nonblocking \
 --enable-shared \
 --disable-static
-
-# Make
-make
