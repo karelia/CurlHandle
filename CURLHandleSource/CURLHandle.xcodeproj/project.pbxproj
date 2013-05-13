@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		227FCE591741462200C3029D /* libcurl-tests-x86_64 */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 227FCE631741462200C3029D /* Build configuration list for PBXAggregateTarget "libcurl-tests-x86_64" */;
+			buildPhases = (
+				227FCE621741462200C3029D /* Run Script - lipo multi-arch dylib */,
+			);
+			dependencies = (
+			);
+			name = "libcurl-tests-x86_64";
+			productName = libcurl;
+		};
 		8008030A16696287004D39F5 /* libcurl-i386 */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 8008030B16696287004D39F5 /* Build configuration list for PBXAggregateTarget "libcurl-i386" */;
@@ -766,6 +777,7 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* CURLHandle */,
 				809ADE7816029C38001D02E1 /* libcurl */,
+				227FCE591741462200C3029D /* libcurl-tests-x86_64 */,
 				809AE1BF1602BEF1001D02E1 /* libcurl-clean */,
 				8008030A16696287004D39F5 /* libcurl-i386 */,
 				8008030E16696292004D39F5 /* libcurl-x86_64 */,
@@ -817,6 +829,21 @@
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 			showEnvVarsInLog = 0;
 		};
+		227FCE621741462200C3029D /* Run Script - lipo multi-arch dylib */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script - lipo multi-arch dylib";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "#../Scripts/c-ares-config.sh \"x86_64\" -- shouldn't need to do this, if the libs have been built already on this machine\n../Scripts/c-ares-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\" \".libs\"\n\n#../Scripts/curl-config.sh \"x86_64\" --  shouldn't need to do this, if the libs have been built already on this machine\n../Scripts/curl-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\" \"lib/.libs\"\n\necho Copying libraries\ncp \"${OBJROOT}/c-ares-x86_64/lib/libcares.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libcrypto.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libssh2.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libssl.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\n\nopen \"${OBJROOT}/curl-x86_64/src/.libs\"\n\necho Running tests\ncd \"${OBJROOT}/curl-x86_64\"\nmake test\necho Finished tests";
+			showEnvVarsInLog = 0;
+		};
 		800803191669665D004D39F5 /* Run Script - Configure + make */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -829,7 +856,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"curl\" \"lib/.libs\"";
+			shellScript = "../Scripts/curl-config-make.sh \"i386\"\n../Scripts/curl-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"curl\" \"lib/.libs\"";
 			showEnvVarsInLog = 0;
 		};
 		8008031B16696675004D39F5 /* Run Script - Configure + make */ = {
@@ -844,7 +871,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\" \"lib/.libs\"";
+			shellScript = "../Scripts/curl-config.sh \"x86_64\"\n../Scripts/curl-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\" \"lib/.libs\"";
 			showEnvVarsInLog = 0;
 		};
 		80080337166A9651004D39F5 /* Run Script - lipo multi-arch dylib */ = {
@@ -893,7 +920,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/c-ares-config-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"cares\" \".libs\"\n";
+			shellScript = "../Scripts/c-ares-config.sh \"i386\"\n../Scripts/c-ares-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"cares\" \".libs\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8008033B166A9682004D39F5 /* Run Script - Configure + make */ = {
@@ -908,7 +935,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/c-ares-config-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\" \".libs\"\n";
+			shellScript = "../Scripts/c-ares-config.sh \"x86_64\"\n../Scripts/c-ares-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\" \".libs\"\n";
 			showEnvVarsInLog = 0;
 		};
 		809AE1BC1602BE6C001D02E1 /* Run Script - lipo multi-arch dylib */ = {
@@ -1186,6 +1213,23 @@
 			};
 			name = Release;
 		};
+		227FCE641741462200C3029D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "libcurl copy";
+			};
+			name = Debug;
+		};
+		227FCE651741462200C3029D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_NAME = "libcurl copy";
+			};
+			name = Release;
+		};
 		22C9CFCA17035A0B004610FE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1413,6 +1457,15 @@
 			buildConfigurations = (
 				223FD0A7160B523700BE1C80 /* Debug */,
 				223FD0A8160B523700BE1C80 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		227FCE631741462200C3029D /* Build configuration list for PBXAggregateTarget "libcurl-tests-x86_64" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				227FCE641741462200C3029D /* Debug */,
+				227FCE651741462200C3029D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
