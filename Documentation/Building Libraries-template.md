@@ -24,7 +24,7 @@ Homebrew
     brew install pkg-config
     brew install libtool
 
-There is a script {{Scripts/install-tools.sh}} which you can run to perform these steps.
+There is now a script {{Scripts/install-tools.sh}} which you can run to perform these steps.
 
 
 ## Fetch Code
@@ -61,3 +61,21 @@ This is one reason why you might find yourself wanting to build the libraries lo
 Ideally we'll figure out how to fix things so that this isn't necessary.
 
 On the other hand, ideally you won't need to debug the internals of these libraries.
+
+## Running libcurl's Test Suite
+
+There is an extensive test suite that comes with libcurl.
+
+You can attempt to run this suite using the following script:
+
+    Scripts/test-libs.sh
+    
+The tests are run for the x86_64 variant of the built library, which is created as part of the build process, and thus buried away in an object folder somewhere.
+
+The tests *aren't* run directly from the curl/ folder, since this hasn't been ./configure'd etc.
+
+The libcurl test script itself requires some details that the user inputs when the script is first run, and which are then stored in a 'setup' file inside the curl/ folder. These details include a user name, email address, and a description of the machine the tests are running on.
+
+Since we're running the scripts on a copy of the curl/ folder, we need to copy this 'setup' file in from somewhere. Currently, it's copied in from Scripts/setup. This means that it's got my details in it! You may wish to change these before running...
+
+Ideally we should probably build this setup file on the fly, pulling out the relevant information from elsewhere.
