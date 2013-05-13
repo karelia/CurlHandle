@@ -21,14 +21,20 @@ rm -rf CURLHandleSource/built
 
 # build SFTP libraries too?
 
-if [ "$1" == "--curl-only" ];
+if [ "$1" == "--all" ];
+then
+	cd SFTP
+	build OpenSSL openssl
+	build libssh2 libssh2
+	cd ..
+	
+elif [ "$1" == "--curl-only" ];
 then
     echo "Skipping SFTP libraries"
+	
 else
-    cd SFTP
-    build OpenSSL openssl
-    build libssh2 libssh2
-    cd ..
+	echo "Usage: build-libs.sh { --all | --curl-only }"
+	exit 0
 fi
 
 # build libcurl and libcares
