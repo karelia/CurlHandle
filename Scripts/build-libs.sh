@@ -1,6 +1,6 @@
 build() {
 
-	echo "Building $1"
+	echo "Building $2"
 
 	obj="$HOME/Library/Caches/CurlHandle/obj"
 	sym="$HOME/Library/Caches/CurlHandle/sym"
