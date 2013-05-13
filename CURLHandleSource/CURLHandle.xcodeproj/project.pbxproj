@@ -11,9 +11,10 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 227FCE631741462200C3029D /* Build configuration list for PBXAggregateTarget "libcurl-tests-x86_64" */;
 			buildPhases = (
-				227FCE621741462200C3029D /* Run Script - lipo multi-arch dylib */,
+				227FCE621741462200C3029D /* Run Script */,
 			);
 			dependencies = (
+				227FCE691741725900C3029D /* PBXTargetDependency */,
 			);
 			name = "libcurl-tests-x86_64";
 			productName = libcurl;
@@ -195,6 +196,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		227FCE681741725900C3029D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 809ADE7816029C38001D02E1;
+			remoteInfo = libcurl;
+		};
 		22BCCE2B16ADD57700DFFE8D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -829,19 +837,19 @@
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 			showEnvVarsInLog = 0;
 		};
-		227FCE621741462200C3029D /* Run Script - lipo multi-arch dylib */ = {
+		227FCE621741462200C3029D /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Run Script - lipo multi-arch dylib";
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#../Scripts/c-ares-config.sh \"x86_64\" -- shouldn't need to do this, if the libs have been built already on this machine\n../Scripts/c-ares-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\" \".libs\"\n\n#../Scripts/curl-config.sh \"x86_64\" --  shouldn't need to do this, if the libs have been built already on this machine\n../Scripts/curl-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\" \"lib/.libs\"\n\necho Copying libraries\ncp \"${OBJROOT}/c-ares-x86_64/lib/libcares.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libcrypto.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libssh2.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libssl.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\n\nopen \"${OBJROOT}/curl-x86_64/src/.libs\"\n\necho Running tests\ncd \"${OBJROOT}/curl-x86_64\"\nmake test\necho Finished tests";
+			shellScript = "if false; then\n#../Scripts/c-ares-clean.sh\n#../Scripts/curl-clean.sh\n\n#../Scripts/c-ares-config.sh \"x86_64\" # shouldn't need to do this, if the libs have been built already on this machine\n../Scripts/c-ares-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"cares\" \".libs\"\n\n../Scripts/curl-config.sh \"x86_64\" #  shouldn't need to do this, if the libs have been built already on this machine\n../Scripts/curl-make.sh \"x86_64\"\n../Scripts/rename-install.sh \"x86_64\" \"curl\" \"lib/.libs\"\nfi\n\necho Copying libraries\ncp \"${OBJROOT}/c-ares-x86_64/lib/libcares.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libcrypto.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libssh2.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\ncp \"${SRCROOT}/../SFTP/libssl.dylib\" \"${OBJROOT}/curl-x86_64/lib/.libs\"\n\nopen \"${OBJROOT}/curl-x86_64/src/.libs\"\n\necho Running tests\ncd \"${OBJROOT}/curl-x86_64\"\nmake test\necho Finished tests\n";
 			showEnvVarsInLog = 0;
 		};
 		800803191669665D004D39F5 /* Run Script - Configure + make */ = {
@@ -856,7 +864,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "../Scripts/curl-config-make.sh \"i386\"\n../Scripts/curl-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"curl\" \"lib/.libs\"";
+			shellScript = "../Scripts/curl-config.sh \"i386\"\n../Scripts/curl-make.sh \"i386\"\n../Scripts/rename-install.sh \"i386\" \"curl\" \"lib/.libs\"";
 			showEnvVarsInLog = 0;
 		};
 		8008031B16696675004D39F5 /* Run Script - Configure + make */ = {
@@ -1032,6 +1040,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		227FCE691741725900C3029D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 809ADE7816029C38001D02E1 /* libcurl */;
+			targetProxy = 227FCE681741725900C3029D /* PBXContainerItemProxy */;
+		};
 		22BCCE2C16ADD57700DFFE8D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* CURLHandle */;
