@@ -1,0 +1,6 @@
+name='Sam Deane'
+email='sam@elegantchaos.com'
+desc='Macbook Pro 15-inch, Mid 2010 2.66 GHz Intel Core i7'
+confopts='--with-ssl --enable-debug'
+notes=''
+fixed='4'
