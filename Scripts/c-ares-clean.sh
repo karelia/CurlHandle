@@ -8,14 +8,17 @@ echo "Please ignore any messages about \"No rule to make target distclean.\" Tha
 make distclean
 
 # Remove final output files from previous run.
-cd "${SRCROOT}"
-rm -f  "libcares.dylib"
-rm -Rf "libcares.dylib.dSYM"
+OUTDIR="${SRCROOT}/built"
+rm -Rf "${OUTDIR}/include/cares-i386"
+rm -Rf "${OUTDIR}/include/cares-x86_64"
+rm -f  "${OUTDIR}/libcares.dylib"
+rm -Rf "${OUTDIR}/libcares.dylib.dSYM"
 
 # Remove intermediate output files from previous run.
+open "${OBJROOT}"
 rm -f  "${OBJROOT}/libcares.dylib"
 rm -Rf "${OBJROOT}/libcares.dylib.dSYM"
 
 # Remove build dirs from previous run.
-rm -Rf "${OBJROOT}/libcares-i386"
-rm -Rf "${OBJROOT}/libcares-x86_64"
+rm -Rf "${OBJROOT}/cares-i386"
+rm -Rf "${OBJROOT}/cares-x86_64"
