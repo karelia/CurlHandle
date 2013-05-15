@@ -2,9 +2,11 @@ build() {
 
 	echo "Building $2"
 
-	obj="$HOME/Library/Caches/CurlHandle/obj"
-	sym="$HOME/Library/Caches/CurlHandle/sym"
-	xcodebuild -project $1.xcodeproj -target $2 -configuration Debug OBJROOT="$obj" SYMROOT="$sym" > /tmp/build.log 
+	obj="$HOME/Library/Caches/CurlHandle/$2/obj"
+	sym="$HOME/Library/Caches/CurlHandle/$2/sym"
+    rm -rf "$obj"
+    rm -rf "$sym"
+	xcodebuild -project $1.xcodeproj -target $2 -configuration Debug OBJROOT="$obj" SYMROOT="$sym" > /tmp/build.log
 	res=$?
 
 	if [ $res -ne 0 ];
