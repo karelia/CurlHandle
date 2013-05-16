@@ -7,16 +7,30 @@
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
-            buildForTesting = "YES"
+            buildForTesting = "NO"
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "80080327166A952A004D39F5"
-               BuildableName = "libcares-i386"
-               BlueprintName = "libcares-i386"
+               BlueprintIdentifier = "809ADE7816029C38001D02E1"
+               BuildableName = "libcurl"
+               BlueprintName = "libcurl"
+               ReferencedContainer = "container:CURLHandle.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "227FCE591741462200C3029D"
+               BuildableName = "libcurl-tests-x86_64"
+               BlueprintName = "libcurl-tests-x86_64"
                ReferencedContainer = "container:CURLHandle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>

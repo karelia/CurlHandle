@@ -776,6 +776,7 @@
 			projectRoot = "";
 			targets = (
 				8DC2EF4F0486A6940098B216 /* CURLHandle */,
+				223FD091160B523700BE1C80 /* CURLHandleTests */,
 				809ADE7816029C38001D02E1 /* libcurl */,
 				227FCE591741462200C3029D /* libcurl-tests-x86_64 */,
 				809AE1BF1602BEF1001D02E1 /* libcurl-clean */,
@@ -785,7 +786,6 @@
 				80080323166A951E004D39F5 /* libcares-clean */,
 				80080327166A952A004D39F5 /* libcares-i386 */,
 				8008032B166A9535004D39F5 /* libcares-x86_64 */,
-				223FD091160B523700BE1C80 /* CURLHandleTests */,
 				22C9CFBE17035A0A004610FE /* Standalone Test */,
 			);
 		};
