@@ -9,4 +9,4 @@
 	url = https://github.com/karelia/libssh2_sftp-Cocoa-wrapper.git
 [submodule "CURLHandleSource/Tests/MockServer"]
 	path = CURLHandleSource/Tests/MockServer
-	url = git@github.com:karelia/MockServer.git
+	url = https://github.com/karelia/MockServer.git
