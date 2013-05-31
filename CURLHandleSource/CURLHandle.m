@@ -411,6 +411,8 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
             
             if (proxyHost && proxyPort)
             {
+				NSLog(@"CURLHandle: Using proxy %@:%@", proxyHost, proxyPort);
+				
                 LOAD_REQUEST_SET_OPTION(CURLOPT_PROXY, [proxyHost UTF8String]);
                 LOAD_REQUEST_SET_OPTION(CURLOPT_PROXYPORT, [proxyPort longValue]);
                 
