@@ -400,13 +400,14 @@ static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, si
                 proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesHTTPSPort)];
             }
             
+			/*	Disable FTP proxy for now as it seems to be messing up for at least one Karelia customer
             if (mProxies
                 && [scheme isEqualToString:@"ftp"]
                 && [[mProxies objectForKey:NSS(kSCPropNetProxiesFTPEnable)] boolValue] )
             {
                 proxyHost = (NSString *) [mProxies objectForKey:NSS(kSCPropNetProxiesFTPProxy)];
                 proxyPort = (NSNumber *)[mProxies objectForKey:NSS(kSCPropNetProxiesFTPPort)];
-            }
+            }*/
             
             if (proxyHost && proxyPort)
             {
