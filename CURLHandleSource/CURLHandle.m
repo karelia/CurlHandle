@@ -329,16 +329,19 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         proxyPort = (NSNumber *)[_proxies objectForKey:(NSString *)kSCPropNetProxiesHTTPSPort];
     }
 
+    /*	Disable FTP proxy for now as it seems to be messing up for at least one Karelia customer
     if (_proxies
         && [scheme isEqualToString:@"ftp"]
         && [[_proxies objectForKey:(NSString *)kSCPropNetProxiesFTPEnable] boolValue] )
     {
         proxyHost = (NSString *) [_proxies objectForKey:(NSString *)kSCPropNetProxiesFTPProxy];
         proxyPort = (NSNumber *)[_proxies objectForKey:(NSString *)kSCPropNetProxiesFTPPort];
-    }
+    }*/
 
     if (proxyHost && proxyPort)
     {
+	    NSLog(@"CURLHandle: Using proxy %@:%@", proxyHost, proxyPort);
+	    
         RETURN_IF_FAILED([self setOption:CURLOPT_PROXY string:proxyHost]);
         RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_PROXYPORT, [proxyPort longValue]));
 
@@ -412,6 +415,24 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             NSString *pair = [NSString stringWithFormat:@"%@: %@", field, value];
             [headers addObject:pair];
         }
+<<<<<<< HEAD
+=======
+        
+        // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
+        LOAD_REQUEST_SET_OPTION(CURLOPT_FTP_USE_EPSV, 0);
+        
+        // Set the URL
+        LOAD_REQUEST_SET_OPTION(CURLOPT_URL, [[[request URL] absoluteString] UTF8String]);
+        
+        // clear the buffers
+        [_headerBuffer setLength:0];	// empty out header buffer
+        
+        // Do the transfer
+        code = curl_easy_perform(mCURL);
+        
+        // The transfer may have had a header but not body data. In which case, still need to report the response
+        [self reportResponseIfNeeded];
+>>>>>>> v3.x
     }
 
     RETURN_IF_FAILED([self setOption:CURLOPT_HTTPHEADER withContentsOfArray:headers]);
@@ -487,6 +508,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     _URL = [[request URL] copy];    // assumes caller will have ensured _URL is suitable for overwriting
     [_headerBuffer setLength:0];
 
+<<<<<<< HEAD
     CURLcode code = CURLE_OK;
 
     // most crucially, the URL...
@@ -532,6 +554,33 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     RETURN_IF_FAILED([self setOption:CURLOPT_POSTQUOTE withContentsOfArray:[request curl_postTransferCommands]]);
 
     return CURLE_OK;
+=======
+	if (_cancelled)
+	{
+		written = -1;		// signify to Curl that we are stopping
+							// Do NOT send message; see "cancelLoadInBackground" comments
+	}
+	else	// Foreground, just write the bytes
+	{
+		if (header)
+		{
+            // Delegate might not care about the response
+            if ([[self delegate] respondsToSelector:@selector(handle:didReceiveResponse:)])
+            {
+                [_headerBuffer appendData:data];
+            }
+		}
+		else
+		{
+            // Once the body starts arriving, we know we have the full header, so can report that
+            [self reportResponseIfNeeded];
+            
+            // Report regular body data
+			[[self delegate] handle:self didReceiveData:data];
+		}
+	}
+	return written;
+>>>>>>> v3.x
 }
 
 #pragma mark - Cleanup
@@ -564,6 +613,51 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         [_uploadStream close];
     }
+<<<<<<< HEAD
+=======
+    
+    return result;
+}
+
+- (void)reportResponseIfNeeded;
+{
+    if ([_headerBuffer length])
+    {
+        NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
+        [_headerBuffer setLength:0];
+        
+        long code;
+        if (curl_easy_getinfo(mCURL, CURLINFO_HTTP_CODE, &code) == CURLE_OK)
+        {
+            char *urlBuffer;
+            if (curl_easy_getinfo(mCURL, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
+            {
+                NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
+                if (urlString)
+                {
+                    NSURL *url = [[NSURL alloc] initWithString:urlString];
+                    if (url)
+                    {
+                        NSURLResponse *response = [[CURLResponse alloc] initWithURL:url
+                                                                         statusCode:code
+                                                                       headerString:headerString];
+                        
+                        [[self delegate] handle:self didReceiveResponse:response];
+                        [response release];
+                        [url release];
+                    }
+                    
+                    [urlString release];
+                }
+                
+            }
+        }
+        [headerString release];
+    }
+}
+
+@synthesize delegate = _delegate;
+>>>>>>> v3.x
 
     [self.lists removeAllObjects];
 
