@@ -250,33 +250,33 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (CURLM*)multiCreate
 {
     CURLMcode result = CURLM_OK;
-    CURLM* multi = curl_multi_init();
-    if (multi)
+    _multi = curl_multi_init();
+    if (_multi)
     {
-        result = curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_callback);
+        result = curl_multi_setopt(_multi, CURLMOPT_TIMERFUNCTION, timeout_callback);
         if (result == CURLM_OK)
         {
-            result = curl_multi_setopt(multi, CURLMOPT_TIMERDATA, self);
+            result = curl_multi_setopt(_multi, CURLMOPT_TIMERDATA, self);
         }
 
         if (result == CURLM_OK)
         {
-            result = curl_multi_setopt(multi, CURLMOPT_SOCKETFUNCTION, socket_callback);
+            result = curl_multi_setopt(_multi, CURLMOPT_SOCKETFUNCTION, socket_callback);
         }
 
         if (result == CURLM_OK)
         {
-            result = curl_multi_setopt(multi, CURLMOPT_SOCKETDATA, self);
+            result = curl_multi_setopt(_multi, CURLMOPT_SOCKETDATA, self);
         }
 
         if (result != CURLM_OK)
         {
-            curl_multi_cleanup(multi);
-            multi = nil;
+            curl_multi_cleanup(_multi);
+            _multi = nil;
         }
     }
 
-    return multi;
+    return _multi;
 }
 
 - (void)cleanupMulti:(CURLM*)multi

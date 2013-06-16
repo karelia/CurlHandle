@@ -43,6 +43,7 @@
 
 @interface CURLMulti : NSObject
 {
+    CURLM *_multi;
     CURLM* _multiForSocket;
     NSMutableArray* _handles;
     NSMutableArray* _sockets;
