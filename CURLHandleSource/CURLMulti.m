@@ -580,12 +580,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)fireTimeoutNow
 {
-    // fire the timer right away - after it's fired, the timeout value will be reset
-    // to the current value of self.timeout
     dispatch_source_t timer = self.timer;
     if (timer)
     {
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 1, 0);
+        dispatch_source_set_timer(timer,
+                                  DISPATCH_TIME_NOW,    // fire as soon as possible
+                                  DISPATCH_TIME_FOREVER,// event handler will take care of rescheduling
+                                  0);                   // don't allow it to be delayed
     }
 }
 
