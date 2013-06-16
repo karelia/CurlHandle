@@ -62,7 +62,6 @@
 @property (strong, nonatomic) NSMutableArray* sockets;
 @property (assign, nonatomic) dispatch_queue_t queue;
 @property (assign, nonatomic) dispatch_source_t timer;
-@property (assign, nonatomic) int64_t timeout;
 
 @end
 
@@ -99,7 +98,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 @synthesize sockets = _sockets;
 @synthesize queue = _queue;
 @synthesize timer = _timer;
-@synthesize timeout = _timeout;
 @synthesize multiForSocket = _multiForSocket;
 
 #pragma mark - Object Lifecycle
@@ -547,10 +545,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         dispatch_source_t timer = self.timer;
         NSAssert(timer != nil, @"should still have a timer");
 
-        // store the actual timeout value we want to use
-        self.timeout = timeout * NSEC_PER_MSEC;
         CURLMultiLog(@"timeout changed to %ldms", (long)timeout);
-
+        
         if (timer)
         {
             if (timeout < 0)
@@ -564,7 +560,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             else
             {
                 dispatch_source_set_timer(timer,
-                                          dispatch_time(DISPATCH_TIME_NOW, self.timeout),// fire when timeout is reached
+                                          dispatch_time(DISPATCH_TIME_NOW, timeout * NSEC_PER_MSEC),// fire when timeout is reached
                                           DISPATCH_TIME_FOREVER,// event handler will take care of rescheduling
                                           0);                   // don't allow it to be delayed
                 
