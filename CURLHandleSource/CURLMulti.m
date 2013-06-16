@@ -522,7 +522,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 [self timeoutMulti:multi];
 
                 // reset the timer to use the current timeout value
-                dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
+                uint64_t timeout = self.timeout;
+                
+                dispatch_source_set_timer(timer,
+                                          dispatch_time(DISPATCH_TIME_NOW, timeout),// fire when timeout is reached
+                                          timeout,                                  // keep going after that
+                                          timeout / 100);                           // allow GCD to wander a bit
             });
 
             dispatch_source_set_cancel_handler(timer, ^{
