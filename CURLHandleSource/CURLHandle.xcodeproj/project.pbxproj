@@ -1181,6 +1181,7 @@
 		223FD0A7160B523700BE1C80 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1199,6 +1200,7 @@
 		223FD0A8160B523700BE1C80 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/built/include/curl-x86_64\"";
