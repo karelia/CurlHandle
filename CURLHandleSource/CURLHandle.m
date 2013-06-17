@@ -799,11 +799,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 #pragma mark - Multi Support
 
-- (BOOL)handledByMulti
-{
-    return self.multi != nil;
-}
-
 - (void)removedByMulti:(CURLMulti*)multi
 {
     if (multi)
@@ -828,11 +823,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 }
 
 #pragma mark Utilities
-
-- (BOOL)isCancelled
-{
-    return _delegate == nil;
-}
 
 - (BOOL)hasCompleted
 {

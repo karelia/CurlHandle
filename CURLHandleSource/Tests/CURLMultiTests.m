@@ -154,10 +154,10 @@
 
     [handle cancel];
 
-    STAssertTrue([handle isCancelled], @"should have been cancelled");
+    STAssertTrue(handle.state >= CURLHandleStateCanceling, @"should have been cancelled");
 
     // wait until the multi actually gets round to removing the handle
-    while ([handle handledByMulti])
+    while (handle.state != CURLHandleStateCompleted)
     {
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
     }

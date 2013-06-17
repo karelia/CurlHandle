@@ -19,26 +19,6 @@
 /** @name Testing Methods */
 
 /**
- Has cancel been called on this handle?
-
- @warning Not intended for general use.
-
- @return YES if the handle has been cancelled.
- */
-
-- (BOOL)isCancelled;
-
-/**
- Is this handle managed by a multi?
-
- @warning Not intended for general use.
-
- @return YES if the handle is managed by a multi.
- */
-
-- (BOOL)handledByMulti;
-
-/**
  Returns a new CURLMulti, for use in testing.
 
  Generally multi's are an internal implementation detail, 
