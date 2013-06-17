@@ -188,7 +188,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         }
         else
         {
-            [self failWithCode:code isMulti:NO];
+            [self completeWithCode:code isMulti:NO];
         }
     }
     
@@ -578,57 +578,56 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     CURLHandleLog(@"cancelled");
 
-    // setting the delegate to nil ensures that we don't send any more delegate messages, and
-    // also tells anything internal that wants to know that we've been cancelled
-    [_delegate release]; _delegate = nil;
-
     if (self.multi)
     {
         [self.multi stopManagingHandle:self];
     }
+    
+    [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
 }
 
-
-- (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode
+- (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
 {
     CURLHandleLog(@"completed with %@ code %d", code, isMulti ? @"multi" : @"easy");
     
-    if (code == (isMultiCode ? CURLM_OK : CURLE_OK))
+    NSError *error = nil;
+    if (code != (isMultiCode ? CURLM_OK : CURLE_OK))
     {
-        [self finish];
+        error = (isMultiCode ?
+                 [NSError errorWithDomain:CURLMcodeErrorDomain code:(CURLMcode)code userInfo:nil] :
+                 [self errorForURL:_URL code:(CURLcode)code]);
+        NSAssert(error, @"Failed to created error");
+    }
+    
+    [self completeWithError:error];
+}
+
+- (void)completeWithError:(NSError *)error;
+{
+    id <CURLHandleDelegate> delegate = self.delegate;
+    
+    if (!error)
+    {
+        CURLHandleLog(@"finished");
+        
+        [self notifyDelegateOfResponseIfNeeded];
+        if ([delegate respondsToSelector:@selector(handleDidFinish:)])
+        {
+            [delegate handleDidFinish:self];
+        }
     }
     else
     {
-        [self failWithCode:code isMulti:isMultiCode];
+        CURLHandleLog(@"failed with error %@", error);
+        
+        if ([delegate respondsToSelector:@selector(handle:didFailWithError:)])
+        {
+            [delegate handle:self didFailWithError:error];
+        }
     }
 
     [self cleanupIncludingHandle:YES];
 }
-
-- (void)finish;
-{
-    CURLHandleLog(@"finished");
-    [self notifyDelegateOfResponseIfNeeded];
-    if ([_delegate respondsToSelector:@selector(handleDidFinish:)])
-    {
-        [self.delegate handleDidFinish:self];
-    }
-}
-
-- (void)failWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
-{
-    NSError* error = (isMultiCode ?
-                      [NSError errorWithDomain:CURLMcodeErrorDomain code:(CURLMcode)code userInfo:nil] :
-                      [self errorForURL:_URL code:(CURLcode)code]);
-    CURLHandleLog(@"failed with error %@", error);
-
-    if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
-    {
-        [self.delegate handle:self didFailWithError:error];
-    }
-}
-
-
 
 #pragma mark Synchronous Loading
 
@@ -645,16 +644,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         result = curl_easy_perform(self.curl);
     }
     
-    if (result == CURLE_OK)
-    {
-        [self finish];
-    }
-    else
-    {
-        [self failWithCode:result isMulti:NO];
-    }
-    
-    [self cleanupIncludingHandle:NO];
+    [self completeWithCode:result isMulti:NO];
 }
 
 #pragma mark Post-Request Info
@@ -815,7 +805,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     self.multi = nil;
-    [_delegate release]; _delegate = nil;
 }
 
 + (CURLMulti*)standaloneMultiForTestPurposes

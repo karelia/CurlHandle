@@ -59,7 +59,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 @property (readonly, strong) id <CURLHandleDelegate> delegate; // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
 
 /**
- Stops the request — and delivery of delegate messages — as quickly as possible
+ Stops the request as quickly as possible. Will report back a NSURLErrorCancelled to the delegate
  */
 
 - (void)cancel;
