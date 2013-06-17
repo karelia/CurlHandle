@@ -80,6 +80,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @implementation CURLHandle
 
 @synthesize delegate = _delegate;
+@synthesize state = _state;
+@synthesize error = _error;
 @synthesize lists = _lists;
 @synthesize multi = _multi;
 
@@ -204,6 +206,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     [_delegate release];
     [_URL release];
+    [_error release];
 	[_headerBuffer release];
 	[_proxies release];
     [_uploadStream release];
@@ -576,6 +579,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)cancel;
 {
+    _state = CURLHandleStateCanceling;
     CURLHandleLog(@"cancelled");
 
     if (self.multi)
@@ -604,6 +608,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithError:(NSError *)error;
 {
+    _error = [error copy];
+    _state = CURLHandleStateCompleted;
+    
     id <CURLHandleDelegate> delegate = self.delegate;
     
     if (!error)
