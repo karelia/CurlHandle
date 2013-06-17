@@ -55,9 +55,7 @@
 
 #pragma mark - Private Properties
 
-@property (strong, nonatomic) NSMutableArray* pendingAdditions;
-@property (strong, nonatomic) NSMutableArray* pendingRemovals;
-@property (strong, nonatomic) NSMutableArray* handles;
+@property (readonly, copy, nonatomic) NSArray* handles;
 @property (assign, nonatomic) CURLM* multiForSocket;
 @property (strong, nonatomic) NSMutableArray* sockets;
 @property (assign, nonatomic) dispatch_queue_t queue;
@@ -92,9 +90,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Synthesized Properties
 
-@synthesize handles = _handles;
-@synthesize pendingAdditions = _pendingAdditions;
-@synthesize pendingRemovals = _pendingRemovals;
 @synthesize sockets = _sockets;
 @synthesize queue = _queue;
 @synthesize timer = _timer;
@@ -120,9 +115,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         if ([self createTimer])
         {
-            self.handles = [NSMutableArray array];
-            self.pendingAdditions = [NSMutableArray array];
-            self.pendingRemovals = [NSMutableArray array];
+            _handles = [[NSMutableArray alloc] init];
             self.sockets = [NSMutableArray array];
 #if COUNT_INSTANCES
             ++gInstanceCount;
@@ -144,8 +137,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert((_multiForSocket == nil) && (_timer == nil) && (_queue == nil), @"should have been shut down by the time we're dealloced");
 
     [_handles release];
-    [_pendingRemovals release];
-    [_pendingAdditions release];
     [_sockets release];
 
 #if COUNT_INSTANCES
@@ -188,36 +179,18 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)manageHandle:(CURLHandle*)handle
 {
     NSAssert(self.queue, @"need queue");
-    NSAssert(self.pendingAdditions, @"need additions array");
 
     dispatch_async(self.queue, ^{
-        if ([self.pendingRemovals containsObject:handle])
-        {
-            [self.pendingRemovals removeObject:handle];
-        }
-        else
-        {
-            [self.pendingAdditions addObject:handle];
-        }
-        [self fireTimeoutNow];
+        [self addHandle:handle];
     });
 }
 
 - (void)stopManagingHandle:(CURLHandle*)handle
 {
     NSAssert(self.queue, @"need queue");
-    NSAssert(self.pendingRemovals, @"need removals array");
 
     dispatch_async(self.queue, ^{
-        if ([self.pendingAdditions containsObject:handle])
-        {
-            [self.pendingAdditions removeObject:handle];
-        }
-        else if ([self.handles containsObject:handle])
-        {
-            [self.pendingRemovals addObject:handle];
-        }
-        [self fireTimeoutNow];
+        [self removeHandle:handle];
     });
 }
 
@@ -278,16 +251,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLMultiLog(@"cleaning up");
 
-    [self.pendingAdditions removeAllObjects];
-    [self.pendingRemovals removeAllObjects];
-    [self.pendingRemovals addObjectsFromArray:self.handles];
+    for (CURLHandle *aHandle in self.handles)
+    {
+        [self removeHandle:aHandle];
+    }
 
     // give handles a last chance to process
     [self multiTimedOut:multi];
 
-    self.handles = nil;
-    self.pendingRemovals = nil;
-    self.pendingAdditions = nil;
+    [_handles release]; _handles = nil;
     self.sockets = nil;
 
     CURLMcode result = curl_multi_cleanup(multi);
@@ -301,16 +273,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)processMulti:(CURLM*)multi action:(int)action forSocket:(int)socket
 {
-    BOOL isTimeout = socket == CURL_SOCKET_TIMEOUT;
-    BOOL gotAdditions = [self.pendingAdditions count] > 0;
-
-    if (isTimeout)
-    {
-        [self performAdditionsWithMulti:multi];
-    }
+    //BOOL isTimeout = socket == CURL_SOCKET_TIMEOUT;
 
     // process the multi
-    if (!isTimeout || !gotAdditions)
+    //if (!isTimeout)
     {
         int running;
         CURLMultiLogDetail(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action]);
@@ -343,16 +309,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                         [handle retain];
 
                         // the order is important here - we remove the handle from the multi first...
-                        [self multi:multi removeHandle:handle];
+                        [self removeHandle:handle];
 
                         // ...then tell the easy handle to complete, which can cause curl_easy_cleanup to be called
                         [handle completeWithCode:code isMulti:NO];
 
                         // ...then tell it that it's no longer in use by the multi, which breaks the reference cycle between us
-                        [handle removedByMulti:self];
-
-                        // also need to make sure that it's not already on the removal list
-                        [self.pendingRemovals removeObject:handle];
+                        //[handle removedByMulti:self];
 
                         [handle autorelease];
                     }
@@ -376,54 +339,41 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         }
     }
 
-    [self performRemovalsWithMulti:multi];
-
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
 }
 
-- (void)performAdditionsWithMulti:(CURLM*)multi
+- (NSArray *)handles; { return [[_handles copy] autorelease]; }
+
+- (void)addHandle:(CURLHandle *)handle;
 {
-    // process the pending additions
-    for (CURLHandle* handle in self.pendingAdditions)
-    {
-        NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
-        CURLMcode result = curl_multi_add_handle(multi, [handle curl]);
-        if (result == CURLM_OK)
-        {
-            CURLMultiLog(@"added handle %@", handle);
-            [self.handles addObject:handle];
-        }
-        else
-        {
-            CURLMultiLogError(@"failed to add handle %@", handle);
-            [handle completeWithCode:result isMulti:YES];
-        }
-    }
+    NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
     
-    [self.pendingAdditions removeAllObjects];
-}
-
-- (void)performRemovalsWithMulti:(CURLM*)multi
-{
-    // process the pending removals
-    for (CURLHandle* handle in self.pendingRemovals)
+    CURLMcode result = curl_multi_add_handle(_multi, [handle curl]);
+    if (result == CURLM_OK)
     {
-        NSAssert([self.handles containsObject:handle], @"we should be managing this handle");
-        [self multi:multi removeHandle:handle];
-        [handle removedByMulti:self];
+        CURLMultiLog(@"added handle %@", handle);
+        [_handles addObject:handle];
     }
-    [self.pendingRemovals removeAllObjects];
+    else
+    {
+        CURLMultiLogError(@"failed to add handle %@", handle);
+        [handle completeWithCode:result isMulti:YES];
+    }
 }
 
-- (void)multi:(CURLM*)multi removeHandle:(CURLHandle*)handle
+- (void)removeHandle:(CURLHandle *)handle;
 {
+    NSAssert([_handles containsObject:handle], @"we should be managing this handle");
+    
     CURLMultiLog(@"removed handle %@", handle);
-    self.multiForSocket = multi;
-    CURLMcode result = curl_multi_remove_handle(multi, [handle curl]);
+    self.multiForSocket = _multi;
+    CURLMcode result = curl_multi_remove_handle(_multi, [handle curl]);
     self.multiForSocket = nil;
     
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
-    [self.handles removeObject:handle];
+    [_handles removeObject:handle];
+    
+    [handle removedByMulti:self];
 }
 
 - (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
