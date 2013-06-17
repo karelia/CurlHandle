@@ -115,4 +115,9 @@
 
 - (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(CURLSocket*)socket raw:(int)raw required:(BOOL)required;
 
+/**
+ The serial queue the instance schedules sources on
+ */
+@property (readonly, assign, nonatomic) dispatch_queue_t queue;
+
 @end
