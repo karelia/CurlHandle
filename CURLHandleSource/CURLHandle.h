@@ -56,6 +56,8 @@ extern NSString * const CURLSHcodeErrorDomain;
 //  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi;
 
+@property (readonly, strong) id <CURLHandleDelegate> delegate; // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
+
 /**
  Stops the request — and delivery of delegate messages — as quickly as possible
  */

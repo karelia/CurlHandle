@@ -72,7 +72,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (size_t) curlSendDataTo:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @property (strong, nonatomic) NSMutableArray* lists;
-@property (strong, nonatomic) id <CURLHandleDelegate> delegate; // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
 @property (strong, nonatomic) CURLMulti* multi;
 
 @end
@@ -176,7 +175,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             multi = [CURLMulti sharedInstance];
         }
         
-        self.delegate = delegate;
+        _delegate = [delegate retain];
 
         // Turn automatic redirects off by default, so can properly report them to delegate
         curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
@@ -545,7 +544,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
     // (the curl_easy_reset below should fix this anyway by unregistering the callbacks, but let's be paranoid...)
-    self.delegate = nil;
+    [_delegate release]; _delegate = nil;
 
     if (_curl)
     {
@@ -581,7 +580,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     // setting the delegate to nil ensures that we don't send any more delegate messages, and
     // also tells anything internal that wants to know that we've been cancelled
-    self.delegate = nil;
+    [_delegate release]; _delegate = nil;
 
     if (self.multi)
     {
@@ -635,7 +634,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
 {
-    self.delegate = delegate;
+    NSAssert(_delegate == nil, @"CURLHandle can only service a single request at a time");
+    _delegate = [delegate retain];
     
     [_URL release]; // -setupRequest:É will fill it back in
     CURLcode result = [self setupRequest:request credential:credential];
@@ -815,7 +815,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     self.multi = nil;
-    self.delegate = nil;
+    [_delegate release]; _delegate = nil;
 }
 
 + (CURLMulti*)standaloneMultiForTestPurposes
