@@ -79,7 +79,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 @implementation CURLHandle
 
-@synthesize delegate = _delegate;
 @synthesize state = _state;
 @synthesize error = _error;
 @synthesize lists = _lists;
@@ -168,18 +167,32 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark Lifecycle
 // -----------------------------------------------------------------------------
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id<CURLHandleDelegate>)delegate delegateQueue:(NSOperationQueue *)queue;
 {
-    return [self initWithRequest:request credential:credential delegate:delegate multi:[CURLMultiHandle sharedInstance]];
+    return [self initWithRequest:request
+                      credential:credential
+                        delegate:delegate delegateQueue:queue
+                           multi:[CURLMultiHandle sharedInstance]];
 }
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMultiHandle*)multi
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLMultiHandle *)multi;
 {
     NSParameterAssert(multi);
     
     if (self = [self init])
     {
         _delegate = [delegate retain];
+        
+        if (queue)
+        {
+            _delegateQueue = [queue retain];
+        }
+        else
+        {
+            // Make our own queue for the delegate to use
+            _delegateQueue = [[NSOperationQueue alloc] init];
+            _delegateQueue.maxConcurrentOperationCount = 1;
+        }
 
         // Turn automatic redirects off by default, so can properly report them to delegate
         curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
@@ -207,6 +220,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     [self cleanupIncludingHandle:YES];
 
     [_delegate release];
+    [_delegateQueue release];
     [_URL release];
     [_error release];
 	[_headerBuffer release];
@@ -550,6 +564,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
     // (the curl_easy_reset below should fix this anyway by unregistering the callbacks, but let's be paranoid...)
     [_delegate release]; _delegate = nil;
+    [_delegateQueue release]; _delegateQueue = nil;
 
     if (_curl)
     {
@@ -616,30 +631,37 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     _error = [error copy];
     _state = CURLHandleStateCompleted;
-    
-    id <CURLHandleDelegate> delegate = self.delegate;
+        
+    // We run cleanup after delegate messages are all delivered if possible
     
     if (!error)
     {
         CURLHandleLog(@"finished");
         
         [self notifyDelegateOfResponseIfNeeded];
-        if ([delegate respondsToSelector:@selector(handleDidFinish:)])
+        
+        if (![self tryToPerformSelectorOnDelegate:@selector(handleDidFinish:) usingBlock:^{
+            
+            [self.delegate handleDidFinish:self];
+            [self cleanupIncludingHandle:YES];
+        }])
         {
-            [delegate handleDidFinish:self];
+            [self cleanupIncludingHandle:YES];
         }
     }
     else
     {
         CURLHandleLog(@"failed with error %@", error);
         
-        if ([delegate respondsToSelector:@selector(handle:didFailWithError:)])
+        if (![self tryToPerformSelectorOnDelegate:@selector(handle:didFailWithError:) usingBlock:^{
+            
+            [self.delegate handle:self didFailWithError:error];
+            [self cleanupIncludingHandle:YES];
+        }])
         {
-            [delegate handle:self didFailWithError:error];
+            [self cleanupIncludingHandle:YES];
         }
     }
-
-    [self cleanupIncludingHandle:YES];
 }
 
 #pragma mark Synchronous Loading
@@ -835,11 +857,37 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return [NSString stringWithFormat:@"<EASY %p (%p)>", self, self.curl];
 }
 
+#pragma mark Delegate
+
+@synthesize delegate = _delegate;
+
+/* Runs the block on our delegate queue.
+ * If the delegate doesn't respond, the block is not run/enqueued
+ */
+- (BOOL)tryToPerformSelectorOnDelegate:(SEL)selector usingBlock:(void (^)(void))block;
+{
+    if ([self.delegate respondsToSelector:selector])
+    {
+        if (_delegateQueue)
+        {
+            [_delegateQueue addOperationWithBlock:block];
+        }
+        else
+        {
+            block();
+        }
+        
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
+}
 
 - (void)notifyDelegateOfResponseIfNeeded;
 {
     // If a response has been buffered, send that off
-    
     if ([_headerBuffer length])
     {
         NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
@@ -858,7 +906,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                     if (url)
                     {
                         NSURLResponse *response = [CURLResponse responseWithURL:url statusCode:code headerString:headerString];
-                        [self.delegate handle:self didReceiveResponse:response];
+                        
+                        [self tryToPerformSelectorOnDelegate:@selector(handle:didReceiveResponse:) usingBlock:^{
+                            [self.delegate handle:self didReceiveResponse:response];
+                        }];
 
                         [url release];
                     }
@@ -900,7 +951,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             [self notifyDelegateOfResponseIfNeeded];
 
             // Report regular body data
-			[self.delegate handle:self didReceiveData:data];
+            [self tryToPerformSelectorOnDelegate:@selector(handle:didReceiveData:) usingBlock:^{
+                [self.delegate handle:self didReceiveData:data];
+            }];
 		}
 	}
     else
@@ -921,27 +974,27 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
         if (result < 0)
         {
-            if ([self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)])
-            {
+            [self tryToPerformSelectorOnDelegate:@selector(handle:didReceiveDebugInformation:ofType:) usingBlock:^{
+                
                 NSError *error = [_uploadStream streamError];
-
+                
                 [self.delegate handle:self
            didReceiveDebugInformation:[NSString stringWithFormat:@"Read failed: %@", [error debugDescription]]
                                ofType:CURLINFO_HEADER_IN];
-            }
+            }];
 
             return CURL_READFUNC_ABORT;
         }
 
-        if (result >= 0 && [self.delegate respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
-        {
+        if (result >= 0) [self tryToPerformSelectorOnDelegate:@selector(handle:willSendBodyDataOfLength:) usingBlock:^{
+            
             CURLHandleLog(@"sending %ld bytes from %p", inSize * inNumber, inPtr);
             [self.delegate handle:self willSendBodyDataOfLength:result];
             if (_uploadStream.streamStatus == NSStreamStatusAtEnd)
             {
                 [self.delegate handle:self willSendBodyDataOfLength:0];
             }
-        }
+        }];
     }
     else
     {
@@ -954,9 +1007,15 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (enum curl_khstat)didFindHostFingerprint:(const struct curl_khkey *)foundKey knownFingerprint:(const struct curl_khkey *)knownkey match:(enum curl_khmatch)match;
 {
-    if ([self.delegate respondsToSelector:@selector(handle:didFindHostFingerprint:knownFingerprint:match:)])
+    __block enum curl_khstat result;
+    
+    if ([self tryToPerformSelectorOnDelegate:@selector(handle:didFindHostFingerprint:knownFingerprint:match:) usingBlock:^{
+        
+        result = [self.delegate handle:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
+    }])
     {
-        return [self.delegate handle:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
+        [_delegateQueue waitUntilAllOperationsAreFinished]; // ideally ought to wait till just the op finishes
+        return result;
     }
     else
     {
@@ -980,7 +1039,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
 {
     BOOL delegateResponds = [self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)];
-    if (LOG_DEBUG || delegateResponds)
+    if (delegateResponds || LOG_DEBUG)
     {
         BOOL shouldProcess = LOG_DEBUG || (infoType == CURLINFO_HEADER_IN) || (infoType == CURLINFO_HEADER_OUT);
         if (shouldProcess)
@@ -1016,10 +1075,10 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
 
             CURLHandleLog(@"%@ - %@", [self.class nameForType:infoType], string);
 
-            if (delegateResponds)
-            {
+            [self tryToPerformSelectorOnDelegate:@selector(handle:didReceiveDebugInformation:ofType:) usingBlock:^{
+                
                 [self.delegate handle:self didReceiveDebugInformation:string ofType:infoType];
-            }
+            }];
 
             [string release];
         }

@@ -63,7 +63,10 @@
         self.transcript = [NSMutableString stringWithString:@""];
     }
 
+    @synchronized(self.transcript)
+    {
     [self.transcript appendFormat:@"%@: %@", typeName, string];
+    }
 }
 
 - (void)handleDidFinish:(CURLHandle *)handle

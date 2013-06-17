@@ -58,7 +58,7 @@
     [multi startup];
 
     NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
     [self runUntilPaused];
 
@@ -84,7 +84,7 @@
         NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"TestContent.txt"];
 
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
+        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
         [self runUntilPaused];
 
@@ -117,7 +117,7 @@
         request.shouldUseCurlHandle = YES;
         [request curl_setCreateIntermediateDirectories:1];
         [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
-        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
+        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
         [self runUntilPaused];
 
@@ -145,7 +145,7 @@
 
     NSURL* largeFile = [NSURL URLWithString:@"https://github.com/karelia/CurlHandle/archive/master.zip"];
     NSURLRequest* request = [NSURLRequest requestWithURL:largeFile];
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:multi];
+    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
     // CURL seems to die horribly if we create and shutdown the multi without actually adding at least one easy handle to it - so wait until
     // we've at least received the response

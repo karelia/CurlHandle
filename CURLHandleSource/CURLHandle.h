@@ -37,6 +37,7 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
     CURLMultiHandle               *_multi;
     NSURL                   *_URL;
 	id <CURLHandleDelegate> _delegate;
+    NSOperationQueue        *_delegateQueue;
     CURLHandleState         _state;
     NSError                 *_error;
     
@@ -63,7 +64,10 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
 //  Delegate messages are delivered on an arbitrary thread; you should bounce over a specific thread if required for thread safety, or doing any significant work
 //
 //  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate __attribute((nonnull(1)));
+- (id)initWithRequest:(NSURLRequest *)request
+           credential:(NSURLCredential *)credential
+             delegate:(id <CURLHandleDelegate>)delegate
+        delegateQueue:(NSOperationQueue *)queue __attribute((nonnull(1)));
 
 @property (readonly, strong) id <CURLHandleDelegate> delegate; // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
 

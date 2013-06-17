@@ -163,7 +163,7 @@ static TestMode gModeToUse;
     }
     else
     {
-       handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:self.multi];
+       handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:self.multi];
     }
     
     return handle;
