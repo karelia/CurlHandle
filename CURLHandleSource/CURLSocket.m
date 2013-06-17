@@ -7,7 +7,7 @@
 //
 
 #import "CURLSocket.h"
-#import "CURLMulti.h"
+#import "CURLMultiHandle.h"
 
 #import <curl/curl.h>
 
@@ -44,7 +44,7 @@
     [super dealloc];
 }
 
-- (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMulti*)multi
+- (void)updateSourcesForSocket:(int)socket mode:(NSInteger)mode multi:(CURLMultiHandle*)multi
 {
     // We call back to the multi to do the actual work - this class really just exists as
     // a place to group together the reader and writer sources corresponding to a socket.

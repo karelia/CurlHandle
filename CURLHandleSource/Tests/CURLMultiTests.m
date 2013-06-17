@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
-#import "CURLMulti.h"
+#import "CURLMultiHandle.h"
 #import "CURLHandleBasedTest.h"
 #import "CURLHandle+TestingSupport.h"
 
@@ -42,7 +42,7 @@
 
 - (void)testStartupShutdown
 {
-    CURLMulti* multi = [[CURLMulti alloc] init];
+    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
 
     [multi startup];
 
@@ -53,7 +53,7 @@
 
 - (void)testHTTPDownload
 {
-    CURLMulti* multi = [[CURLMulti alloc] init];
+    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
 
     [multi startup];
 
@@ -74,7 +74,7 @@
 
 - (void)testFTPDownload
 {
-    CURLMulti* multi = [[CURLMulti alloc] init];
+    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
 
     [multi startup];
     
@@ -100,7 +100,7 @@
 
 - (void)testFTPUpload
 {
-    CURLMulti* multi = [[CURLMulti alloc] init];
+    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
 
     [multi startup];
     
@@ -139,7 +139,7 @@
 {
     self.pauseOnResponse = YES;
 
-    CURLMulti* multi = [[CURLMulti alloc] init];
+    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
 
     [multi startup];
 

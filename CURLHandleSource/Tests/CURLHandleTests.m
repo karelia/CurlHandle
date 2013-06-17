@@ -8,7 +8,7 @@
 
 #import "CURLHandleBasedTest.h"
 #import "CURLHandle+TestingSupport.h"
-#import "CURLMulti.h"
+#import "CURLMultiHandle.h"
 
 #import "NSURLRequest+CURLHandle.h"
 
@@ -39,7 +39,7 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 
 @interface CURLHandleTests : CURLHandleBasedTest
 
-@property (strong, nonatomic) CURLMulti* multi;
+@property (strong, nonatomic) CURLMultiHandle* multi;
 @property (assign, nonatomic) TestMode mode;
 
 @end
@@ -133,14 +133,14 @@ static TestMode gModeToUse;
             if (!self.multi)
             {
                 NSLog(@"Using custom multi");
-                self.multi = [[[CURLMulti alloc] init] autorelease];
+                self.multi = [[[CURLMultiHandle alloc] init] autorelease];
                 [self.multi startup];
             }
             break;
 
         case TEST_SYNCHRONOUS:
         case TEST_WITH_SHARED_MULTI:
-            self.multi = [CURLMulti sharedInstance];
+            self.multi = [CURLMultiHandle sharedInstance];
             break;
 
         default:

@@ -13,7 +13,7 @@
 #define CURLHandleLog(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLHandleLog NSLog
 #endif
 
-@class CURLMulti;
+@class CURLMultiHandle;
 
 @protocol CURLHandleDelegate;
 
@@ -34,7 +34,7 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
 @interface CURLHandle : NSObject
 {
 	CURL                    *_curl;                         /*" Pointer to the actual CURL object that does all the hard work "*/
-    CURLMulti               *_multi;
+    CURLMultiHandle               *_multi;
     NSURL                   *_URL;
 	id <CURLHandleDelegate> _delegate;
     CURLHandleState         _state;

@@ -9,7 +9,7 @@
 #import "CURLHandle.h"
 #import "CURLHandle+MultiSupport.h"
 #import "CURLHandle+TestingSupport.h"
-#import "CURLMulti.h"
+#import "CURLMultiHandle.h"
 #import "CURLResponse.h"
 #import "CURLList.h"
 
@@ -72,7 +72,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (size_t) curlSendDataTo:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @property (strong, nonatomic) NSMutableArray* lists;
-@property (strong, nonatomic, readonly) CURLMulti* multi;
+@property (strong, nonatomic, readonly) CURLMultiHandle* multi;
 
 @end
 
@@ -170,10 +170,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
 {
-    return [self initWithRequest:request credential:credential delegate:delegate multi:[CURLMulti sharedInstance]];
+    return [self initWithRequest:request credential:credential delegate:delegate multi:[CURLMultiHandle sharedInstance]];
 }
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMultiHandle*)multi
 {
     NSParameterAssert(multi);
     
@@ -805,15 +805,15 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 #pragma mark - Multi Support
 
-+ (CURLMulti*)standaloneMultiForTestPurposes
++ (CURLMultiHandle*)standaloneMultiForTestPurposes
 {
-    CURLMulti* multi = [[[CURLMulti alloc] init] autorelease];
+    CURLMultiHandle* multi = [[[CURLMultiHandle alloc] init] autorelease];
     [multi startup];
 
     return multi;
 }
 
-+ (void)cleanupStandaloneMulti:(CURLMulti*)multi
++ (void)cleanupStandaloneMulti:(CURLMultiHandle*)multi
 {
     [multi shutdown];
 }

@@ -119,8 +119,8 @@
 		22002EDD161097EC00464D33 /* CURLProtocolTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22002EDC161097EC00464D33 /* CURLProtocolTests.m */; };
 		220C118E1715A1CB0086F199 /* upload-root.c in Sources */ = {isa = PBXBuildFile; fileRef = 220C118D1715A1CB0086F199 /* upload-root.c */; };
 		220C11A3171606310086F199 /* Documentation in Resources */ = {isa = PBXBuildFile; fileRef = 220C11A2171606310086F199 /* Documentation */; };
-		221EAD11160B167900E4F270 /* CURLMulti.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMulti.h */; };
-		221EAD12160B167900E4F270 /* CURLMulti.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMulti.m */; };
+		221EAD11160B167900E4F270 /* CURLMultiHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMultiHandle.h */; };
+		221EAD12160B167900E4F270 /* CURLMultiHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMultiHandle.m */; };
 		221F8B7B17255229004E7B9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
 		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
@@ -312,8 +312,8 @@
 		220C11A5171606A90086F199 /* .appledoc.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = .appledoc.plist; path = ../.appledoc.plist; sourceTree = "<group>"; };
 		220C11A617160E250086F199 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StandaloneGcdTest.m; sourceTree = "<group>"; };
-		221EAD0F160B167900E4F270 /* CURLMulti.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMulti.h; sourceTree = "<group>"; };
-		221EAD10160B167900E4F270 /* CURLMulti.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMulti.m; sourceTree = "<group>"; };
+		221EAD0F160B167900E4F270 /* CURLMultiHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMultiHandle.h; sourceTree = "<group>"; };
+		221EAD10160B167900E4F270 /* CURLMultiHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMultiHandle.m; sourceTree = "<group>"; };
 		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		223FD094160B523700BE1C80 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
@@ -578,8 +578,8 @@
 				32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */,
 				22C9D0061704C627004610FE /* CURLList.h */,
 				22C9D0071704C627004610FE /* CURLList.m */,
-				221EAD0F160B167900E4F270 /* CURLMulti.h */,
-				221EAD10160B167900E4F270 /* CURLMulti.m */,
+				221EAD0F160B167900E4F270 /* CURLMultiHandle.h */,
+				221EAD10160B167900E4F270 /* CURLMultiHandle.m */,
 				2270F4AA16109133009B6F98 /* CURLRequest.h */,
 				2270F4AB16109133009B6F98 /* CURLRequest.m */,
 				22731036161305FF00D6D49E /* CURLSocket.h */,
@@ -680,7 +680,7 @@
 			files = (
 				79B96CBF0A6360F90060AC12 /* CURLHandle.h in Headers */,
 				27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */,
-				221EAD11160B167900E4F270 /* CURLMulti.h in Headers */,
+				221EAD11160B167900E4F270 /* CURLMultiHandle.h in Headers */,
 				22767ED9161078F2008D0848 /* NSDictionary+CURLHandle.h in Headers */,
 				2270F4A116108D44009B6F98 /* NSURLRequest+CURLHandle.h in Headers */,
 				2270F4A7161090AB009B6F98 /* CURLResponse.h in Headers */,
@@ -1018,7 +1018,7 @@
 			files = (
 				79B96CC00A6360F90060AC12 /* CURLHandle.m in Sources */,
 				27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */,
-				221EAD12160B167900E4F270 /* CURLMulti.m in Sources */,
+				221EAD12160B167900E4F270 /* CURLMultiHandle.m in Sources */,
 				22767EDA161078F2008D0848 /* NSDictionary+CURLHandle.m in Sources */,
 				2270F4A8161090AB009B6F98 /* CURLResponse.m in Sources */,
 				2270F4AD16109133009B6F98 /* CURLRequest.m in Sources */,

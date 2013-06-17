@@ -1,5 +1,5 @@
 //
-//  CURLMulti.m
+//  CURLMultiHandle.m
 //  CURLHandle
 //
 //  Created by Sam Deane on 20/09/2012.
@@ -45,7 +45,7 @@
  */
 
 
-#import "CURLMulti.h"
+#import "CURLMultiHandle.h"
 
 #import "CURLHandle.h"
 #import "CURLHandle+MultiSupport.h"
@@ -57,7 +57,7 @@
 @end
 
 
-@interface CURLMulti()
+@interface CURLMultiHandle()
 
 #pragma mark - Private Properties
 
@@ -92,7 +92,7 @@ static int timeout_callback(CURLM *multi, long timeout_ms, void *userp);
 static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *socketp);
 
 
-@implementation CURLMulti
+@implementation CURLMultiHandle
 
 #pragma mark - Synthesized Properties
 
@@ -103,12 +103,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Object Lifecycle
 
-+ (CURLMulti*)sharedInstance;
++ (CURLMultiHandle*)sharedInstance;
 {
-    static CURLMulti* instance = nil;
+    static CURLMultiHandle* instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instance = [[CURLMulti alloc] init];
+        instance = [[CURLMultiHandle alloc] init];
         [instance startup];
     });
 
@@ -608,7 +608,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 int timeout_callback(CURLM *multi, long timeout_ms, void *userp)
 {
-    CURLMulti* source = userp;
+    CURLMultiHandle* source = userp;
     [source updateTimeout:timeout_ms];
 
     return CURLM_OK;
@@ -616,7 +616,7 @@ int timeout_callback(CURLM *multi, long timeout_ms, void *userp)
 
 int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *socketp)
 {
-    CURLMulti* multi = userp;
+    CURLMultiHandle* multi = userp;
     NSCAssert([multi findHandleWithEasyHandle:easy] != nil, @"socket callback for a handle %p that isn't managed by %@", easy, multi);
 
     [multi multiUpdateSocket:socketp raw:s what:what];

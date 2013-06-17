@@ -1,5 +1,5 @@
 //
-//  CURLMulti.h
+//  CURLMultiHandle.h
 //  CURLHandle
 //
 //  Created by Sam Deane on 20/09/2012.
@@ -41,7 +41,7 @@
  * happens that needs attention.
  */
 
-@interface CURLMulti : NSObject
+@interface CURLMultiHandle : NSObject
 {
     CURLM *_multi;
     CURLM* _multiForSocket;
@@ -60,7 +60,7 @@
  * @return The shared instance.
  */
 
-+ (CURLMulti*)sharedInstance;
++ (CURLMultiHandle*)sharedInstance;
 
 
 /** Prepare the multi for work. Needs to be called once before addHandle is called. Should be matched with a call to shutdown
