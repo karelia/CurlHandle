@@ -19,6 +19,15 @@
 /** @name Testing Methods */
 
 /**
+ Creates a CURLHandle instance tied to a specific multi handle
+ 
+ @warning Not intended for general use.
+ 
+ @return A new CURLHandle object.
+ */
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi __attribute((nonnull(1,4)));
+
+/**
  Returns a new CURLMulti, for use in testing.
 
  Generally multi's are an internal implementation detail, 

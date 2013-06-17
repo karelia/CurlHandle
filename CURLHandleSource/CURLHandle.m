@@ -168,15 +168,17 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark Lifecycle
 // -----------------------------------------------------------------------------
 
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+{
+    return [self initWithRequest:request credential:credential delegate:delegate multi:[CURLMulti sharedInstance]];
+}
+
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi
 {
+    NSParameterAssert(multi);
+    
     if (self = [self init])
     {
-        if (!multi)
-        {
-            multi = [CURLMulti sharedInstance];
-        }
-        
         _delegate = [delegate retain];
 
         // Turn automatic redirects off by default, so can properly report them to delegate

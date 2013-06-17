@@ -7,6 +7,7 @@
 //
 
 #import "CURLHandleBasedTest.h"
+#import "CURLHandle+TestingSupport.h"
 #import "CURLMulti.h"
 
 #import "NSURLRequest+CURLHandle.h"

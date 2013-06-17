@@ -92,7 +92,7 @@
 
 - (void)startLoadingWithCredential:(NSURLCredential *)credential;
 {
-    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self multi:nil];
+    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self];
     self.handle = handle;
     [handle release];
 }
