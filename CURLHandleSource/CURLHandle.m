@@ -584,10 +584,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     if (self.multi)
     {
-        [self.multi stopManagingHandle:self];
+        [self.multi cancelHandle:self];
     }
-    
-    [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+    else    // synchronous usage
+    {
+        [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+    }
 }
 
 - (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;

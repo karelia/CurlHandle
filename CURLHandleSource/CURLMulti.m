@@ -51,6 +51,12 @@
 #import "CURLHandle+MultiSupport.h"
 #import "CURLSocket.h"
 
+
+@interface CURLHandle (Private)
+- (void)completeWithError:(NSError *)error;
+@end
+
+
 @interface CURLMulti()
 
 #pragma mark - Private Properties
@@ -185,12 +191,18 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     });
 }
 
-- (void)stopManagingHandle:(CURLHandle*)handle
+- (void)cancelHandle:(CURLHandle*)handle
 {
     NSAssert(self.queue, @"need queue");
 
     dispatch_async(self.queue, ^{
+        
         [self removeHandle:handle];
+        
+        // Handle completes once any pending work on the queue is performed
+        dispatch_async(self.queue, ^{
+            [handle completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+        });
     });
 }
 
