@@ -559,10 +559,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             }
             else
             {
+                int64_t dispatchTimeout = timeout * NSEC_PER_MSEC;
+                
                 dispatch_source_set_timer(timer,
-                                          dispatch_time(DISPATCH_TIME_NOW, timeout * NSEC_PER_MSEC),// fire when timeout is reached
-                                          DISPATCH_TIME_FOREVER,// event handler will take care of rescheduling
-                                          0);                   // don't allow it to be delayed
+                                          dispatch_time(DISPATCH_TIME_NOW, dispatchTimeout),// fire when timeout is reached
+                                          DISPATCH_TIME_FOREVER,                            // libcurl takes care of rescheduling
+                                          dispatchTimeout/100);                             // we're fairly delay tolerant
                 
                 if (_timeoutTimerSuspended)
                 {
