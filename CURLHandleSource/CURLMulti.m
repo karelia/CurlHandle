@@ -384,8 +384,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [_handles removeObject:handle];
-    
-    [handle removedByMulti:self];
 }
 
 - (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what

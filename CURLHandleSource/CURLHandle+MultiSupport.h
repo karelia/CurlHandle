@@ -51,16 +51,5 @@
 
 - (BOOL)hasCompleted;
 
-/**
- Called by <CURLMulti> when it stops managing the handle.
- 
- @param multi The multi object that was managing this handle.
- 
- @warning Not intended for general use.
-
- */
-
-- (void)removedByMulti:(CURLMulti*)multi;
-
 @end
 

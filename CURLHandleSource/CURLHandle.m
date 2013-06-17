@@ -72,7 +72,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (size_t) curlSendDataTo:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @property (strong, nonatomic) NSMutableArray* lists;
-@property (strong, nonatomic) CURLMulti* multi;
+@property (strong, nonatomic, readonly) CURLMulti* multi;
 
 @end
 
@@ -185,7 +185,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
-            self.multi = multi;
+            _multi = [multi retain];
             [multi manageHandle:self];
         }
         else
@@ -571,6 +571,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     [self.lists removeAllObjects];
+    
+    [_multi release]; _multi = nil;
 
     _executing = NO;
 }
@@ -800,16 +802,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 }
 
 #pragma mark - Multi Support
-
-- (void)removedByMulti:(CURLMulti*)multi
-{
-    if (multi)
-    {
-        NSAssert(multi == self.multi, @"removed by the wrong multi: %@ not %@", multi, self.multi);
-    }
-
-    self.multi = nil;
-}
 
 + (CURLMulti*)standaloneMultiForTestPurposes
 {
