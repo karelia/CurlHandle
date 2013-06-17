@@ -598,12 +598,24 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)cancel;
 {
-    _state = CURLHandleStateCanceling;
     CURLHandleLog(@"cancelled");
-
-    if (self.multi)
+    
+    CURLMultiHandle *multi = self.multi;
+    if (multi)
     {
-        [self.multi cancelHandle:self];
+        // Mark as cancelling. There's a slim chance we've been asked to cancel at
+        // the same time as the operation is actually completing anyway. If so skip
+        // the "canceling" state entirely, as it's a bit confusing otherwise.
+        //
+        // We use the CURLMulti's queue to synchronize access to this ivar, and
+        // deliberately make the usage synchronous so that self.state is correct upon
+        // returning from this method. Deadlock *shouldn't* be possible since client
+        // code should always run on _delegateQueue rather than CURLMulti's.
+        dispatch_sync(multi.queue, ^{
+            if (_state < CURLHandleStateCanceling) _state = CURLHandleStateCanceling;
+        });
+        
+        [multi cancelHandle:self];
     }
     else    // synchronous usage
     {
