@@ -283,7 +283,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     [self.pendingRemovals addObjectsFromArray:self.handles];
 
     // give handles a last chance to process
-    [self timeoutMulti:multi];
+    [self multiTimedOut:multi];
 
     self.handles = nil;
     self.pendingRemovals = nil;
@@ -294,7 +294,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
 }
 
-- (void)timeoutMulti:(CURLM*)multi
+- (void)multiTimedOut:(CURLM*)multi
 {
     [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
 }
@@ -508,7 +508,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 CURLMultiLogDetail(@"timer fired");
 
                 // perform processing
-                [self timeoutMulti:multi];
+                [self multiTimedOut:multi];
             });
 
             dispatch_source_set_cancel_handler(timer, ^{
@@ -581,7 +581,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     dispatch_source_t timer = self.timer;
     if (timer)
     {
-        [self timeoutMulti:_multi];
+        [self multiTimedOut:_multi];
     }
 }
 
