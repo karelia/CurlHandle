@@ -613,10 +613,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         // returning from this method. Deadlock *shouldn't* be possible since client
         // code should always run on _delegateQueue rather than CURLMulti's.
         dispatch_sync(multi.queue, ^{
-            if (_state < CURLHandleStateCanceling) _state = CURLHandleStateCanceling;
+            
+            if (_state < CURLHandleStateCanceling)
+            {
+                _state = CURLHandleStateCanceling;
+                [multi cancelHandle:self];
+            }
         });
-        
-        [multi cancelHandle:self];
     }
     else    // synchronous usage
     {

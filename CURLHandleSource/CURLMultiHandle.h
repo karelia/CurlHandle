@@ -93,6 +93,8 @@
  * It is safe to call this method for a handle that has already been cancelled, or has completed,
  * (or indeed was never managed by the multi). Doing so will simply do nothing.
  *
+ * @warning ONLY call this on the receiver's queue
+ *
  * To cancel the handle, call [handle cancel] instead - it will end up calling this method too,
  * if the handle was being managed by a multi.
  *
