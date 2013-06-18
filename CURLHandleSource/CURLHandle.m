@@ -612,12 +612,21 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         // deliberately make the usage synchronous so that self.state is correct upon
         // returning from this method. Deadlock *shouldn't* be possible since client
         // code should always run on _delegateQueue rather than CURLMulti's.
-        dispatch_sync(multi.queue, ^{
+        dispatch_queue_t queue = multi.queue;
+        dispatch_sync(queue, ^{
             
             if (_state < CURLHandleStateCanceling)
             {
                 _state = CURLHandleStateCanceling;
-                [multi cancelHandle:self];
+                
+                [multi removeHandle:self];
+                
+                // Report self as completed once any pending work on the queue is performed
+                // Removing will have stopped any new events, but there may be some already
+                // received, sitting in the queue
+                dispatch_async(queue, ^{
+                    [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+                });
             }
         });
     }

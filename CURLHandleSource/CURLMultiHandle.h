@@ -101,7 +101,7 @@
  * @param handle The handle to cancel. Should have previously been added with manageHandle:.
  */
 
-- (void)cancelHandle:(CURLHandle*)handle;
+- (void)removeHandle:(CURLHandle*)handle;
 
 /**
  Update the dispatch source for a given socket and type.
