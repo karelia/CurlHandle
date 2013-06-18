@@ -43,6 +43,7 @@
 
 @interface CURLMulti : NSObject
 {
+    CURLM *_multi;
     CURLM* _multiForSocket;
     NSMutableArray* _handles;
     NSMutableArray* _sockets;
@@ -50,7 +51,7 @@
     NSMutableArray* _pendingRemovals;
     dispatch_queue_t _queue;
     dispatch_source_t _timer;
-    int64_t _timeout;
+    BOOL _timeoutTimerSuspended;
 }
 
 /**

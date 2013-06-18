@@ -62,11 +62,8 @@
 @property (strong, nonatomic) NSMutableArray* sockets;
 @property (assign, nonatomic) dispatch_queue_t queue;
 @property (assign, nonatomic) dispatch_source_t timer;
-@property (assign, nonatomic) int64_t timeout;
 
 @end
-
-static int kMaximumTimeoutMilliseconds = 1000;
 
 
 #define USE_GLOBAL_QUEUE YES            // turn this on to share one queue across all instances
@@ -101,7 +98,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 @synthesize sockets = _sockets;
 @synthesize queue = _queue;
 @synthesize timer = _timer;
-@synthesize timeout = _timeout;
 @synthesize multiForSocket = _multiForSocket;
 
 #pragma mark - Object Lifecycle
@@ -167,8 +163,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)startup
 
 {
-    CURLMultiLog(@"started monitoring");
-    dispatch_resume(self.timer);
+    CURLMultiLog(@"started");
 }
 
 
@@ -250,33 +245,33 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (CURLM*)multiCreate
 {
     CURLMcode result = CURLM_OK;
-    CURLM* multi = curl_multi_init();
-    if (multi)
+    _multi = curl_multi_init();
+    if (_multi)
     {
-        result = curl_multi_setopt(multi, CURLMOPT_TIMERFUNCTION, timeout_callback);
+        result = curl_multi_setopt(_multi, CURLMOPT_TIMERFUNCTION, timeout_callback);
         if (result == CURLM_OK)
         {
-            result = curl_multi_setopt(multi, CURLMOPT_TIMERDATA, self);
+            result = curl_multi_setopt(_multi, CURLMOPT_TIMERDATA, self);
         }
 
         if (result == CURLM_OK)
         {
-            result = curl_multi_setopt(multi, CURLMOPT_SOCKETFUNCTION, socket_callback);
+            result = curl_multi_setopt(_multi, CURLMOPT_SOCKETFUNCTION, socket_callback);
         }
 
         if (result == CURLM_OK)
         {
-            result = curl_multi_setopt(multi, CURLMOPT_SOCKETDATA, self);
+            result = curl_multi_setopt(_multi, CURLMOPT_SOCKETDATA, self);
         }
 
         if (result != CURLM_OK)
         {
-            curl_multi_cleanup(multi);
-            multi = nil;
+            curl_multi_cleanup(_multi);
+            _multi = nil;
         }
     }
 
-    return multi;
+    return _multi;
 }
 
 - (void)cleanupMulti:(CURLM*)multi
@@ -288,7 +283,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     [self.pendingRemovals addObjectsFromArray:self.handles];
 
     // give handles a last chance to process
-    [self timeoutMulti:multi];
+    [self multiTimedOut:multi];
 
     self.handles = nil;
     self.pendingRemovals = nil;
@@ -299,7 +294,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
 }
 
-- (void)timeoutMulti:(CURLM*)multi
+- (void)multiTimedOut:(CURLM*)multi
 {
     [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
 }
@@ -382,14 +377,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
 
     [self performRemovalsWithMulti:multi];
-
-    // set the next processing time using the timeout value we got from libcurl.
-    // the timer will be forced to fire sooner if something else happens (eg a handle is added/removed)
-    dispatch_source_t timer = self.timer;
-    if (timer)
-    {
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
-    }
 
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
 }
@@ -514,15 +501,14 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         if (queue)
         {
             dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
+            _timeoutTimerSuspended = YES;
+            // CURLM will command us to resume the timer when it's ready
 
             dispatch_source_set_event_handler(timer, ^{
                 CURLMultiLogDetail(@"timer fired");
 
                 // perform processing
-                [self timeoutMulti:multi];
-
-                // reset the timer to use the current timeout value
-                dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, self.timeout, self.timeout / 100);
+                [self multiTimedOut:multi];
             });
 
             dispatch_source_set_cancel_handler(timer, ^{
@@ -539,11 +525,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 });
 
                 self.queue = nil;
-            });
-
-            // kick things off - this should be enough to get the timer scheduled, but it won't actually start firing again until it is resumed
-            dispatch_async(queue, ^{
-                [self fireTimeoutNow];
             });
 
             self.timer = timer;
@@ -564,28 +545,43 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         dispatch_source_t timer = self.timer;
         NSAssert(timer != nil, @"should still have a timer");
 
-        // cap the timeout
-        if ((timeout == -1) || (timeout > kMaximumTimeoutMilliseconds))
-        {
-            timeout = kMaximumTimeoutMilliseconds;
-        }
-
-        // store the actual timeout value we want to use
-        self.timeout = timeout * NSEC_PER_MSEC;
         CURLMultiLog(@"timeout changed to %ldms", (long)timeout);
-
-        [self fireTimeoutNow];
+        
+        if (timer)
+        {
+            if (timeout < 0)
+            {
+                if (!_timeoutTimerSuspended)
+                {
+                    _timeoutTimerSuspended = YES;
+                    dispatch_suspend(timer);
+                }
+            }
+            else
+            {
+                int64_t dispatchTimeout = timeout * NSEC_PER_MSEC;
+                
+                dispatch_source_set_timer(timer,
+                                          dispatch_time(DISPATCH_TIME_NOW, dispatchTimeout),// fire when timeout is reached
+                                          DISPATCH_TIME_FOREVER,                            // libcurl takes care of rescheduling
+                                          dispatchTimeout/100);                             // we're fairly delay tolerant
+                
+                if (_timeoutTimerSuspended)
+                {
+                    _timeoutTimerSuspended = NO;
+                    dispatch_resume(timer);
+                }
+            }
+        }
     }
 }
 
 - (void)fireTimeoutNow
 {
-    // fire the timer right away - after it's fired, the timeout value will be reset
-    // to the current value of self.timeout
     dispatch_source_t timer = self.timer;
     if (timer)
     {
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 1, 0);
+        [self multiTimedOut:_multi];
     }
 }
 
