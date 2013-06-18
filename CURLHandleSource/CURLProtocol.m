@@ -135,18 +135,19 @@
     [client URLProtocol:self didLoadData:data];
 }
 
-- (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
-{
-        id <NSURLProtocolClient> client = [self client];
-        CURLProtocolLog(@"got didFailWithError %@ from %@ for %@", error, handle, client);
-        [client URLProtocol:self didFailWithError:error];
-}
-
-- (void)handleDidFinish:(CURLHandle *)handle
+- (void)handle:(CURLHandle*)handle didCompleteWithError:(NSError *)error
 {
     id <NSURLProtocolClient> client = [self client];
-    CURLProtocolLog(@"got didFinish from %@ for %@", handle, client);
-    [client URLProtocolDidFinishLoading:self];
+    if (error)
+    {
+        CURLProtocolLog(@"got didFailWithError %@ from %@ for %@", error, handle, client);
+        [client URLProtocol:self didFailWithError:error];
+    }
+    else
+    {
+        CURLProtocolLog(@"got didFinish from %@ for %@", handle, client);
+        [client URLProtocolDidFinishLoading:self];
+    }
 }
 
 - (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten

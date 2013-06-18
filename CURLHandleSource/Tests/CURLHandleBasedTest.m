@@ -69,17 +69,19 @@
     }
 }
 
-- (void)handleDidFinish:(CURLHandle *)handle
+- (void)handle:(CURLHandle*)handle didCompleteWithError:(NSError *)error
 {
-    NSLog(@"test: handle %@ finished", handle);
-    self.finishedCount++;
-    [self pause];
-}
-
-- (void)handle:(CURLHandle*)handle didFailWithError:(NSError *)error
-{
-    NSLog(@"test: handle failed with error %@", error);
-    self.error = error;
+    if (error)
+    {
+        NSLog(@"test: handle failed with error %@", error);
+        self.error = error;
+    }
+    else
+    {
+        NSLog(@"test: handle %@ finished", handle);
+        self.finishedCount++;
+    }
+    
     [self pause];
 }
 

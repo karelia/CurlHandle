@@ -32,10 +32,10 @@
     [super handle:handle didReceiveResponse:response];
 }
 
-- (void)handleDidFinish:(CURLHandle *)handle
+- (void)handle:(CURLHandle *)handle didCompleteWithError:(NSError *)error;
 {
-    self.finished = YES;
-    [super handleDidFinish:handle];
+    if (!error) self.finished = YES;
+    [super handle:handle didCompleteWithError:error];
 }
 
 #pragma mark - Tests

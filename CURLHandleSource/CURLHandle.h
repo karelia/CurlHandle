@@ -85,7 +85,7 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
 @property (readonly) CURLHandleState state;
 
 /*
- * The error, if any, delivered via -handle:didFailWithError:
+ * The error, if any, delivered via -handle:didCompleteWithError:
  * This property will be nil in the event that no error occurred.
  */
 @property (readonly, copy) NSError *error;
@@ -154,16 +154,9 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
 
 - (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
 
-/** 
- Optional method, called when the handle has successfully completed.
- 
- @param handle The handle that has completed.
- */
-
-- (void)handleDidFinish:(CURLHandle *)handle;
-
 /**
- Optional method, called when the handle has failed.
+ Sent as the last message related to the handle. Error may be nil, which implies
+ that no error occurred and this task is complete.
 
  Where possible errors are in NSURLErrorDomain or NSCocoaErrorDomain. 
  
@@ -175,11 +168,11 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
  At present all errors include NSURLErrorFailingURLErrorKey and NSURLErrorFailingURLStringErrorKey if applicable even
  though the docs say "This key is only present in the NSURLErrorDomain". Should we respect that?
  
- @param handle The handle that has failed.
- @param error The error that it failed with.
+ @param handle The handle that has completed.
+ @param error The error that it failed with if there was one
  */
 
-- (void)handle:(CURLHandle*)handle didFailWithError:(NSError*)error;
+- (void)handle:(CURLHandle*)handle didCompleteWithError:(NSError*)error;
 
 /**
  Optional method, called to ask how to handle a host fingerprint.

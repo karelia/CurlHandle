@@ -644,36 +644,26 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     _error = [error copy];
     _state = CURLHandleStateCompleted;
-        
-    // We run cleanup after delegate messages are all delivered if possible
+    
+    [self notifyDelegateOfResponseIfNeeded];
     
     if (!error)
     {
         CURLHandleLog(@"finished");
-        
-        [self notifyDelegateOfResponseIfNeeded];
-        
-        if (![self tryToPerformSelectorOnDelegate:@selector(handleDidFinish:) usingBlock:^{
-            
-            [self.delegate handleDidFinish:self];
-            [self cleanupIncludingHandle:YES];
-        }])
-        {
-            [self cleanupIncludingHandle:YES];
-        }
     }
     else
     {
         CURLHandleLog(@"failed with error %@", error);
+    }
+    
+    // We run cleanup after delegate messages are all delivered if possible
+    if (![self tryToPerformSelectorOnDelegate:@selector(handle:didCompleteWithError:) usingBlock:^{
         
-        if (![self tryToPerformSelectorOnDelegate:@selector(handle:didFailWithError:) usingBlock:^{
-            
-            [self.delegate handle:self didFailWithError:error];
-            [self cleanupIncludingHandle:YES];
-        }])
-        {
-            [self cleanupIncludingHandle:YES];
-        }
+        [self.delegate handle:self didCompleteWithError:error];
+        [self cleanupIncludingHandle:YES];
+    }])
+    {
+        [self cleanupIncludingHandle:YES];
     }
 }
 
