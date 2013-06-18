@@ -49,7 +49,7 @@
 
 #import "CURLHandle.h"
 #import "CURLHandle+MultiSupport.h"
-#import "CURLSocket.h"
+#import "CURLSocketRegistration.h"
 
 
 @interface CURLHandle (Private)
@@ -356,34 +356,34 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
 }
 
-- (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
+- (void)updateRegistration:(CURLSocketRegistration *)registration forSocket:(curl_socket_t)socket to:(NSInteger)what
 {
     NSAssert(_multi != nil, @"should never be called without a multi value");
     {
         if (what == CURL_POLL_NONE)
         {
-            NSAssert(socket == nil, @"should have no socket object first time");
+            NSAssert(registration == nil, @"should have no socket object first time");
         }
 
-        if (!socket)
+        if (!registration)
         {
             NSAssert(what != CURL_POLL_REMOVE, @"shouldn't need to make a socket if we're being asked to remove it");
-            socket = [[CURLSocket alloc] init];
-            [self.sockets addObject:socket];
-            curl_multi_assign(_multi, raw, socket);
+            registration = [[CURLSocketRegistration alloc] init];
+            [self.sockets addObject:registration];
+            curl_multi_assign(_multi, socket, registration);
             CURLMultiLog(@"new socket:%@", socket);
-            [socket release];
+            [registration release];
         }
 
-        [socket updateSourcesForSocket:raw mode:what multi:self];
+        [registration updateSourcesForSocket:socket mode:what multi:self];
         CURLMultiLog(@"updated socket:%@", socket);
 
         if (what == CURL_POLL_REMOVE)
         {
-            NSAssert(socket != nil, @"should have socket");
+            NSAssert(registration != nil, @"should have socket");
             CURLMultiLog(@"removed socket:%@", socket);
-            [self.sockets removeObject:socket];
-            curl_multi_assign(_multi, raw, nil);
+            [self.sockets removeObject:registration];
+            curl_multi_assign(_multi, socket, nil);
         }
     }
 }
@@ -512,24 +512,24 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     return (type == DISPATCH_SOURCE_TYPE_READ) ? @"reader" : @"writer";
 }
 
-- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(CURLSocket*)socket raw:(int)raw required:(BOOL)required
+- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket registration:(CURLSocketRegistration *)registration required:(BOOL)required
 {
     if (required)
     {
         if (!source)
         {
             CURLMultiLog(@"%@ dispatch source added for socket %d", [self nameForType:type], raw);
-            source = dispatch_source_create(type, raw, 0, self.queue);
+            source = dispatch_source_create(type, socket, 0, self.queue);
 
             NSAssert(_multi != nil, @"should never be called without a multi value");
             int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
             dispatch_source_set_event_handler(source, ^{
                 CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], raw, dispatch_source_get_data(source));
-                BOOL sourceIsActive = [self.sockets containsObject:socket] && [socket ownsSource:source];
+                BOOL sourceIsActive = [self.sockets containsObject:registration] && [registration ownsSource:source];
                 NSAssert(sourceIsActive, @"should have active source");
                 if (sourceIsActive)
                 {
-                    [self processMulti:_multi action:action forSocket:raw];
+                    [self processMulti:_multi action:action forSocket:socket];
                 }
             });
 
@@ -580,7 +580,7 @@ int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *so
     CURLMultiHandle* multi = userp;
     NSCAssert([multi handleForCURL:easy] != nil, @"socket callback for a handle %p that isn't managed by %@", easy, multi);
 
-    [multi multiUpdateSocket:socketp raw:s what:what];
+    [multi updateRegistration:socketp forSocket:s to:what];
     
     return CURLM_OK;
 }

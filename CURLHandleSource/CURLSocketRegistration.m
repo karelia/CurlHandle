@@ -1,17 +1,17 @@
 //
-//  CURLSocket.m
+//  CURLSocketRegistration.m
 //  CURLHandle
 //
 //  Created by Sam Deane on 26/09/2012.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
-#import "CURLSocket.h"
+#import "CURLSocketRegistration.h"
 #import "CURLMultiHandle.h"
 
 #import <curl/curl.h>
 
-@interface CURLSocket()
+@interface CURLSocketRegistration()
 
 #pragma mark - Private Properties
 
@@ -20,7 +20,7 @@
 
 @end
 
-@implementation CURLSocket
+@implementation CURLSocketRegistration
 
 #pragma mark - Synthesized Properties
 
@@ -50,10 +50,10 @@
     // a place to group together the reader and writer sources corresponding to a socket.
 
     BOOL readerRequired = (mode == CURL_POLL_IN) || (mode == CURL_POLL_INOUT);
-    self.reader = [multi updateSource:self.reader type:DISPATCH_SOURCE_TYPE_READ socket:self raw:socket required:readerRequired];
+    self.reader = [multi updateSource:self.reader type:DISPATCH_SOURCE_TYPE_READ socket:socket registration:self required:readerRequired];
 
     BOOL writerRequired = (mode == CURL_POLL_OUT) || (mode == CURL_POLL_INOUT);
-    self.writer = [multi updateSource:self.writer type:DISPATCH_SOURCE_TYPE_WRITE socket:self raw:socket required:writerRequired];
+    self.writer = [multi updateSource:self.writer type:DISPATCH_SOURCE_TYPE_WRITE socket:socket registration:self required:writerRequired];
 }
 
 - (NSString*)description

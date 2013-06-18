@@ -23,7 +23,7 @@
 #endif
 
 @class CURLHandle;
-@class CURLSocket;
+@class CURLSocketRegistration;
 
 /**
  * Wrapper for a curl_multi handle.
@@ -109,13 +109,13 @@
 
  @param source The current dispatch source for the given type
  @param type Is this the source for reading or writing?
- @param socket The <CURLSocket> object that owns the source.
- @param raw The raw system socket that the dispatch source should be monitoring.
+ @param socket The raw system socket that the dispatch source should be monitoring.
+ @param registration The <CURLSocketRegistration> object that owns the source.
  @param required Is the source required? If not, an existing source will be cancelled. If required and the source parameter is nil, and new one will be created.
  @return The new/updated dispatch source.
 */
 
-- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(CURLSocket*)socket raw:(int)raw required:(BOOL)required;
+- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket registration:(CURLSocketRegistration *)registration required:(BOOL)required;
 
 /**
  The serial queue the instance schedules sources on

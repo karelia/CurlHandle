@@ -1,5 +1,5 @@
 //
-//  CURLSocket.h
+//  CURLSocketRegistration.h
 //  CURLHandle
 //
 //  Created by Sam Deane on 26/09/2012.
@@ -15,7 +15,7 @@
  * CURLMulti uses this internally - not intended for public consumption.
  */
 
-@interface CURLSocket : NSObject
+@interface CURLSocketRegistration : NSObject
 {
     dispatch_source_t _reader;
     dispatch_source_t _writer;
