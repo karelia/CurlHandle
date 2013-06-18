@@ -470,7 +470,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     return _multi && self.timer && self.queue;
 }
 
-- (void)updateTimeout:(NSInteger)timeout
+- (void)setTimeout:(long)timeout_ms
 {
     // if multi is nil, the object is being thrown away
     if ([self notShutdown])
@@ -482,7 +482,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         
         if (timer)
         {
-            if (timeout < 0)
+            if (timeout_ms < 0)
             {
                 if (!_timerIsSuspended)
                 {
@@ -492,12 +492,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             }
             else
             {
-                int64_t dispatchTimeout = timeout * NSEC_PER_MSEC;
+                int64_t timeout_ns = timeout_ms * NSEC_PER_MSEC;
                 
                 dispatch_source_set_timer(timer,
-                                          dispatch_time(DISPATCH_TIME_NOW, dispatchTimeout),// fire when timeout is reached
-                                          DISPATCH_TIME_FOREVER,                            // libcurl takes care of rescheduling
-                                          dispatchTimeout/100);                             // we're fairly delay tolerant
+                                          dispatch_time(DISPATCH_TIME_NOW, timeout_ns), // fire when timeout is reached
+                                          DISPATCH_TIME_FOREVER,                        // libcurl takes care of rescheduling
+                                          timeout_ns/100);                              // we're fairly delay tolerant
                 
                 if (_timerIsSuspended)
                 {
@@ -574,7 +574,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 int timeout_callback(CURLM *multi, long timeout_ms, void *userp)
 {
     CURLMultiHandle* source = userp;
-    [source updateTimeout:timeout_ms];
+    [source setTimeout:timeout_ms];
 
     return CURLM_OK;
 }
