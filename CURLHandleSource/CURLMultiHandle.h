@@ -44,7 +44,6 @@
 @interface CURLMultiHandle : NSObject
 {
     CURLM *_multi;
-    CURLM* _multiForSocket;
     NSMutableArray* _handles;
     NSMutableArray* _sockets;
     dispatch_queue_t _queue;

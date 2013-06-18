@@ -62,7 +62,6 @@
 #pragma mark - Private Properties
 
 @property (readonly, copy, nonatomic) NSArray* handles;
-@property (assign, nonatomic) CURLM* multiForSocket;
 @property (strong, nonatomic) NSMutableArray* sockets;
 @property (assign, nonatomic) dispatch_queue_t queue;
 @property (assign, nonatomic) dispatch_source_t timer;
@@ -99,7 +98,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 @synthesize sockets = _sockets;
 @synthesize queue = _queue;
 @synthesize timer = _timer;
-@synthesize multiForSocket = _multiForSocket;
 
 #pragma mark - Object Lifecycle
 
@@ -140,7 +138,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)dealloc
 {
     CURLMultiLog(@"deallocing");
-    NSAssert((_multiForSocket == nil) && (_timer == nil) && (_queue == nil), @"should have been shut down by the time we're dealloced");
+    NSAssert((_multi == NULL) && (_timer == NULL) && (_queue == NULL), @"should have been shut down by the time we're dealloced");
 
     [_handles release];
     [_sockets release];
@@ -212,7 +210,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Multi Handle Management
 
-- (CURLM*)multiCreate
+- (void)multiCreate;
 {
     CURLMcode result = CURLM_OK;
     _multi = curl_multi_init();
@@ -240,11 +238,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             _multi = nil;
         }
     }
-
-    return _multi;
 }
 
-- (void)cleanupMulti:(CURLM*)multi
+- (void)cleanupMulti;
 {
     CURLMultiLog(@"cleaning up");
 
@@ -254,12 +250,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
 
     // give handles a last chance to process
-    [self multiTimedOut:multi];
+    [self multiTimedOut:_multi];
 
     [_handles release]; _handles = nil;
     self.sockets = nil;
 
-    CURLMcode result = curl_multi_cleanup(multi);
+    CURLMcode result = curl_multi_cleanup(_multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
 }
 
@@ -277,13 +273,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         int running;
         CURLMultiLogDetail(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action]);
+        
         CURLMcode result;
         do
         {
-            self.multiForSocket = multi;
-            result = curl_multi_socket_action(multi, socket, action, &running);
-            self.multiForSocket = nil;
-        } while (result == CURLM_CALL_MULTI_SOCKET);
+            result = curl_multi_socket_action(_multi, socket, action, &running);
+        }
+        while (result == CURLM_CALL_MULTI_SOCKET);
 
         if (result == CURLM_OK)
         {
@@ -363,9 +359,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert([_handles containsObject:handle], @"we should be managing this handle");
     
     CURLMultiLog(@"removed handle %@", handle);
-    self.multiForSocket = _multi;
     CURLMcode result = curl_multi_remove_handle(_multi, [handle curl]);
-    self.multiForSocket = nil;
     
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [_handles removeObject:handle];
@@ -373,9 +367,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)multiUpdateSocket:(CURLSocket*)socket raw:(curl_socket_t)raw what:(NSInteger)what
 {
-    CURLM* multi = self.multiForSocket;
-    NSAssert(multi != nil, @"should never be called without a multi value");
-    if (multi)
+    NSAssert(_multi != nil, @"should never be called without a multi value");
     {
         if (what == CURL_POLL_NONE)
         {
@@ -387,7 +379,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             NSAssert(what != CURL_POLL_REMOVE, @"shouldn't need to make a socket if we're being asked to remove it");
             socket = [[CURLSocket alloc] init];
             [self.sockets addObject:socket];
-            curl_multi_assign(multi, raw, socket);
+            curl_multi_assign(_multi, raw, socket);
             CURLMultiLog(@"new socket:%@", socket);
             [socket release];
         }
@@ -400,7 +392,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             NSAssert(socket != nil, @"should have socket");
             CURLMultiLog(@"removed socket:%@", socket);
             [self.sockets removeObject:socket];
-            curl_multi_assign(multi, raw, nil);
+            curl_multi_assign(_multi, raw, nil);
         }
     }
 }
@@ -439,8 +431,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (BOOL)createTimer
 {
-    CURLM* multi = [self multiCreate];
-    if (multi)
+    [self multiCreate];
+    
+    if (_multi)
     {
         dispatch_queue_t queue = [self createQueue];
         if (queue)
@@ -453,14 +446,14 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 CURLMultiLogDetail(@"timer fired");
 
                 // perform processing
-                [self multiTimedOut:multi];
+                [self multiTimedOut:_multi];
             });
 
             dispatch_source_set_cancel_handler(timer, ^{
 
                 NSAssert(self.timer == nil, @"timer property should have been cleared by now");
 
-                [self cleanupMulti:multi];
+                [self cleanupMulti];
 
                 dispatch_queue_t queue = self.queue;
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -477,7 +470,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         }
     }
 
-    return multi && self.timer && self.queue;
+    return _multi && self.timer && self.queue;
 }
 
 #pragma mark - Callback Support
@@ -544,8 +537,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             CURLMultiLog(@"%@ dispatch source added for socket %d", [self nameForType:type], raw);
             source = dispatch_source_create(type, raw, 0, self.queue);
 
-            CURLM* multi = self.multiForSocket;
-            NSAssert(multi != nil, @"should never be called without a multi value");
+            NSAssert(_multi != nil, @"should never be called without a multi value");
             int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
             dispatch_source_set_event_handler(source, ^{
                 CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], raw, dispatch_source_get_data(source));
@@ -553,7 +545,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 NSAssert(sourceIsActive, @"should have active source");
                 if (sourceIsActive)
                 {
-                    [self processMulti:multi action:action forSocket:raw];
+                    [self processMulti:_multi action:action forSocket:raw];
                 }
             });
 
