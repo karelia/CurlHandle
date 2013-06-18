@@ -202,7 +202,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         if (code == CURLE_OK)
         {
             _multi = [multi retain];
-            [multi manageHandle:self];
+            [multi addHandle:self];
         }
         else
         {

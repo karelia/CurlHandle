@@ -179,15 +179,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Easy Handle Management
 
-- (void)manageHandle:(CURLHandle*)handle
-{
-    NSAssert(self.queue, @"need queue");
-
-    dispatch_async(self.queue, ^{
-        [self addHandle:handle];
-    });
-}
-
 - (CURLHandle*)findHandleWithEasyHandle:(CURL*)easy
 {
     CURLHandle* result = nil;
@@ -334,19 +325,24 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)addHandle:(CURLHandle *)handle;
 {
-    NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
+    NSAssert(self.queue, @"need queue");
     
-    CURLMcode result = curl_multi_add_handle(_multi, [handle curl]);
-    if (result == CURLM_OK)
-    {
-        CURLMultiLog(@"added handle %@", handle);
-        [_handles addObject:handle];
-    }
-    else
-    {
-        CURLMultiLogError(@"failed to add handle %@", handle);
-        [handle completeWithCode:result isMulti:YES];
-    }
+    dispatch_async(self.queue, ^{
+        
+        NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
+        
+        CURLMcode result = curl_multi_add_handle(_multi, [handle curl]);
+        if (result == CURLM_OK)
+        {
+            CURLMultiLog(@"added handle %@", handle);
+            [_handles addObject:handle];
+        }
+        else
+        {
+            CURLMultiLogError(@"failed to add handle %@", handle);
+            [handle completeWithCode:result isMulti:YES];
+        }
+    });
 }
 
 - (void)removeHandle:(CURLHandle *)handle;

@@ -82,10 +82,10 @@
  * The multi will retain the handle for as long as it needs it, but will silently release it once
  * the handle's upload/download has completed or failed.
  *
- * @param handle The handle to manage. Will be retained by the multi.
+ * @param handle The handle to manage. Will be retained by the multi until removed (completion automatically performs removal).
  */
 
-- (void)manageHandle:(CURLHandle*)handle;
+- (void)addHandle:(CURLHandle*)handle;
 
 /** 
  * This removes the handle from the multi. *
