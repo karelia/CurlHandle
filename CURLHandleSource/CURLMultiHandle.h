@@ -48,8 +48,9 @@
     NSMutableArray* _handles;
     NSMutableArray* _sockets;
     dispatch_queue_t _queue;
-    dispatch_source_t _timer;
-    BOOL _timeoutTimerSuspended;
+    
+    dispatch_source_t   _timer;
+    BOOL                _timerIsSuspended;
 }
 
 /**

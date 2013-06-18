@@ -461,7 +461,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         if (queue)
         {
             dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-            _timeoutTimerSuspended = YES;
+            _timerIsSuspended = YES;
             // CURLM will command us to resume the timer when it's ready
 
             dispatch_source_set_event_handler(timer, ^{
@@ -511,9 +511,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         {
             if (timeout < 0)
             {
-                if (!_timeoutTimerSuspended)
+                if (!_timerIsSuspended)
                 {
-                    _timeoutTimerSuspended = YES;
+                    _timerIsSuspended = YES;
                     dispatch_suspend(timer);
                 }
             }
@@ -526,9 +526,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                                           DISPATCH_TIME_FOREVER,                            // libcurl takes care of rescheduling
                                           dispatchTimeout/100);                             // we're fairly delay tolerant
                 
-                if (_timeoutTimerSuspended)
+                if (_timerIsSuspended)
                 {
-                    _timeoutTimerSuspended = NO;
+                    _timerIsSuspended = NO;
                     dispatch_resume(timer);
                 }
             }
