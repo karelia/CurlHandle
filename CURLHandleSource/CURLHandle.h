@@ -35,7 +35,7 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
 {
 	CURL                    *_curl;                         /*" Pointer to the actual CURL object that does all the hard work "*/
     CURLMultiHandle               *_multi;
-    NSURL                   *_URL;
+    NSURLRequest            *_request;
 	id <CURLHandleDelegate> _delegate;
     NSOperationQueue        *_delegateQueue;
     CURLHandleState         _state;
@@ -68,6 +68,8 @@ typedef NS_ENUM(NSInteger, CURLHandleState) {
            credential:(NSURLCredential *)credential
              delegate:(id <CURLHandleDelegate>)delegate
         delegateQueue:(NSOperationQueue *)queue __attribute((nonnull(1)));
+
+@property (readonly, copy) NSURLRequest *originalRequest;  // auth might cause a slightly different request to be sent out
 
 @property (readonly, strong) id <CURLHandleDelegate> delegate; // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
 

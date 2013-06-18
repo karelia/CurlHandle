@@ -79,6 +79,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 @implementation CURLHandle
 
+@synthesize originalRequest = _request;
 @synthesize state = _state;
 @synthesize error = _error;
 @synthesize lists = _lists;
@@ -221,7 +222,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     [_delegate release];
     [_delegateQueue release];
-    [_URL release];
+    [_request release];
     [_error release];
 	[_headerBuffer release];
 	[_proxies release];
@@ -505,7 +506,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     curl_easy_reset([self curl]);
 
-    _URL = [[request URL] copy];    // assumes caller will have ensured _URL is suitable for overwriting
+    _request = [request copy];    // assumes caller will have ensured _originalRequest is suitable for overwriting
     [_headerBuffer setLength:0];
 
     CURLcode code = CURLE_OK;
@@ -632,7 +633,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         error = (isMultiCode ?
                  [NSError errorWithDomain:CURLMcodeErrorDomain code:(CURLMcode)code userInfo:nil] :
-                 [self errorForURL:_URL code:(CURLcode)code]);
+                 [self errorForURL:self.originalRequest.URL code:(CURLcode)code]);
         NSAssert(error, @"Failed to created error");
     }
     
@@ -683,7 +684,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     NSAssert(_delegate == nil, @"CURLHandle can only service a single request at a time");
     _delegate = [delegate retain];
     
-    [_URL release]; // -setupRequest:É will fill it back in
+    [_request release]; // -setupRequest:É will fill it back in
     CURLcode result = [self setupRequest:request credential:credential];
     
     if (result == CURLE_OK)
@@ -1105,7 +1106,7 @@ int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype p
     {
         // FTP control connections should be kept alive. However, I'm fairly sure this is unlikely to have a real effect in practice since OS X's default time before it starts sending keep alive packets is 2 hours :(
         // TODO: Looks like we could adopt CURLOPT_TCP_KEEPINTVL instead
-        if ([[[self valueForKey:@"_URL"] scheme] isEqualToString:@"ftp"])
+        if ([self.originalRequest.URL.scheme isEqualToString:@"ftp"])
         {
             int keepAlive = 1;
             socklen_t keepAliveLen = sizeof(keepAlive);
