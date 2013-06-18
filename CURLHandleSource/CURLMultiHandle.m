@@ -513,15 +513,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
 }
 
-- (void)fireTimeoutNow
-{
-    dispatch_source_t timer = self.timer;
-    if (timer)
-    {
-        [self multiTimedOut:_multi];
-    }
-}
-
 #pragma mark - Callback Support
 
 - (NSString*)nameForType:(dispatch_source_type_t)type
