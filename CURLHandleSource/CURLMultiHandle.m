@@ -97,7 +97,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 @synthesize sockets = _sockets;
 @synthesize queue = _queue;
-@synthesize timer = _timer;
 
 #pragma mark - Object Lifecycle
 
@@ -429,6 +428,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Timer Management
 
+@synthesize timer = _timer;
+
 - (BOOL)createTimer
 {
     [self multiCreate];
@@ -472,8 +473,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     return _multi && self.timer && self.queue;
 }
-
-#pragma mark - Callback Support
 
 - (void)updateTimeout:(NSInteger)timeout
 {
@@ -522,6 +521,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         [self multiTimedOut:_multi];
     }
 }
+
+#pragma mark - Callback Support
 
 - (NSString*)nameForType:(dispatch_source_type_t)type
 {
