@@ -249,18 +249,14 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
 
     // give handles a last chance to process
-    [self multiTimedOut:_multi];
+    // I'm not sure this is strictly the right thing to do, since timeout hasn't actually been reached. Mike
+    [self processMulti:_multi action:0 forSocket:CURL_SOCKET_TIMEOUT];;
 
     [_handles release]; _handles = nil;
     self.sockets = nil;
 
     CURLMcode result = curl_multi_cleanup(_multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
-}
-
-- (void)multiTimedOut:(CURLM*)multi
-{
-    [self processMulti:multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
 }
 
 - (void)processMulti:(CURLM*)multi action:(int)action forSocket:(int)socket
@@ -447,7 +443,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 CURLMultiLogDetail(@"timer fired");
 
                 // perform processing
-                [self multiTimedOut:_multi];
+                [self processMulti:_multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
             });
 
             dispatch_source_set_cancel_handler(timer, ^{
