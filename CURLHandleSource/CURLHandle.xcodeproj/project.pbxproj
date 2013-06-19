@@ -391,8 +391,6 @@
 		27D77E151672BD9B0091EF91 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLHandle_Prefix.pch; sourceTree = "<group>"; };
 		50ED7E2716EED8D000723020 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
-		795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResumableHTTPUploader.h; sourceTree = "<group>"; };
-		7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResumableHTTPUploader.m; sourceTree = "<group>"; };
 		79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		79B96CBB0A6360F90060AC12 /* CURLTransfer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLTransfer.h; sourceTree = "<group>"; };
 		79B96CBC0A6360F90060AC12 /* CURLTransfer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CURLTransfer.m; sourceTree = "<group>"; };
@@ -495,7 +493,6 @@
 			isa = PBXGroup;
 			children = (
 				2298FF5B1716C3FF0001EBC7 /* Public */,
-				2298FF5E1716C9DC0001EBC7 /* Obsolete? */,
 				2298FF5C1716C40D0001EBC7 /* Private */,
 			);
 			name = Source;
@@ -587,15 +584,6 @@
 				22767ED8161078F1008D0848 /* NSDictionary+CURLHandle.m */,
 			);
 			name = Private;
-			sourceTree = "<group>";
-		};
-		2298FF5E1716C9DC0001EBC7 /* Obsolete? */ = {
-			isa = PBXGroup;
-			children = (
-				795946890AA88D0000EBF548 /* ResumableHTTPUploader.h */,
-				7959468A0AA88D0000EBF548 /* ResumableHTTPUploader.m */,
-			);
-			name = "Obsolete?";
 			sourceTree = "<group>";
 		};
 		22BF085916AEECEC009BE5A3 /* MockServer */ = {
