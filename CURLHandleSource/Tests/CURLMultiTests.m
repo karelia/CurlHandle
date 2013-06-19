@@ -114,7 +114,6 @@
         NSString* devNotes = [NSString stringWithContentsOfURL:devNotesURL encoding:NSUTF8StringEncoding error:&error];
 
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
-        request.shouldUseCurlHandle = YES;
         [request curl_setCreateIntermediateDirectories:1];
         [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
         CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];

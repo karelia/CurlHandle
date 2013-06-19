@@ -204,7 +204,6 @@ static TestMode gModeToUse;
     NSString* testNotes = [NSString stringWithContentsOfURL:testNotesURL encoding:NSUTF8StringEncoding error:&error];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
-    request.shouldUseCurlHandle = YES;
     [request curl_setCreateIntermediateDirectories:1];
     [request setHTTPBody:[testNotes dataUsingEncoding:NSUTF8StringEncoding]];
     CURLTransfer* transfer = [self newHandleWithRequest:request];
