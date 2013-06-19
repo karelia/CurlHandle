@@ -10,7 +10,7 @@
 #import "CURLTransfer+TestingSupport.h"
 #import "CURLMultiHandle.h"
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLRequest.h"
 
 #pragma mark - Globals
 

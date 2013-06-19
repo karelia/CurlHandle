@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLRequest.h"
 
 #import "CURLHandleBasedTest.h"
 

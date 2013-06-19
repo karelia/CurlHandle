@@ -1,11 +1,11 @@
 //
-//  NSURLRequest+CURLHandle.m
+//  CURLRequest.m
 //  CURLHandle
 //
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLRequest.h"
 #import "CURLProtocol.h"
 
 static NSString *const UseCurlHandleKey = @"useCurlHandle";

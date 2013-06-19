@@ -1,5 +1,5 @@
 //
-//  NSURLRequest+CURLHandle.h
+//  CURLRequest.h
 //  CURLHandle
 //
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.

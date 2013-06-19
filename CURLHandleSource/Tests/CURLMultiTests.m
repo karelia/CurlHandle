@@ -10,7 +10,7 @@
 #import "CURLHandleBasedTest.h"
 #import "CURLTransfer+TestingSupport.h"
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLRequest.h"
 #import "KMSServer.h"
 
 

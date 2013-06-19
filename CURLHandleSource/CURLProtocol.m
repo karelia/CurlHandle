@@ -9,7 +9,7 @@
 #import "CURLProtocol.h"
 #import "CURLMultiHandle.h"
 #import "CURLTransfer+MultiSupport.h"
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLRequest.h"
 
 @interface CURLProtocol()
 

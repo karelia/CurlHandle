@@ -9,11 +9,12 @@
 #import "CURLTransfer.h"
 #import "CURLTransfer+MultiSupport.h"
 #import "CURLTransfer+TestingSupport.h"
-#import "CURLMultiHandle.h"
-#import "CURLResponse.h"
-#import "CURLList.h"
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLList.h"
+#import "CURLMultiHandle.h"
+#import "CURLRequest.h"
+#import "CURLResponse.h"
+
 #import "CK2SSHCredential.h"
 
 #include <SystemConfiguration/SystemConfiguration.h>
