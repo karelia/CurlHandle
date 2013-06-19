@@ -25,7 +25,7 @@
     return testFileURL;
 }
 
-- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data
+- (void)transfer:(CURLTransfer *)transfer didReceiveData:(NSData *)data
 {
     NSMutableData* buffer = self.buffer;
     if (!buffer)
@@ -37,7 +37,7 @@
     [buffer appendData:data];
 }
 
-- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response
+- (void)transfer:(CURLTransfer *)transfer didReceiveResponse:(NSURLResponse *)response
 {
     self.response = response;
     if (response.expectedContentLength > 0)
@@ -46,7 +46,7 @@
     }
 }
 
-- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
+- (void)transfer:(CURLTransfer *)transfer willSendBodyDataOfLength:(NSUInteger)bytesWritten
 {
     self.sending = YES;
     if (bytesWritten == 0)
@@ -55,9 +55,9 @@
     }
 }
 
-- (void)handle:(CURLHandle *)handle didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type
+- (void)transfer:(CURLTransfer *)transfer didReceiveDebugInformation:(NSString *)string ofType:(curl_infotype)type
 {
-    NSString* typeName = [handle.class nameForType:type];
+    NSString* typeName = [transfer.class nameForType:type];
     if (!self.transcript)
     {
         self.transcript = [NSMutableString stringWithString:@""];
@@ -69,16 +69,16 @@
     }
 }
 
-- (void)handle:(CURLHandle*)handle didCompleteWithError:(NSError *)error
+- (void)transfer:(CURLTransfer*)transfer didCompleteWithError:(NSError *)error
 {
     if (error)
     {
-        NSLog(@"test: handle failed with error %@", error);
+        NSLog(@"test: transfer failed with error %@", error);
         self.error = error;
     }
     else
     {
-        NSLog(@"test: handle %@ finished", handle);
+        NSLog(@"test: transfer %@ finished", transfer);
         self.finishedCount++;
     }
     

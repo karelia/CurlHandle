@@ -8,9 +8,9 @@
 
 #import "KMSTestCase.h"
 
-#import "CURLHandle.h"
+#import "CURLTransfer.h"
 
-@interface CURLHandleBasedTest : KMSTestCase<CURLHandleDelegate>
+@interface CURLHandleBasedTest : KMSTestCase<CURLTransferDelegate>
 
 @property (strong, nonatomic) NSMutableData* buffer;
 @property (strong, nonatomic) NSError* error;

@@ -1,11 +1,11 @@
 //
-//  CURLHandle+TestingSupport.h
+//  CURLTransfer+TestingSupport.h
 //  CURLHandle
 //
 //  Created by Sam Deane on 27/03/2013.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 
-#import "CURLHandle.h"
+#import "CURLTransfer.h"
 
 
 /**
@@ -14,18 +14,18 @@
  use these functions in their unit tests.
  */
 
-@interface CURLHandle(TestingSupport)
+@interface CURLTransfer(TestingSupport)
 
 /** @name Testing Methods */
 
 /**
- Creates a CURLHandle instance tied to a specific multi handle
+ Creates a CURLTransfer instance tied to a specific multi handle
  
  @warning Not intended for general use.
  
- @return A new CURLHandle object.
+ @return A new CURLTransfer object.
  */
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLMultiHandle*)multi __attribute((nonnull(1,5)));
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLMultiHandle*)multi __attribute((nonnull(1,5)));
 
 /**
  Returns a new CURLMulti, for use in testing.

@@ -8,14 +8,13 @@
 
 #import "CURLProtocol.h"
 #import "CURLMultiHandle.h"
-#import "CURLHandle.h"
-#import "CURLHandle+MultiSupport.h"
+#import "CURLTransfer+MultiSupport.h"
 #import "NSURLRequest+CURLHandle.h"
 
 @interface CURLProtocol()
 
 @property (assign, nonatomic) BOOL gotResponse;
-@property (strong, nonatomic) CURLHandle* handle;
+@property (strong, nonatomic) CURLTransfer* transfer;
 @property (assign, nonatomic) BOOL uploaded;
 
 @end
@@ -23,16 +22,16 @@
 @implementation CURLProtocol
 
 @synthesize gotResponse = _gotResponse;
-@synthesize handle = _handle;
+@synthesize transfer = _transfer;
 @synthesize uploaded = _uploaded;
 
 #pragma mark - Object Lifecycle
 
 - (void)dealloc
 {
-    NSAssert((_handle == nil) || [_handle hasCompleted], @"handle should be done by the time we are destroyed");
+    NSAssert((_transfer == nil) || [_transfer hasCompleted], @"transfer should be done by the time we are destroyed");
 
-    [_handle release];
+    [_transfer release];
 
     CURLProtocolLog(@"dealloced");
 
@@ -92,9 +91,9 @@
 
 - (void)startLoadingWithCredential:(NSURLCredential *)credential;
 {
-    CURLHandle *handle = [[CURLHandle alloc] initWithRequest:[self request] credential:credential delegate:self delegateQueue:nil];
-    self.handle = handle;
-    [handle release];
+    CURLTransfer *transfer = [[CURLTransfer alloc] initWithRequest:[self request] credential:credential delegate:self delegateQueue:nil];
+    self.transfer = transfer;
+    [transfer release];
 }
 
 - (void)stopLoading;
@@ -102,10 +101,10 @@
     CURLProtocolLog(@"stopping");
     
     // this protocol object is going away
-    // if our associated handle hasn't completed yet, we need to cancel it, to stop
+    // if our associated transfer hasn't completed yet, we need to cancel it, to stop
     // it from trying to send us delegate messages after we've been disposed
-    [self.handle cancel];
-    self.handle = nil;
+    [self.transfer cancel];
+    self.transfer = nil;
 }
 
 #pragma mark - Utilities
@@ -115,42 +114,42 @@
     return [NSString stringWithFormat:@"<CURLProtocol %p %@>", self, self.request.URL];
 }
 
-#pragma mark - CURLHandleDelegate
+#pragma mark - CURLTransferDelegate
 
-- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response;
+- (void)transfer:(CURLTransfer *)transfer didReceiveResponse:(NSURLResponse *)response;
 {
     if (!self.gotResponse)
     {
         id <NSURLProtocolClient> client = [self client];
-        CURLProtocolLog(@"got didReceiveResponse %ld from %@ for %@", (long)[(NSHTTPURLResponse*)response statusCode], handle, client);
+        CURLProtocolLog(@"got didReceiveResponse %ld from %@ for %@", (long)[(NSHTTPURLResponse*)response statusCode], transfer, client);
         [client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageAllowed];
         self.gotResponse = YES;
     }
 }
 
-- (void)handle:(CURLHandle *)handle didReceiveData:(NSData *)data;
+- (void)transfer:(CURLTransfer *)transfer didReceiveData:(NSData *)data;
 {
     id <NSURLProtocolClient> client = [self client];
-    CURLProtocolLog(@"got didReceiveData from %@ for %@", handle, client);
+    CURLProtocolLog(@"got didReceiveData from %@ for %@", transfer, client);
     [client URLProtocol:self didLoadData:data];
 }
 
-- (void)handle:(CURLHandle*)handle didCompleteWithError:(NSError *)error
+- (void)transfer:(CURLTransfer*)transfer didCompleteWithError:(NSError *)error
 {
     id <NSURLProtocolClient> client = [self client];
     if (error)
     {
-        CURLProtocolLog(@"got didFailWithError %@ from %@ for %@", error, handle, client);
+        CURLProtocolLog(@"got didFailWithError %@ from %@ for %@", error, transfer, client);
         [client URLProtocol:self didFailWithError:error];
     }
     else
     {
-        CURLProtocolLog(@"got didFinish from %@ for %@", handle, client);
+        CURLProtocolLog(@"got didFinish from %@ for %@", transfer, client);
         [client URLProtocolDidFinishLoading:self];
     }
 }
 
-- (void)handle:(CURLHandle *)handle willSendBodyDataOfLength:(NSUInteger)bytesWritten
+- (void)transfer:(CURLTransfer *)transfer willSendBodyDataOfLength:(NSUInteger)bytesWritten
 {
     // TODO: improve this if we're ever given acess
     // ideally we'd be able to generate a connection:didSendBodyData:totalBytesWritten:totalBytesExpectedToWrite: call here

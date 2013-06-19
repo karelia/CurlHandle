@@ -8,7 +8,7 @@
 
 #import "CURLMultiHandle.h"
 #import "CURLHandleBasedTest.h"
-#import "CURLHandle+TestingSupport.h"
+#import "CURLTransfer+TestingSupport.h"
 
 #import "NSURLRequest+CURLHandle.h"
 #import "KMSServer.h"
@@ -23,19 +23,19 @@
 @implementation CURLMultiTests
 
 
-- (void)handle:(CURLHandle *)handle didReceiveResponse:(NSURLResponse *)response
+- (void)transfer:(CURLTransfer *)transfer didReceiveResponse:(NSURLResponse *)response
 {
     if (self.pauseOnResponse)
     {
         [self pause];
     }
-    [super handle:handle didReceiveResponse:response];
+    [super transfer:transfer didReceiveResponse:response];
 }
 
-- (void)handle:(CURLHandle *)handle didCompleteWithError:(NSError *)error;
+- (void)transfer:(CURLTransfer *)transfer didCompleteWithError:(NSError *)error;
 {
     if (!error) self.finished = YES;
-    [super handle:handle didCompleteWithError:error];
+    [super transfer:transfer didCompleteWithError:error];
 }
 
 #pragma mark - Tests
@@ -58,13 +58,13 @@
     [multi startup];
 
     NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
+    CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
     [self runUntilPaused];
 
     [self checkDownloadedBufferWasCorrect];
 
-    [handle release];
+    [transfer release];
 
     [multi shutdown];
 
@@ -84,13 +84,13 @@
         NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"TestContent.txt"];
 
         NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
+        CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
         [self runUntilPaused];
 
         [self checkDownloadedBufferWasCorrect];
         
-        [handle release];
+        [transfer release];
     }
 
     [multi shutdown];
@@ -117,7 +117,7 @@
         request.shouldUseCurlHandle = YES;
         [request curl_setCreateIntermediateDirectories:1];
         [request setHTTPBody:[devNotes dataUsingEncoding:NSUTF8StringEncoding]];
-        CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
+        CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
         [self runUntilPaused];
 
@@ -126,7 +126,7 @@
         STAssertNotNil(self.response, @"expected response");
         STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
         
-        [handle release];
+        [transfer release];
     }
 
     [multi shutdown];
@@ -145,26 +145,26 @@
 
     NSURL* largeFile = [NSURL URLWithString:@"https://github.com/karelia/CurlHandle/archive/master.zip"];
     NSURLRequest* request = [NSURLRequest requestWithURL:largeFile];
-    CURLHandle* handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
+    CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
-    // CURL seems to die horribly if we create and shutdown the multi without actually adding at least one easy handle to it - so wait until
+    // CURL seems to die horribly if we create and shutdown the multi without actually adding at least one easy transfer to it - so wait until
     // we've at least received the response
     
     [self runUntilPaused];
 
-    [handle cancel];
+    [transfer cancel];
 
-    STAssertTrue(handle.state >= CURLHandleStateCanceling, @"should have been cancelled");
+    STAssertTrue(transfer.state >= CURLTransferStateCanceling, @"should have been cancelled");
 
-    // wait until the multi actually gets round to removing the handle
-    while (handle.state != CURLHandleStateCompleted)
+    // wait until the multi actually gets round to removing the transfer
+    while (transfer.state != CURLTransferStateCompleted)
     {
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
     }
 
     STAssertFalse(self.finished, @"shouldn't have finished by the time we get here");
     
-    [handle release];
+    [transfer release];
 
     [multi shutdown];
     

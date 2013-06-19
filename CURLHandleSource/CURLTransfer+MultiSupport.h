@@ -1,11 +1,11 @@
 //
-//  CURLHandle+MultiSupport.h
+//  CURLTransfer+MultiSupport.h
 //  CURLHandle
 //
 //  Created by Sam Deane on 27/03/2013.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 
-#import "CURLHandle.h"
+#import "CURLTransfer.h"
 
 
 /**
@@ -13,7 +13,7 @@
  Not exported in the framework, and not recommended for general use.
  */
 
-@interface CURLHandle(MultiSupport)
+@interface CURLTransfer(MultiSupport)
 
 /** @name Internal Methods */
 
@@ -29,7 +29,7 @@
 - (CURL*)curl;
 
 /**
- Called by <CURLMulti> to tell the handle that it has completed.
+ Called by <CURLMulti> to tell the transfer that it has completed.
  
  @param code The completion code.
  @param isMultiCode Is the code a result from the handle itself, or the multi managing it?
@@ -41,9 +41,9 @@
 - (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
 
 /**
- Has the handle completed?
+ Has the transfer completed?
  
- @return YES if the handle has completed.
+ @return YES if the transfer has completed.
  
  @warning Not intended for general use.
 

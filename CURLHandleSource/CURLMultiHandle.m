@@ -9,7 +9,7 @@
 /**
  As mentioned in the header, the intention is that all access to the multi
  is controlled via our internal serial queue. The queue also protects additions to
- and removals from our array of the easy handles that we're managing.
+ and removals from our array of the transfers that we're managing.
 
  The CURL multi handle is generally not stored by the CURLMUlti object. 
  Instead it is set up when the dispatch timer is created, and it's value is
@@ -47,8 +47,7 @@
 
 #import "CURLMultiHandle.h"
 
-#import "CURLHandle.h"
-#import "CURLHandle+MultiSupport.h"
+#import "CURLTransfer+MultiSupport.h"
 #import "CURLSocketRegistration.h"
 
 
@@ -56,7 +55,7 @@
 
 #pragma mark - Private Properties
 
-@property (readonly, copy, nonatomic) NSArray* handles;
+@property (readonly, copy, nonatomic) NSArray* transfers;
 @property (strong, nonatomic) NSMutableArray* sockets;
 @property (assign, nonatomic) dispatch_queue_t queue;
 @property (assign, nonatomic) dispatch_source_t timer;
@@ -113,7 +112,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         if ([self createTimer])
         {
-            _handles = [[NSMutableArray alloc] init];
+            _transfers = [[NSMutableArray alloc] init];
             self.sockets = [NSMutableArray array];
 #if COUNT_INSTANCES
             ++gInstanceCount;
@@ -134,7 +133,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMultiLog(@"deallocing");
     NSAssert((_multi == NULL) && (_timer == NULL) && (_queue == NULL), @"should have been shut down by the time we're dealloced");
 
-    [_handles release];
+    [_transfers release];
     [_sockets release];
 
 #if COUNT_INSTANCES
@@ -172,51 +171,51 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
 }
 
-#pragma mark - Easy Handle Management
+#pragma mark - Transfer Management
 
-- (NSArray *)handles; { return [[_handles copy] autorelease]; }
+- (NSArray *)transfers; { return [[_transfers copy] autorelease]; }
 
-- (void)addHandle:(CURLHandle *)handle;
+- (void)beginTransfer:(CURLTransfer *)transfer;
 {
     NSAssert(self.queue, @"need queue");
     
     dispatch_async(self.queue, ^{
         
-        NSAssert(![self.handles containsObject:handle], @"shouldn't add a handle twice");
+        NSAssert(![self.transfers containsObject:transfer], @"shouldn't add a transfer twice");
         
-        CURLMcode result = curl_multi_add_handle(_multi, [handle curl]);
+        CURLMcode result = curl_multi_add_handle(_multi, [transfer curl]);
         if (result == CURLM_OK)
         {
-            CURLMultiLog(@"added handle %@", handle);
-            [_handles addObject:handle];
+            CURLMultiLog(@"added transfer %@", transfer);
+            [_transfers addObject:transfer];
         }
         else
         {
-            CURLMultiLogError(@"failed to add handle %@", handle);
-            [handle completeWithCode:result isMulti:YES];
+            CURLMultiLogError(@"failed to add transfer %@", transfer);
+            [transfer completeWithCode:result isMulti:YES];
         }
     });
 }
 
-- (void)removeHandle:(CURLHandle *)handle;
+- (void)suspendTransfer:(CURLTransfer *)transfer;
 {
-    NSAssert([_handles containsObject:handle], @"we should be managing this handle");
+    NSAssert([_transfers containsObject:transfer], @"we should be managing this transfer");
     
-    CURLMultiLog(@"removed handle %@", handle);
-    CURLMcode result = curl_multi_remove_handle(_multi, [handle curl]);
+    CURLMultiLog(@"removed transfer %@", transfer);
+    CURLMcode result = curl_multi_remove_handle(_multi, [transfer curl]);
     
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
-    [_handles removeObject:handle];
+    [_transfers removeObject:transfer];
 }
 
-- (CURLHandle*)handleForCURL:(CURL*)easy
+- (CURLTransfer*)transferForHandle:(CURL*)easy
 {
-    CURLHandle* result = nil;
-    CURLHandle* info;
+    CURLTransfer* result = nil;
+    CURLTransfer* info;
     CURLcode code = curl_easy_getinfo(easy, CURLINFO_PRIVATE, &info);
     if (code == CURLE_OK)
     {
-        NSAssert([info isKindOfClass:[CURLHandle class]], @"easy handle doesn't seem to be backed by a CURLHandle object");
+        NSAssert([info isKindOfClass:[CURLTransfer class]], @"easy handle doesn't seem to be backed by a CURLTransfer object");
 
         result = info;
     }
@@ -264,16 +263,16 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLMultiLog(@"cleaning up");
 
-    for (CURLHandle *aHandle in self.handles)
+    for (CURLTransfer *aTransfer in self.transfers)
     {
-        [self removeHandle:aHandle];
+        [self suspendTransfer:aTransfer];
     }
 
     // give handles a last chance to process
     // I'm not sure this is strictly the right thing to do, since timeout hasn't actually been reached. Mike
     [self processMulti:_multi action:0 forSocket:CURL_SOCKET_TIMEOUT];;
 
-    [_handles release]; _handles = nil;
+    [_transfers release]; _transfers = nil;
     self.sockets = nil;
 
     CURLMcode result = curl_multi_cleanup(_multi);
@@ -309,29 +308,29 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 {
                     CURLcode code = message->data.result;
                     CURL* easy = message->easy_handle;
-                    CURLHandle* handle = [self handleForCURL:easy];
-                    if (handle)
+                    CURLTransfer* transfer = [self transferForHandle:easy];
+                    if (transfer)
                     {
                         const char* url;
                         curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &url);
-                        CURLMultiLog(@"done msg result %d for %@ %s", code, handle, url);
-                        [handle retain];
+                        CURLMultiLog(@"done msg result %d for %@ %s", code, transfer, url);
+                        [transfer retain];
 
-                        // the order is important here - we remove the handle from the multi first...
-                        [self removeHandle:handle];
+                        // the order is important here - we remove the transfer from the multi first...
+                        [self suspendTransfer:transfer];
 
-                        // ...then tell the easy handle to complete, which can cause curl_easy_cleanup to be called
-                        [handle completeWithCode:code isMulti:NO];
+                        // ...then tell the easy transfer to complete, which can cause curl_easy_cleanup to be called
+                        [transfer completeWithCode:code isMulti:NO];
 
                         // ...then tell it that it's no longer in use by the multi, which breaks the reference cycle between us
-                        //[handle removedByMulti:self];
+                        //[transfer removedByMulti:self];
 
-                        [handle autorelease];
+                        [transfer autorelease];
                     }
                     else
                     {
-                        // this really shouldn't happen - there should always be a matching CURLHandle - but just in case...
-                        CURLMultiLogError(@"SOMETHING WRONG: done msg result %d for easy without a matching CURLHandle %p", code, easy);
+                        // this really shouldn't happen - there should always be a matching CURLTransfer - but just in case...
+                        CURLMultiLogError(@"SOMETHING WRONG: done msg result %d for easy without a matching CURLTransfer %p", code, easy);
                         result = curl_multi_remove_handle(multi, message->easy_handle);
                         NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
                     }
@@ -555,7 +554,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (NSString*)description
 {
-    NSString* managing = [self.handles count] ? [NSString stringWithFormat:@": %@", [self.handles componentsJoinedByString:@","]] : @": no handles";
+    NSString* managing = [self.transfers count] ? [NSString stringWithFormat:@": %@", [self.transfers componentsJoinedByString:@","]] : @": no transfers";
     return [NSString stringWithFormat:@"<MULTI %p%@>", self, managing];
 }
 
@@ -573,7 +572,7 @@ int timeout_callback(CURLM *multi, long timeout_ms, void *userp)
 int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, void *socketp)
 {
     CURLMultiHandle* multi = userp;
-    NSCAssert([multi handleForCURL:easy] != nil, @"socket callback for a handle %p that isn't managed by %@", easy, multi);
+    NSCAssert([multi transferForHandle:easy] != nil, @"socket callback for a handle %p that isn't managed by %@", easy, multi);
 
     [multi updateRegistration:socketp forSocket:s to:what];
     
