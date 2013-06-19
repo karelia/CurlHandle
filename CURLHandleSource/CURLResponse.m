@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 
 #import "CURLResponse.h"
-#import "CURLRequest.h"
+#import "CURLHTTPParsing.h"
 
 
 @interface CURLHTTPResponse : NSHTTPURLResponse

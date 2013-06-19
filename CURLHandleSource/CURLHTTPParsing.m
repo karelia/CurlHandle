@@ -5,7 +5,7 @@
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 
-#import "CURLRequest.h"
+#import "CURLHTTPParsing.h"
 
 @implementation NSString (CURLHandle)
 
