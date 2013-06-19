@@ -8,6 +8,6 @@
 
 
 #import <CURLHandle/CURLTransfer.h>
-#import <CURLHandle/NSURLRequest+CURLHandle.h>
+#import <CURLHandle/CURLRequest.h>
 #import <CURLHandle/CURLProtocol.h>
 #import <CURLHandle/CK2SSHCredential.h>
