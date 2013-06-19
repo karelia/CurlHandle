@@ -168,7 +168,7 @@
 		22C9CFD3170364FB004610FE /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
 		22C9CFD4170364FB004610FE /* libcares.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
 		22C9CFE81703A86D004610FE /* CURLTransfer+MultiSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9CFE71703A86D004610FE /* CURLTransfer+MultiSupport.h */; };
-		22C9CFEA1703A955004610FE /* CURLTransfer+TestingSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9CFE91703A954004610FE /* CURLTransfer+TestingSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		22C9CFEA1703A955004610FE /* CURLTransfer+TestingSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9CFE91703A954004610FE /* CURLTransfer+TestingSupport.h */; };
 		22C9D0081704C627004610FE /* CURLList.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C9D0061704C627004610FE /* CURLList.h */; };
 		22C9D0091704C627004610FE /* CURLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0071704C627004610FE /* CURLList.m */; };
 		22C9D00A1704C627004610FE /* CURLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0071704C627004610FE /* CURLList.m */; };
@@ -554,7 +554,6 @@
 				2721F6011771FB35009A07FE /* CURLHandle.h */,
 				27D77E111672BBB50091EF91 /* CK2SSHCredential.h */,
 				27D77E121672BBB50091EF91 /* CK2SSHCredential.m */,
-				22C9CFE91703A954004610FE /* CURLTransfer+TestingSupport.h */,
 				79B96CBB0A6360F90060AC12 /* CURLTransfer.h */,
 				79B96CBC0A6360F90060AC12 /* CURLTransfer.m */,
 				27229B3814C83905007D0FF1 /* CURLProtocol.h */,
@@ -570,6 +569,7 @@
 			children = (
 				32DBCF5E0370ADEE00C91783 /* CURLHandle_Prefix.pch */,
 				22C9CFE71703A86D004610FE /* CURLTransfer+MultiSupport.h */,
+				22C9CFE91703A954004610FE /* CURLTransfer+TestingSupport.h */,
 				2270F4AA16109133009B6F98 /* CURLHTTPParsing.h */,
 				2270F4AB16109133009B6F98 /* CURLHTTPParsing.m */,
 				22C9D0061704C627004610FE /* CURLList.h */,
