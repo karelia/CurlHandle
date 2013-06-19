@@ -13,9 +13,10 @@
 #endif
 
 /**
- NSURLProtocol support for CURLHandle.
+ An NSURLProtocol subclass implemented by handing off requests to libcurl via CURLTransfer.
  
- This allows you to use NSURLConnection and have it work via a CURLTransfer behind the scenes.
+ This allows you to use the Cocoa URL Loading System's APIs, but have it work
+ using CURLHandle behind the scenes.
  */
 
 @interface CURLProtocol : NSURLProtocol <CURLTransferDelegate, NSURLAuthenticationChallengeSender>
@@ -29,7 +30,12 @@
 
 
 @interface NSURLRequest (CURLProtocol)
+
+/**
+ @return Whether the Cocoa URL Loading System should attempt to use CURLHandle for this request.
+ */
 - (BOOL)shouldUseCurlHandle;
+
 @end
 
 
