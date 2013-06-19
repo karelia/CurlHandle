@@ -33,7 +33,7 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
 
 @interface CURLTransfer : NSObject
 {
-	CURL                    *_curl;                         /*" Pointer to the actual CURL object that does all the hard work "*/
+	CURL                    *_handle;                         /*" Pointer to the actual CURL object that does all the hard work "*/
     CURLMultiHandle               *_multi;
     NSURLRequest            *_request;
 	id <CURLTransferDelegate> _delegate;

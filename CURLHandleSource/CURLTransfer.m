@@ -153,9 +153,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	that do curl-specific stuff like #curl_easy_getinfo
 "*/
 
-- (CURL *) curl
+- (CURL *) curlHandle
 {
-	return _curl;
+	return _handle;
 }
 
 + (NSString *) curlVersion
@@ -196,7 +196,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         }
 
         // Turn automatic redirects off by default, so can properly report them to delegate
-        curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
+        curl_easy_setopt([self curlHandle], CURLOPT_FOLLOWLOCATION, NO);
                 
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
@@ -241,8 +241,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
 	if ((self = [super init]) != nil)
 	{
-		_curl = curl_easy_init();
-		if (_curl)
+		_handle = curl_easy_init();
+		if (_handle)
 		{
             _errorBuffer[0] = 0;	// initialize the error buffer to empty
             _headerBuffer = [[NSMutableData alloc] init];
@@ -264,10 +264,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (CURLcode)setOption:(CURLoption)option data:(CURLoption)data function:(void*)function
 {
-    CURLcode code = curl_easy_setopt(_curl, option, function);
+    CURLcode code = curl_easy_setopt(_handle, option, function);
     if (code == CURLE_OK)
     {
-        code = (curl_easy_setopt(_curl, data, self));
+        code = (curl_easy_setopt(_handle, data, self));
     }
 
     return code;
@@ -275,7 +275,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (CURLcode)setOption:(CURLoption)option string:(NSString*)string
 {
-    CURLcode code = curl_easy_setopt(_curl, option, [string UTF8String]);
+    CURLcode code = curl_easy_setopt(_handle, option, [string UTF8String]);
 
     return code;
 }
@@ -285,7 +285,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     CURLcode code = CURLE_OK;
     if (number)
     {
-        code = curl_easy_setopt(_curl, option, [number longValue]);
+        code = curl_easy_setopt(_handle, option, [number longValue]);
     }
 
     return code;
@@ -294,7 +294,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (CURLcode)setOption:(CURLoption)option url:(NSURL*)url justPath:(BOOL)justPath
 {
     NSString* string = justPath ? [url path] : [url absoluteString];
-    CURLcode code = curl_easy_setopt(_curl, option, [string UTF8String]);
+    CURLcode code = curl_easy_setopt(_handle, option, [string UTF8String]);
 
     return code;
 }
@@ -306,7 +306,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         // make a curl list with the values in the array
         CURLList* values = [CURLList listWithArray:array];
-        result = curl_easy_setopt(_curl, option, values.list);
+        result = curl_easy_setopt(_handle, option, values.list);
 
         // hang on to the list until the handle is done
         if (!self.lists)
@@ -362,7 +362,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	    NSLog(@"CURLTransfer: Using proxy %@:%@", proxyHost, proxyPort);
 	    
         RETURN_IF_FAILED([self setOption:CURLOPT_PROXY string:proxyHost]);
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_PROXYPORT, [proxyPort longValue]));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_PROXYPORT, [proxyPort longValue]));
 
         // Now, provide a user/password if one is globally set.
         if (nil != sProxyUserIDAndPassword)
@@ -387,16 +387,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     RETURN_IF_FAILED([self setOption:CURLOPT_SSH_PUBLIC_KEYFILE url:[credential ck2_publicKeyURL] justPath:YES]);
     if (privateKey)
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY));
         RETURN_IF_FAILED([self setOption:CURLOPT_KEYPASSWD string:password]);
     }
     else if (credential.ck2_isPublicKeyCredential)
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSH_AUTH_TYPES, (1<<4)));    // want to use CURLSSH_AUTH_AGENT, but can't get Xcode to recognise the header
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSH_AUTH_TYPES, (1<<4)));    // want to use CURLSSH_AUTH_AGENT, but can't get Xcode to recognise the header
     }
     else
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD));
         RETURN_IF_FAILED([self setOption:CURLOPT_PASSWORD string:password]);
     }
 
@@ -450,7 +450,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (uploadData)
     {
         _uploadStream = [[NSInputStream alloc] initWithData:uploadData];
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_INFILESIZE, [uploadData length]));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_INFILESIZE, [uploadData length]));
     }
     else
     {
@@ -460,11 +460,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (_uploadStream)
     {
         [_uploadStream open];
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_UPLOAD, 1L));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_UPLOAD, 1L));
     }
     else
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_UPLOAD, 0));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_UPLOAD, 0));
     }
 
     return code;
@@ -477,19 +477,19 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     NSString *method = [request HTTPMethod];
     if ([method isEqualToString:@"GET"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_HTTPGET, 1));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_HTTPGET, 1));
     }
     else if ([method isEqualToString:@"HEAD"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_NOBODY, 1));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_NOBODY, 1));
     }
     else if ([method isEqualToString:@"PUT"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_UPLOAD, 1L));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_UPLOAD, 1L));
     }
     else if ([method isEqualToString:@"POST"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_POST, 1));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_POST, 1));
     }
     else
     {
@@ -504,7 +504,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     NSAssert(_executing == NO, @"CURLTransfer instances may not be accessed on multiple threads at once, or re-entrantly");
     _executing = YES;
 
-    curl_easy_reset([self curl]);
+    curl_easy_reset([self curlHandle]);
 
     _request = [request copy];    // assumes caller will have ensured _originalRequest is suitable for overwriting
     [_headerBuffer setLength:0];
@@ -515,19 +515,19 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     RETURN_IF_FAILED([self setOption:CURLOPT_URL url:[request URL] justPath:NO]);
 
     // misc settings
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_ERRORBUFFER, &_errorBuffer));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FOLLOWLOCATION, YES));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FAILONERROR, YES));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_PRIVATE, self));       // store self in the private data, so that we can turn an easy handle back into a CURLTransfer object
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_ERRORBUFFER, &_errorBuffer));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, YES));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FAILONERROR, YES));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_VERBOSE, 1));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_PRIVATE, self));       // store self in the private data, so that we can turn an easy handle back into a CURLTransfer object
     RETURN_IF_FAILED([self setOption:CURLOPT_SSH_KNOWNHOSTS url:[request curl_SSHKnownHostsFileURL] justPath:YES]);
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories] ? 2 : 0));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories] ? 2 : 0));
     RETURN_IF_FAILED([self setOption:CURLOPT_NEW_FILE_PERMS number:[request curl_newFilePermissions]]);
     RETURN_IF_FAILED([self setOption:CURLOPT_NEW_DIRECTORY_PERMS number:[request curl_newDirectoryPermissions]]);
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]));
     //RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_CERTINFO, 1L);    // isn't supported by Darwin-SSL backend yet
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FTP_USE_EPSV, 0));     // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FTP_USE_EPSV, 0));     // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
 
     // functions
     RETURN_IF_FAILED([self setOption:CURLOPT_SOCKOPTFUNCTION data:CURLOPT_SOCKOPTDATA function:curlSocketOptFunction]);
@@ -567,19 +567,19 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     [_delegate release]; _delegate = nil;
     [_delegateQueue release]; _delegateQueue = nil;
 
-    if (_curl)
+    if (_handle)
     {
         // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
         // can get accessed when calling curl_multi_cleanup, even though the easy handle has been removed from the multi, and cleaned up itself!
         // see http://curl.haxx.se/mail/lib-2009-10/0222.html
         //
         // Additionally, it ought to be done anyway since we're clearing away the curl_slists that the handle currently references
-        curl_easy_reset(_curl);
+        curl_easy_reset(_handle);
         
         if (cleanupHandleToo)
         {
-            curl_easy_cleanup(_curl);
-            _curl = NULL;
+            curl_easy_cleanup(_handle);
+            _handle = NULL;
         }
     }
     
@@ -691,7 +691,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     
     if (result == CURLE_OK)
     {
-        result = curl_easy_perform(self.curl);
+        result = curl_easy_perform(self.curlHandle);
     }
     
     [self completeWithCode:result isMulti:NO];
@@ -702,7 +702,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (NSString *)initialFTPPath;
 {
     char *entryPath;
-    if (curl_easy_getinfo(_curl, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
+    if (curl_easy_getinfo(_handle, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
     
     return (entryPath ? [NSString stringWithUTF8String:entryPath] : nil);
 }
@@ -719,13 +719,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                                      nil];
     
     long responseCode;
-    if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
+    if (curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
     {
         [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:@(CURLINFO_RESPONSE_CODE)];
     }
     
     long osErrorNumber = 0;
-    if (curl_easy_getinfo(_curl, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
+    if (curl_easy_getinfo(_handle, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
     {
         [userInfo setObject:[NSError errorWithDomain:NSPOSIXErrorDomain code:osErrorNumber userInfo:nil]
                      forKey:NSUnderlyingErrorKey];
@@ -809,7 +809,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         case CURLE_SSL_CACERT:
         {
             struct curl_certinfo *certInfo = NULL;
-            if (curl_easy_getinfo(_curl, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
+            if (curl_easy_getinfo(_handle, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
             {
                 // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
             }
@@ -869,7 +869,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (NSString*)description
 {
-    return [NSString stringWithFormat:@"<EASY %p (%p)>", self, self.curl];
+    return [NSString stringWithFormat:@"<EASY %p (%p)>", self, self.curlHandle];
 }
 
 #pragma mark Delegate
@@ -909,10 +909,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         [_headerBuffer setLength:0];
 
         long code;
-        if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK)
+        if (curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK)
         {
             char *urlBuffer;
-            if (curl_easy_getinfo(_curl, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
+            if (curl_easy_getinfo(_handle, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
             {
                 NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
                 if (urlString)

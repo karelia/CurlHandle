@@ -26,7 +26,7 @@
 
  */
 
-- (CURL*)curl;
+- (CURL*)curlHandle;
 
 /**
  Called by <CURLMulti> to tell the transfer that it has completed.

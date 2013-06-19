@@ -183,7 +183,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         
         NSAssert(![self.transfers containsObject:transfer], @"shouldn't add a transfer twice");
         
-        CURLMcode result = curl_multi_add_handle(_multi, [transfer curl]);
+        CURLMcode result = curl_multi_add_handle(_multi, [transfer curlHandle]);
         if (result == CURLM_OK)
         {
             CURLMultiLog(@"added transfer %@", transfer);
@@ -202,7 +202,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert([_transfers containsObject:transfer], @"we should be managing this transfer");
     
     CURLMultiLog(@"removed transfer %@", transfer);
-    CURLMcode result = curl_multi_remove_handle(_multi, [transfer curl]);
+    CURLMcode result = curl_multi_remove_handle(_multi, [transfer curlHandle]);
     
     NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
     [_transfers removeObject:transfer];
