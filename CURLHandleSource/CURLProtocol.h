@@ -40,11 +40,17 @@
 
 
 @interface NSMutableURLRequest (CURLProtocol)
-/**
- Setting to YES automatically registers CURLProtocol with NSURLProtocol. You can do so earlier, manually if required
- 
- @param useCurl should this request use CURL?
- */
 
+/**
+ libcurl supports a wide variety of protocols, but you probably don't want the
+ Cocoa URL Loading System to hand off to it for everything. Thus this method
+ must be used to explicitly mark a request as wanting to use CURLHandle.
+ 
+ Note that the URL Loading System will ignore this property **unless** you've
+ already registered `CURLProtocol` appropriately.
+ 
+ @param useCurl Whether the Cocoa URL Loading System should attempt to use CURLHandle for this request.
+ */
 - (void)setShouldUseCurlHandle:(BOOL)useCurl;
+
 @end

@@ -19,6 +19,12 @@
 
 @implementation CURLProtocolTests
 
+- (void)setUp;
+{
+    [super setUp];
+    [NSURLProtocol registerClass:[CURLProtocol class]];
+}
+
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     NSLog(@"failed with error %@", error);

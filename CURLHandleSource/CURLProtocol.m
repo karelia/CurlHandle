@@ -205,7 +205,6 @@ static NSString *const UseCurlHandleKey = @"useCurlHandle";
 - (void)setShouldUseCurlHandle:(BOOL)useCurl;
 {
     [NSURLProtocol setProperty:[NSNumber numberWithBool:useCurl] forKey:UseCurlHandleKey inRequest:self];
-    [NSURLProtocol registerClass:[CURLProtocol class]];
 }
 
 @end
