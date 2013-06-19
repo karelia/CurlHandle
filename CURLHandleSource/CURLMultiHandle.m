@@ -52,11 +52,6 @@
 #import "CURLSocketRegistration.h"
 
 
-@interface CURLHandle (Private)
-- (void)completeWithError:(NSError *)error;
-@end
-
-
 @interface CURLMultiHandle()
 
 #pragma mark - Private Properties
