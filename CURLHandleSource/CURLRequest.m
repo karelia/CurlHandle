@@ -9,18 +9,6 @@
 
 @implementation NSString (CURLHandle)
 
-- (NSString *) headerStatus
-{
-	// Get the first line of the headers
-	NSArray *components = [self componentsSeparatedByLineSeparators];
-	NSString *theFirstLine = [components objectAtIndex:0];
-	// Pull out from the second "word"
-	NSArray *theLineComponents = [theFirstLine componentsSeparatedByString: @" "];
-	NSRange theRange = NSMakeRange(2, [theLineComponents count] - 2);
-	NSString *theResult = [[theLineComponents subarrayWithRange: theRange] componentsJoinedByString: @" "];
-	return theResult;
-}
-
 - (NSString *) headerHTTPVersion
 {
 	NSString *result = nil;
@@ -32,42 +20,6 @@
 	}
 	return result;
 }
-
-/*"	Create an array of values from the HTTP headers string that match the given header key.
-"*/
-
-- (NSArray *) headersMatchingKey:(NSString *)inKey
-{
-	NSMutableArray *result = [NSMutableArray array];
-	NSArray *components = [self componentsSeparatedByLineSeparators];
-	NSEnumerator *theEnum = [components objectEnumerator];
-	NSString *theLine = [theEnum nextObject];		// result code -- ignore
-	(void)theLine;
-	while (nil != (theLine = [theEnum nextObject]) )
-	{
-		if ([[theLine headerKey] isEqualToString:inKey])
-		{
-			// Add it to the resulting array
-			[result addObject:[theLine headerValue]];
-		}
-	}
-	return result;
-}
-
-
-/*" Return a the single (first) value of a header.  Returns NULL if not found. "*/
-
-- (NSString *)headerMatchingKey:(NSString *)inKey
-{
-	NSString *result = nil;
-	NSArray *headerArray = [self headersMatchingKey:inKey];
-	if ([headerArray count] > 0)
-	{
-		result = [headerArray objectAtIndex:0];
-	}
-	return result;
-}
-
 
 /*"	Create a dictionary from the HTTP headers. "*/
 

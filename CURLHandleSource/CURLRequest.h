@@ -9,10 +9,7 @@
 
 @interface NSString (CURLHandle)
 
-- (NSString *) headerStatus;
 - (NSString *) headerHTTPVersion;
-- (NSString *) headerMatchingKey:(NSString *)inKey;
-- (NSArray *) headersMatchingKey:(NSString *)inKey;
 - (NSDictionary *) allHTTPHeaderFields;
 - (NSString *) headerKey;
 - (NSString *) headerValue;
