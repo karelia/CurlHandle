@@ -6,7 +6,8 @@
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLProtocol.h"
+#import "CURLRequest.h"
 
 #import "CURLHandleBasedTest.h"
 
@@ -17,6 +18,12 @@
 @end
 
 @implementation CURLProtocolTests
+
+- (void)setUp;
+{
+    [super setUp];
+    [NSURLProtocol registerClass:[CURLProtocol class]];
+}
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {

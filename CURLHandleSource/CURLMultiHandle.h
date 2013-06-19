@@ -1,5 +1,5 @@
 //
-//  CURLMulti.h
+//  CURLMultiHandle.h
 //  CURLHandle
 //
 //  Created by Sam Deane on 20/09/2012.
@@ -22,8 +22,8 @@
 #define CURLMultiLogDetail CURLMultiLog
 #endif
 
-@class CURLHandle;
-@class CURLSocket;
+@class CURLTransfer;
+@class CURLSocketRegistration;
 
 /**
  * Wrapper for a curl_multi handle.
@@ -41,17 +41,15 @@
  * happens that needs attention.
  */
 
-@interface CURLMulti : NSObject
+@interface CURLMultiHandle : NSObject
 {
     CURLM *_multi;
-    CURLM* _multiForSocket;
-    NSMutableArray* _handles;
+    NSMutableArray* _transfers;
     NSMutableArray* _sockets;
-    NSMutableArray* _pendingAdditions;
-    NSMutableArray* _pendingRemovals;
     dispatch_queue_t _queue;
-    dispatch_source_t _timer;
-    BOOL _timeoutTimerSuspended;
+    
+    dispatch_source_t   _timer;
+    BOOL                _timerIsSuspended;
 }
 
 /**
@@ -62,10 +60,10 @@
  * @return The shared instance.
  */
 
-+ (CURLMulti*)sharedInstance;
++ (CURLMultiHandle*)sharedInstance;
 
 
-/** Prepare the multi for work. Needs to be called once before addHandle is called. Should be matched with a call to shutdown
+/** Prepare the multi for work. Needs to be called once before beginTransfer is called. Should be matched with a call to shutdown
  * before the multi is destroyed.
  */
 
@@ -78,29 +76,31 @@
 - (void)shutdown;
 
 /**
- * Assign a CURLHandle to the multi to manage.
- * CURLHandle uses this method internally when you call loadRequest:withMulti: on a handle,
+ * Assign a CURLTransfer to the multi to manage.
+ * CURLTransfer uses this method internally when you call loadRequest:withMulti: on a transfer,
  * so generally you don't need to call it directly.
- * The multi will retain the handle for as long as it needs it, but will silently release it once
- * the handle's upload/download has completed or failed.
+ * The multi will retain the transfer for as long as it needs it, but will silently release it once
+ * the transfer has completed or failed.
  *
- * @param handle The handle to manage. Will be retained by the multi.
+ * @param transfer The transfer to manage. Will be retained by the multi until removed (completion automatically performs removal).
  */
 
-- (void)manageHandle:(CURLHandle*)handle;
+- (void)beginTransfer:(CURLTransfer*)transfer;
 
 /** 
- * This removes the handle from the multi. *
- * It is safe to call this method for a handle that has already been cancelled, or has completed,
+ * This removes the transfer from the multi. *
+ * It is safe to call this method for a transfer that has already been cancelled, or has completed,
  * (or indeed was never managed by the multi). Doing so will simply do nothing.
  *
- * To cancel the handle, call [handle cancel] instead - it will end up calling this method too,
- * if the handle was being managed by a multi.
+ * @warning ONLY call this on the receiver's queue
  *
- * @param handle The handle to cancel. Should have previously been added with manageHandle:.
+ * To cancel the transfer, call [transfer cancel] instead - it will end up calling this method too,
+ * if the transfer was being managed by a multi.
+ *
+ * @param transfer The transfer to cancel. Should have previously been added with beginTransfer:.
  */
 
-- (void)stopManagingHandle:(CURLHandle*)handle;
+- (void)suspendTransfer:(CURLTransfer*)transfer;
 
 /**
  Update the dispatch source for a given socket and type.
@@ -109,12 +109,17 @@
 
  @param source The current dispatch source for the given type
  @param type Is this the source for reading or writing?
- @param socket The <CURLSocket> object that owns the source.
- @param raw The raw system socket that the dispatch source should be monitoring.
+ @param socket The raw system socket that the dispatch source should be monitoring.
+ @param registration The <CURLSocketRegistration> object that owns the source.
  @param required Is the source required? If not, an existing source will be cancelled. If required and the source parameter is nil, and new one will be created.
  @return The new/updated dispatch source.
 */
 
-- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(CURLSocket*)socket raw:(int)raw required:(BOOL)required;
+- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket registration:(CURLSocketRegistration *)registration required:(BOOL)required;
+
+/**
+ The serial queue the instance schedules sources on
+ */
+@property (readonly, assign, nonatomic) dispatch_queue_t queue;
 
 @end

@@ -1,19 +1,20 @@
 //
-//  CURLHandle.m
+//  CURLTransfer.m
 //  CURLHandle
 //
 //  Created by Dan Wood <dwood@karelia.com> on Fri Jun 22 2001.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
-#import "CURLHandle.h"
-#import "CURLHandle+MultiSupport.h"
-#import "CURLHandle+TestingSupport.h"
-#import "CURLMulti.h"
-#import "CURLResponse.h"
-#import "CURLList.h"
+#import "CURLTransfer.h"
+#import "CURLTransfer+MultiSupport.h"
+#import "CURLTransfer+TestingSupport.h"
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLList.h"
+#import "CURLMultiHandle.h"
+#import "CURLRequest.h"
+#import "CURLResponse.h"
+
 #import "CK2SSHCredential.h"
 
 #include <SystemConfiguration/SystemConfiguration.h>
@@ -52,40 +53,41 @@ NSString			*sProxyUserIDAndPassword = nil;
 
 #pragma mark - Callback Prototypes
 
-int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype purpose);
-static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self);
-static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self);
-static size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *handle);
-static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *handle);
+int curlSocketOptFunction(CURLTransfer *self, curl_socket_t curlfd, curlsocktype purpose);
+static size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLTransfer *self);
+static size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLTransfer *self);
+static size_t curlReadFunction(void *ptr, size_t size, size_t nmemb, CURLTransfer *transfer);
+static int curlDebugFunction(CURL *mCURL, curl_infotype infoType, char *info, size_t infoLength, CURLTransfer *transfer);
 
 static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                                   const struct curl_khkey *knownkey, /* known */
                                   const struct curl_khkey *foundkey, /* found */
                                   enum curl_khmatch, /* libcurl's view on the keys */
-                                  CURLHandle *self); /* custom pointer passed from app */
+                                  CURLTransfer *self); /* custom pointer passed from app */
 
 #pragma mark - Private API
 
-@interface CURLHandle()
+@interface CURLTransfer()
 
 - (size_t) curlReceiveDataFrom:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber isHeader:(BOOL)header;
 - (size_t) curlSendDataTo:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @property (strong, nonatomic) NSMutableArray* lists;
-@property (strong, nonatomic) id <CURLHandleDelegate> delegate; // As an asynchronous API, CURLHandle retains its delegate until the request is finished, failed, or cancelled. Much like NSURLConnection
-@property (strong, nonatomic) CURLMulti* multi;
+@property (strong, nonatomic, readonly) CURLMultiHandle* multi;
 
 @end
 
 
-@implementation CURLHandle
+@implementation CURLTransfer
 
-@synthesize delegate = _delegate;
+@synthesize originalRequest = _request;
+@synthesize state = _state;
+@synthesize error = _error;
 @synthesize lists = _lists;
 @synthesize multi = _multi;
 
 
-/*"	CURLHandle is a wrapper around a CURL.
+/*"	CURLTransfer is a wrapper around a CURL.
 	This is in the public domain, but please report any improvements back to the author
 	(dwood_karelia_com).
 	Be sure to be familiar with CURL and how it works; see http://curl.haxx.se/
@@ -111,7 +113,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark ----- ADDITIONAL CURLHANDLE INTERFACES
 // -----------------------------------------------------------------------------
 
-/*" Initialize CURLHandle and the underlying CURL.  This can be invoked when the program is launched or before any loading is needed.
+/*" Initialize CURLTransfer and the underlying CURL.  This can be invoked when the program is launched or before any loading is needed.
 "*/
 
 + (void)initialize
@@ -130,7 +132,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	}
 }
 
-/*"	Set a proxy user id and password, used by all CURLHandle. This should be done before any transfers are made."*/
+/*"	Set a proxy user id and password, used by all CURLTransfer. This should be done before any transfers are made."*/
 
 + (void) setProxyUserIDAndPassword:(NSString *)inString
 {
@@ -152,9 +154,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	that do curl-specific stuff like #curl_easy_getinfo
 "*/
 
-- (CURL *) curl
+- (CURL *) curlHandle
 {
-	return _curl;
+	return _handle;
 }
 
 + (NSString *) curlVersion
@@ -167,29 +169,45 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark Lifecycle
 // -----------------------------------------------------------------------------
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate multi:(CURLMulti*)multi
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id<CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue;
 {
+    return [self initWithRequest:request
+                      credential:credential
+                        delegate:delegate delegateQueue:queue
+                           multi:[CURLMultiHandle sharedInstance]];
+}
+
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLMultiHandle *)multi;
+{
+    NSParameterAssert(multi);
+    
     if (self = [self init])
     {
-        if (!multi)
-        {
-            multi = [CURLMulti sharedInstance];
-        }
+        _delegate = [delegate retain];
         
-        self.delegate = delegate;
+        if (queue)
+        {
+            _delegateQueue = [queue retain];
+        }
+        else
+        {
+            // Make our own queue for the delegate to use
+            _delegateQueue = [[NSOperationQueue alloc] init];
+            _delegateQueue.maxConcurrentOperationCount = 1;
+        }
 
         // Turn automatic redirects off by default, so can properly report them to delegate
-        curl_easy_setopt([self curl], CURLOPT_FOLLOWLOCATION, NO);
+        curl_easy_setopt([self curlHandle], CURLOPT_FOLLOWLOCATION, NO);
                 
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
-            self.multi = multi;
-            [multi manageHandle:self];
+            _multi = [multi retain];
+            [multi beginTransfer:self];
         }
         else
         {
-            [self failWithCode:code isMulti:NO];
+            [self completeWithCode:code isMulti:NO];
         }
     }
     
@@ -204,7 +222,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     [self cleanupIncludingHandle:YES];
 
     [_delegate release];
-    [_URL release];
+    [_delegateQueue release];
+    [_request release];
+    [_error release];
 	[_headerBuffer release];
 	[_proxies release];
     [_uploadStream release];
@@ -214,7 +234,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	[super dealloc];
 }
 
-/*" %{Initializes a newly created URL handle with the request.}
+/*" %{Initializes a newly created URL transfer with the request.}
 
 "*/
 
@@ -222,8 +242,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
 	if ((self = [super init]) != nil)
 	{
-		_curl = curl_easy_init();
-		if (_curl)
+		_handle = curl_easy_init();
+		if (_handle)
 		{
             _errorBuffer[0] = 0;	// initialize the error buffer to empty
             _headerBuffer = [[NSMutableData alloc] init];
@@ -245,10 +265,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (CURLcode)setOption:(CURLoption)option data:(CURLoption)data function:(void*)function
 {
-    CURLcode code = curl_easy_setopt(_curl, option, function);
+    CURLcode code = curl_easy_setopt(_handle, option, function);
     if (code == CURLE_OK)
     {
-        code = (curl_easy_setopt(_curl, data, self));
+        code = (curl_easy_setopt(_handle, data, self));
     }
 
     return code;
@@ -256,7 +276,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (CURLcode)setOption:(CURLoption)option string:(NSString*)string
 {
-    CURLcode code = curl_easy_setopt(_curl, option, [string UTF8String]);
+    CURLcode code = curl_easy_setopt(_handle, option, [string UTF8String]);
 
     return code;
 }
@@ -266,7 +286,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     CURLcode code = CURLE_OK;
     if (number)
     {
-        code = curl_easy_setopt(_curl, option, [number longValue]);
+        code = curl_easy_setopt(_handle, option, [number longValue]);
     }
 
     return code;
@@ -275,7 +295,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (CURLcode)setOption:(CURLoption)option url:(NSURL*)url justPath:(BOOL)justPath
 {
     NSString* string = justPath ? [url path] : [url absoluteString];
-    CURLcode code = curl_easy_setopt(_curl, option, [string UTF8String]);
+    CURLcode code = curl_easy_setopt(_handle, option, [string UTF8String]);
 
     return code;
 }
@@ -287,7 +307,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         // make a curl list with the values in the array
         CURLList* values = [CURLList listWithArray:array];
-        result = curl_easy_setopt(_curl, option, values.list);
+        result = curl_easy_setopt(_handle, option, values.list);
 
         // hang on to the list until the handle is done
         if (!self.lists)
@@ -340,10 +360,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     if (proxyHost && proxyPort)
     {
-	    NSLog(@"CURLHandle: Using proxy %@:%@", proxyHost, proxyPort);
+	    NSLog(@"CURLTransfer: Using proxy %@:%@", proxyHost, proxyPort);
 	    
         RETURN_IF_FAILED([self setOption:CURLOPT_PROXY string:proxyHost]);
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_PROXYPORT, [proxyPort longValue]));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_PROXYPORT, [proxyPort longValue]));
 
         // Now, provide a user/password if one is globally set.
         if (nil != sProxyUserIDAndPassword)
@@ -368,16 +388,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     RETURN_IF_FAILED([self setOption:CURLOPT_SSH_PUBLIC_KEYFILE url:[credential ck2_publicKeyURL] justPath:YES]);
     if (privateKey)
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY));
         RETURN_IF_FAILED([self setOption:CURLOPT_KEYPASSWD string:password]);
     }
     else if (credential.ck2_isPublicKeyCredential)
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSH_AUTH_TYPES, (1<<4)));    // want to use CURLSSH_AUTH_AGENT, but can't get Xcode to recognise the header
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSH_AUTH_TYPES, (1<<4)));    // want to use CURLSSH_AUTH_AGENT, but can't get Xcode to recognise the header
     }
     else
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PASSWORD|CURLSSH_AUTH_KEYBOARD));
         RETURN_IF_FAILED([self setOption:CURLOPT_PASSWORD string:password]);
     }
 
@@ -431,7 +451,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (uploadData)
     {
         _uploadStream = [[NSInputStream alloc] initWithData:uploadData];
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_INFILESIZE, [uploadData length]));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_INFILESIZE, [uploadData length]));
     }
     else
     {
@@ -441,11 +461,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (_uploadStream)
     {
         [_uploadStream open];
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_UPLOAD, 1L));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_UPLOAD, 1L));
     }
     else
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_UPLOAD, 0));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_UPLOAD, 0));
     }
 
     return code;
@@ -458,19 +478,19 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     NSString *method = [request HTTPMethod];
     if ([method isEqualToString:@"GET"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_HTTPGET, 1));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_HTTPGET, 1));
     }
     else if ([method isEqualToString:@"HEAD"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_NOBODY, 1));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_NOBODY, 1));
     }
     else if ([method isEqualToString:@"PUT"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_UPLOAD, 1L));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_UPLOAD, 1L));
     }
     else if ([method isEqualToString:@"POST"])
     {
-        RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_POST, 1));
+        RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_POST, 1));
     }
     else
     {
@@ -482,12 +502,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (CURLcode)setupRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential
 {
-    NSAssert(_executing == NO, @"CURLHandle instances may not be accessed on multiple threads at once, or re-entrantly");
+    NSAssert(_executing == NO, @"CURLTransfer instances may not be accessed on multiple threads at once, or re-entrantly");
     _executing = YES;
 
-    curl_easy_reset([self curl]);
+    curl_easy_reset([self curlHandle]);
 
-    _URL = [[request URL] copy];    // assumes caller will have ensured _URL is suitable for overwriting
+    _request = [request copy];    // assumes caller will have ensured _originalRequest is suitable for overwriting
     [_headerBuffer setLength:0];
 
     CURLcode code = CURLE_OK;
@@ -496,19 +516,19 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     RETURN_IF_FAILED([self setOption:CURLOPT_URL url:[request URL] justPath:NO]);
 
     // misc settings
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_ERRORBUFFER, &_errorBuffer));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FOLLOWLOCATION, YES));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FAILONERROR, YES));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_PRIVATE, self));       // store self in the private data, so that we can turn an easy handle back into a CURLHandle object
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_ERRORBUFFER, &_errorBuffer));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, YES));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FAILONERROR, YES));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_VERBOSE, 1));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_PRIVATE, self));       // store self in the private data, so that we can turn an easy handle back into a CURLTransfer object
     RETURN_IF_FAILED([self setOption:CURLOPT_SSH_KNOWNHOSTS url:[request curl_SSHKnownHostsFileURL] justPath:YES]);
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories] ? 2 : 0));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FTP_CREATE_MISSING_DIRS, [request curl_createIntermediateDirectories] ? 2 : 0));
     RETURN_IF_FAILED([self setOption:CURLOPT_NEW_FILE_PERMS number:[request curl_newFilePermissions]]);
     RETURN_IF_FAILED([self setOption:CURLOPT_NEW_DIRECTORY_PERMS number:[request curl_newDirectoryPermissions]]);
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_USE_SSL, (long)[request curl_desiredSSLLevel]));
     //RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_CERTINFO, 1L);    // isn't supported by Darwin-SSL backend yet
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]));
-    RETURN_IF_FAILED(curl_easy_setopt(_curl, CURLOPT_FTP_USE_EPSV, 0));     // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]));
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FTP_USE_EPSV, 0));     // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
 
     // functions
     RETURN_IF_FAILED([self setOption:CURLOPT_SOCKOPTFUNCTION data:CURLOPT_SOCKOPTDATA function:curlSocketOptFunction]);
@@ -545,21 +565,22 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
     // (the curl_easy_reset below should fix this anyway by unregistering the callbacks, but let's be paranoid...)
-    self.delegate = nil;
+    [_delegate release]; _delegate = nil;
+    [_delegateQueue release]; _delegateQueue = nil;
 
-    if (_curl)
+    if (_handle)
     {
         // NB this is a workaround to fix a bug where an easy handle that was attached to a multi
         // can get accessed when calling curl_multi_cleanup, even though the easy handle has been removed from the multi, and cleaned up itself!
         // see http://curl.haxx.se/mail/lib-2009-10/0222.html
         //
         // Additionally, it ought to be done anyway since we're clearing away the curl_slists that the handle currently references
-        curl_easy_reset(_curl);
+        curl_easy_reset(_handle);
         
         if (cleanupHandleToo)
         {
-            curl_easy_cleanup(_curl);
-            _curl = NULL;
+            curl_easy_cleanup(_handle);
+            _handle = NULL;
         }
     }
     
@@ -569,6 +590,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     [self.lists removeAllObjects];
+    
+    [_multi release]; _multi = nil;
 
     _executing = NO;
 }
@@ -578,83 +601,101 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (void)cancel;
 {
     CURLHandleLog(@"cancelled");
-
-    // setting the delegate to nil ensures that we don't send any more delegate messages, and
-    // also tells anything internal that wants to know that we've been cancelled
-    self.delegate = nil;
-
-    if (self.multi)
+    
+    CURLMultiHandle *multi = self.multi;
+    if (multi)
     {
-        [self.multi stopManagingHandle:self];
+        // Mark as cancelling. There's a slim chance we've been asked to cancel at
+        // the same time as the operation is actually completing anyway. If so skip
+        // the "canceling" state entirely, as it's a bit confusing otherwise.
+        //
+        // We use the CURLMulti's queue to synchronize access to this ivar, and
+        // deliberately make the usage synchronous so that self.state is correct upon
+        // returning from this method. Deadlock *shouldn't* be possible since client
+        // code should always run on _delegateQueue rather than CURLMulti's.
+        dispatch_queue_t queue = multi.queue;
+        dispatch_sync(queue, ^{
+            
+            if (_state < CURLTransferStateCanceling)
+            {
+                _state = CURLTransferStateCanceling;
+                
+                [multi suspendTransfer:self];
+                
+                // Report self as completed once any pending work on the queue is performed
+                // Removing will have stopped any new events, but there may be some already
+                // received, sitting in the queue
+                dispatch_async(queue, ^{
+                    [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+                });
+            }
+        });
+    }
+    else    // synchronous usage
+    {
+        [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
     }
 }
 
-
-- (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode
+- (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
 {
     CURLHandleLog(@"completed with %@ code %d", code, isMulti ? @"multi" : @"easy");
     
-    if (code == (isMultiCode ? CURLM_OK : CURLE_OK))
+    NSError *error = nil;
+    if (code != (isMultiCode ? CURLM_OK : CURLE_OK))
     {
-        [self finish];
+        error = (isMultiCode ?
+                 [NSError errorWithDomain:CURLMcodeErrorDomain code:(CURLMcode)code userInfo:nil] :
+                 [self errorForURL:self.originalRequest.URL code:(CURLcode)code]);
+        NSAssert(error, @"Failed to created error");
+    }
+    
+    [self completeWithError:error];
+}
+
+- (void)completeWithError:(NSError *)error;
+{
+    _error = [error copy];
+    _state = CURLTransferStateCompleted;
+    
+    [self notifyDelegateOfResponseIfNeeded];
+    
+    if (!error)
+    {
+        CURLHandleLog(@"finished");
     }
     else
     {
-        [self failWithCode:code isMulti:isMultiCode];
+        CURLHandleLog(@"failed with error %@", error);
     }
-
-    [self cleanupIncludingHandle:YES];
-}
-
-- (void)finish;
-{
-    CURLHandleLog(@"finished");
-    [self notifyDelegateOfResponseIfNeeded];
-    if ([_delegate respondsToSelector:@selector(handleDidFinish:)])
+    
+    // We run cleanup after delegate messages are all delivered if possible
+    if (![self tryToPerformSelectorOnDelegate:@selector(transfer:didCompleteWithError:) usingBlock:^{
+        
+        [self.delegate transfer:self didCompleteWithError:error];
+        [self cleanupIncludingHandle:YES];
+    }])
     {
-        [self.delegate handleDidFinish:self];
+        [self cleanupIncludingHandle:YES];
     }
 }
-
-- (void)failWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
-{
-    NSError* error = (isMultiCode ?
-                      [NSError errorWithDomain:CURLMcodeErrorDomain code:(CURLMcode)code userInfo:nil] :
-                      [self errorForURL:_URL code:(CURLcode)code]);
-    CURLHandleLog(@"failed with error %@", error);
-
-    if ([self.delegate respondsToSelector:@selector(handle:didFailWithError:)])
-    {
-        [self.delegate handle:self didFailWithError:error];
-    }
-}
-
-
 
 #pragma mark Synchronous Loading
 
-- (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLHandleDelegate>)delegate;
+- (void)sendSynchronousRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate;
 {
-    self.delegate = delegate;
+    NSAssert(_delegate == nil, @"CURLTransfer can only service a single request at a time");
+    _delegate = [delegate retain];
     
-    [_URL release]; // -setupRequest:É will fill it back in
+    [_request release]; // -setupRequest:É will fill it back in
     CURLcode result = [self setupRequest:request credential:credential];
     
     if (result == CURLE_OK)
     {
-        result = curl_easy_perform(self.curl);
+        result = curl_easy_perform(self.curlHandle);
     }
     
-    if (result == CURLE_OK)
-    {
-        [self finish];
-    }
-    else
-    {
-        [self failWithCode:result isMulti:NO];
-    }
-    
-    [self cleanupIncludingHandle:NO];
+    [self completeWithCode:result isMulti:NO];
 }
 
 #pragma mark Post-Request Info
@@ -662,7 +703,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (NSString *)initialFTPPath;
 {
     char *entryPath;
-    if (curl_easy_getinfo(_curl, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
+    if (curl_easy_getinfo(_handle, CURLINFO_FTP_ENTRY_PATH, &entryPath) != CURLE_OK) return nil;
     
     return (entryPath ? [NSString stringWithUTF8String:entryPath] : nil);
 }
@@ -679,13 +720,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                                      nil];
     
     long responseCode;
-    if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
+    if (curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &responseCode) == CURLE_OK && responseCode)
     {
         [userInfo setObject:[NSNumber numberWithLong:responseCode] forKey:@(CURLINFO_RESPONSE_CODE)];
     }
     
     long osErrorNumber = 0;
-    if (curl_easy_getinfo(_curl, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
+    if (curl_easy_getinfo(_handle, CURLINFO_OS_ERRNO, &osErrorNumber) == CURLE_OK && osErrorNumber)
     {
         [userInfo setObject:[NSError errorWithDomain:NSPOSIXErrorDomain code:osErrorNumber userInfo:nil]
                      forKey:NSUnderlyingErrorKey];
@@ -769,7 +810,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         case CURLE_SSL_CACERT:
         {
             struct curl_certinfo *certInfo = NULL;
-            if (curl_easy_getinfo(_curl, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
+            if (curl_easy_getinfo(_handle, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
             {
                 // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
             }
@@ -802,41 +843,20 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 #pragma mark - Multi Support
 
-- (BOOL)handledByMulti
++ (CURLMultiHandle*)standaloneMultiForTestPurposes
 {
-    return self.multi != nil;
-}
-
-- (void)removedByMulti:(CURLMulti*)multi
-{
-    if (multi)
-    {
-        NSAssert(multi == self.multi, @"removed by the wrong multi: %@ not %@", multi, self.multi);
-    }
-
-    self.multi = nil;
-    self.delegate = nil;
-}
-
-+ (CURLMulti*)standaloneMultiForTestPurposes
-{
-    CURLMulti* multi = [[[CURLMulti alloc] init] autorelease];
+    CURLMultiHandle* multi = [[[CURLMultiHandle alloc] init] autorelease];
     [multi startup];
 
     return multi;
 }
 
-+ (void)cleanupStandaloneMulti:(CURLMulti*)multi
++ (void)cleanupStandaloneMulti:(CURLMultiHandle*)multi
 {
     [multi shutdown];
 }
 
 #pragma mark Utilities
-
-- (BOOL)isCancelled
-{
-    return _delegate == nil;
-}
 
 - (BOOL)hasCompleted
 {
@@ -850,24 +870,50 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (NSString*)description
 {
-    return [NSString stringWithFormat:@"<EASY %p (%p)>", self, self.curl];
+    return [NSString stringWithFormat:@"<EASY %p (%p)>", self, self.curlHandle];
 }
 
+#pragma mark Delegate
+
+@synthesize delegate = _delegate;
+
+/* Runs the block on our delegate queue.
+ * If the delegate doesn't respond, the block is not run/enqueued
+ */
+- (BOOL)tryToPerformSelectorOnDelegate:(SEL)selector usingBlock:(void (^)(void))block;
+{
+    if ([self.delegate respondsToSelector:selector])
+    {
+        if (_delegateQueue)
+        {
+            [_delegateQueue addOperationWithBlock:block];
+        }
+        else
+        {
+            block();
+        }
+        
+        return YES;
+    }
+    else
+    {
+        return NO;
+    }
+}
 
 - (void)notifyDelegateOfResponseIfNeeded;
 {
     // If a response has been buffered, send that off
-    
     if ([_headerBuffer length])
     {
         NSString *headerString = [[NSString alloc] initWithData:_headerBuffer encoding:NSASCIIStringEncoding];
         [_headerBuffer setLength:0];
 
         long code;
-        if (curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK)
+        if (curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK)
         {
             char *urlBuffer;
-            if (curl_easy_getinfo(_curl, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
+            if (curl_easy_getinfo(_handle, CURLINFO_EFFECTIVE_URL, &urlBuffer) == CURLE_OK)
             {
                 NSString *urlString = [[NSString alloc] initWithUTF8String:urlBuffer];
                 if (urlString)
@@ -876,7 +922,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                     if (url)
                     {
                         NSURLResponse *response = [CURLResponse responseWithURL:url statusCode:code headerString:headerString];
-                        [self.delegate handle:self didReceiveResponse:response];
+                        
+                        [self tryToPerformSelectorOnDelegate:@selector(transfer:didReceiveResponse:) usingBlock:^{
+                            [self.delegate transfer:self didReceiveResponse:response];
+                        }];
 
                         [url release];
                     }
@@ -907,7 +956,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 		if (header)
 		{
             // Delegate might not care about the response
-            if ([self.delegate respondsToSelector:@selector(handle:didReceiveResponse:)])
+            if ([self.delegate respondsToSelector:@selector(transfer:didReceiveResponse:)])
             {
                 [_headerBuffer appendData:data];
             }
@@ -918,7 +967,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             [self notifyDelegateOfResponseIfNeeded];
 
             // Report regular body data
-			[self.delegate handle:self didReceiveData:data];
+            [self tryToPerformSelectorOnDelegate:@selector(transfer:didReceiveData:) usingBlock:^{
+                [self.delegate transfer:self didReceiveData:data];
+            }];
 		}
 	}
     else
@@ -939,27 +990,27 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
         if (result < 0)
         {
-            if ([self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)])
-            {
+            [self tryToPerformSelectorOnDelegate:@selector(transfer:didReceiveDebugInformation:ofType:) usingBlock:^{
+                
                 NSError *error = [_uploadStream streamError];
-
-                [self.delegate handle:self
+                
+                [self.delegate transfer:self
            didReceiveDebugInformation:[NSString stringWithFormat:@"Read failed: %@", [error debugDescription]]
                                ofType:CURLINFO_HEADER_IN];
-            }
+            }];
 
             return CURL_READFUNC_ABORT;
         }
 
-        if (result >= 0 && [self.delegate respondsToSelector:@selector(handle:willSendBodyDataOfLength:)])
-        {
+        if (result >= 0) [self tryToPerformSelectorOnDelegate:@selector(transfer:willSendBodyDataOfLength:) usingBlock:^{
+            
             CURLHandleLog(@"sending %ld bytes from %p", inSize * inNumber, inPtr);
-            [self.delegate handle:self willSendBodyDataOfLength:result];
+            [self.delegate transfer:self willSendBodyDataOfLength:result];
             if (_uploadStream.streamStatus == NSStreamStatusAtEnd)
             {
-                [self.delegate handle:self willSendBodyDataOfLength:0];
+                [self.delegate transfer:self willSendBodyDataOfLength:0];
             }
-        }
+        }];
     }
     else
     {
@@ -972,9 +1023,15 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (enum curl_khstat)didFindHostFingerprint:(const struct curl_khkey *)foundKey knownFingerprint:(const struct curl_khkey *)knownkey match:(enum curl_khmatch)match;
 {
-    if ([self.delegate respondsToSelector:@selector(handle:didFindHostFingerprint:knownFingerprint:match:)])
+    __block enum curl_khstat result;
+    
+    if ([self tryToPerformSelectorOnDelegate:@selector(transfer:didFindHostFingerprint:knownFingerprint:match:) usingBlock:^{
+        
+        result = [self.delegate transfer:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
+    }])
     {
-        return [self.delegate handle:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
+        [_delegateQueue waitUntilAllOperationsAreFinished]; // ideally ought to wait till just the op finishes
+        return result;
     }
     else
     {
@@ -995,10 +1052,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #define LOG_DEBUG 0
 #endif
 
-int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, CURLHandle *self)
+int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t infoLength, CURLTransfer *self)
 {
-    BOOL delegateResponds = [self.delegate respondsToSelector:@selector(handle:didReceiveDebugInformation:ofType:)];
-    if (LOG_DEBUG || delegateResponds)
+    BOOL delegateResponds = [self.delegate respondsToSelector:@selector(transfer:didReceiveDebugInformation:ofType:)];
+    if (delegateResponds || LOG_DEBUG)
     {
         BOOL shouldProcess = LOG_DEBUG || (infoType == CURLINFO_HEADER_IN) || (infoType == CURLINFO_HEADER_OUT);
         if (shouldProcess)
@@ -1034,10 +1091,10 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
 
             CURLHandleLog(@"%@ - %@", [self.class nameForType:infoType], string);
 
-            if (delegateResponds)
-            {
-                [self.delegate handle:self didReceiveDebugInformation:string ofType:infoType];
-            }
+            [self tryToPerformSelectorOnDelegate:@selector(transfer:didReceiveDebugInformation:ofType:) usingBlock:^{
+                
+                [self.delegate transfer:self didReceiveDebugInformation:string ofType:infoType];
+            }];
 
             [string release];
         }
@@ -1046,13 +1103,13 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
     return 0;
 }
 
-int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype purpose)
+int curlSocketOptFunction(CURLTransfer *self, curl_socket_t curlfd, curlsocktype purpose)
 {
     if (purpose == CURLSOCKTYPE_IPCXN)
     {
         // FTP control connections should be kept alive. However, I'm fairly sure this is unlikely to have a real effect in practice since OS X's default time before it starts sending keep alive packets is 2 hours :(
         // TODO: Looks like we could adopt CURLOPT_TCP_KEEPINTVL instead
-        if ([[[self valueForKey:@"_URL"] scheme] isEqualToString:@"ftp"])
+        if ([self.originalRequest.URL.scheme isEqualToString:@"ftp"])
         {
             int keepAlive = 1;
             socklen_t keepAliveLen = sizeof(keepAlive);
@@ -1073,7 +1130,7 @@ int curlSocketOptFunction(CURLHandle *self, curl_socket_t curlfd, curlsocktype p
  we can use that to get back into Objective C and do the work with the class.
  "*/
 
-size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
+size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLTransfer *self)
 {
 	return [self curlReceiveDataFrom:ptr size:size number:nmemb isHeader:NO];
 }
@@ -1082,7 +1139,7 @@ size_t curlBodyFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
  we can use that to get back into Objective C and do the work with the class.
  "*/
 
-size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self)
+size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLTransfer *self)
 {
 	return [self curlReceiveDataFrom:ptr size:size number:nmemb isHeader:YES];
 }
@@ -1091,7 +1148,7 @@ size_t curlHeaderFunction(void *ptr, size_t size, size_t nmemb, CURLHandle *self
  we can use that to get back into Objective C and do the work with the class.
  "*/
 
-size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLHandle *self)
+size_t curlReadFunction( void *ptr, size_t size, size_t nmemb, CURLTransfer *self)
 {
     return [self curlSendDataTo:ptr size:size number:nmemb];
 }
@@ -1100,7 +1157,7 @@ int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                            const struct curl_khkey *knownkey, /* known */
                            const struct curl_khkey *foundkey, /* found */
                            enum curl_khmatch match, /* libcurl's view on the keys */
-                           CURLHandle *self) /* custom pointer passed from app */
+                           CURLTransfer *self) /* custom pointer passed from app */
 {
     return [self didFindHostFingerprint:foundkey knownFingerprint:knownkey match:match];
 }

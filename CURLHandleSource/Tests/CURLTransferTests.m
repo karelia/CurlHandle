@@ -1,5 +1,5 @@
 //
-//  CURLHandleTests.m
+//  CURLTransferTests.m
 //  CURLHandle
 //
 //  Created by Sam Deane on 20/09/2012.
@@ -7,9 +7,10 @@
 //
 
 #import "CURLHandleBasedTest.h"
-#import "CURLMulti.h"
+#import "CURLTransfer+TestingSupport.h"
+#import "CURLMultiHandle.h"
 
-#import "NSURLRequest+CURLHandle.h"
+#import "CURLRequest.h"
 
 #pragma mark - Globals
 
@@ -36,16 +37,16 @@ static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 
 #pragma mark - Test Class
 
-@interface CURLHandleTests : CURLHandleBasedTest
+@interface CURLTransferTests : CURLHandleBasedTest
 
-@property (strong, nonatomic) CURLMulti* multi;
+@property (strong, nonatomic) CURLMultiHandle* multi;
 @property (assign, nonatomic) TestMode mode;
 
 @end
 
 static TestMode gModeToUse;
 
-@implementation CURLHandleTests
+@implementation CURLTransferTests
 
 + (id) defaultTestSuite
 {
@@ -57,7 +58,7 @@ static TestMode gModeToUse;
         // in order to re-use the default SenTest mechanism for building up a suite of tests, we set some global variables
         // to indicate the test configuration we want, then call on to the defaultTestSuite to get a set of tests using that configuration.
         gModeToUse = (TestMode)[mode unsignedIntegerValue];
-        SenTestSuite* suite = [[SenTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Using%@", NSStringFromClass(self), [CURLHandleTests nameForMode:gModeToUse]]];
+        SenTestSuite* suite = [[SenTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Using%@", NSStringFromClass(self), [CURLTransferTests nameForMode:gModeToUse]]];
         [suite addTest:[super defaultTestSuite]];
         [result addTest:suite];
         [suite release];
@@ -124,7 +125,7 @@ static TestMode gModeToUse;
     return name;
 }
 
-- (CURLHandle*)newHandleWithRequest:(NSURLRequest*)request
+- (CURLTransfer*)newHandleWithRequest:(NSURLRequest*)request
 {
     switch (self.mode)
     {
@@ -132,56 +133,56 @@ static TestMode gModeToUse;
             if (!self.multi)
             {
                 NSLog(@"Using custom multi");
-                self.multi = [[[CURLMulti alloc] init] autorelease];
+                self.multi = [[[CURLMultiHandle alloc] init] autorelease];
                 [self.multi startup];
             }
             break;
 
         case TEST_SYNCHRONOUS:
         case TEST_WITH_SHARED_MULTI:
-            self.multi = [CURLMulti sharedInstance];
+            self.multi = [CURLMultiHandle sharedInstance];
             break;
 
         default:
             break;
     }
 
-    CURLHandle* handle;
+    CURLTransfer* transfer;
     if (self.mode == TEST_SYNCHRONOUS)
     {
         if ([self usingMockServer])
         {
-            handle = nil;
+            transfer = nil;
             NSLog(@"Skipping test for synchronous iteration as we're using MockServer");
         }
         else
         {
-            handle = [[CURLHandle alloc] init];
-            [handle sendSynchronousRequest:request credential:nil delegate:self];
+            transfer = [[CURLTransfer alloc] init];
+            [transfer sendSynchronousRequest:request credential:nil delegate:self];
         }
     }
     else
     {
-       handle = [[CURLHandle alloc] initWithRequest:request credential:nil delegate:self multi:self.multi];
+       transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:self.multi];
     }
     
-    return handle;
+    return transfer;
 }
 
-- (CURLHandle*)newDownloadWithRoot:(NSURL*)ftpRoot
+- (CURLTransfer*)newDownloadWithRoot:(NSURL*)ftpRoot
 {
     NSURL* ftpDownload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"TestContent.txt"];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpDownload];
-    CURLHandle* handle = [self newHandleWithRequest:request];
+    CURLTransfer* transfer = [self newHandleWithRequest:request];
 
-    return handle;
+    return transfer;
 }
 
 - (void)doFTPDownloadWithRoot:(NSURL*)ftpRoot
 {
-    CURLHandle* handle = [self newDownloadWithRoot:ftpRoot];
-    if (handle)
+    CURLTransfer* transfer = [self newDownloadWithRoot:ftpRoot];
+    if (transfer)
     {
         if (self.mode != TEST_SYNCHRONOUS)
         {
@@ -190,11 +191,11 @@ static TestMode gModeToUse;
 
         STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
         
-        [handle release];
+        [transfer release];
     }
 }
 
-- (CURLHandle*)newUploadWithRoot:(NSURL*)ftpRoot
+- (CURLTransfer*)newUploadWithRoot:(NSURL*)ftpRoot
 {
     NSURL* ftpUpload = [[ftpRoot URLByAppendingPathComponent:@"CURLHandleTests"] URLByAppendingPathComponent:@"Upload.txt"];
 
@@ -203,12 +204,11 @@ static TestMode gModeToUse;
     NSString* testNotes = [NSString stringWithContentsOfURL:testNotesURL encoding:NSUTF8StringEncoding error:&error];
 
     NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:ftpUpload];
-    request.shouldUseCurlHandle = YES;
     [request curl_setCreateIntermediateDirectories:1];
     [request setHTTPBody:[testNotes dataUsingEncoding:NSUTF8StringEncoding]];
-    CURLHandle* handle = [self newHandleWithRequest:request];
+    CURLTransfer* transfer = [self newHandleWithRequest:request];
 
-    return handle;
+    return transfer;
 }
 
 - (void)doFTPUploadWithRoot:(NSURL*)ftpRoot
@@ -216,8 +216,8 @@ static TestMode gModeToUse;
     [self.buffer setLength:0];
     self.response = nil;
 
-    CURLHandle* handle = [self newUploadWithRoot:ftpRoot];
-    if (handle)
+    CURLTransfer* transfer = [self newUploadWithRoot:ftpRoot];
+    if (transfer)
     {
         if (self.mode != TEST_SYNCHRONOUS)
         {
@@ -232,7 +232,7 @@ static TestMode gModeToUse;
         STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
         STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
         
-        [handle release];
+        [transfer release];
     }
 }
 
@@ -240,7 +240,7 @@ static TestMode gModeToUse;
 
 - (void)testVersion
 {
-    NSString* version = [CURLHandle curlVersion];
+    NSString* version = [CURLTransfer curlVersion];
     NSLog(@"curl version %@", version);
     STAssertTrue([version isEqualToString:@"libcurl/7.31.0-DEV SecureTransport zlib/1.2.5 c-ares/1.10.0-DEV libssh2/1.4.3_DEV"], @"version was \n\n%@\n\n", version);
 }
@@ -248,8 +248,8 @@ static TestMode gModeToUse;
 - (void)testHTTPDownload
 {
     NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
-    CURLHandle* handle = [self newHandleWithRequest:request];
-    if (handle)
+    CURLTransfer* transfer = [self newHandleWithRequest:request];
+    if (transfer)
     {
         if (self.mode != TEST_SYNCHRONOUS)
         {
@@ -258,7 +258,7 @@ static TestMode gModeToUse;
 
         STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
         
-        [handle release];
+        [transfer release];
     }
 }
 
@@ -344,8 +344,8 @@ static TestMode gModeToUse;
         [request curl_setCreateIntermediateDirectories:YES];
         [request curl_setPreTransferCommands:@[@"DELE Upload.txt"]];
 
-        CURLHandle* handle = [self newHandleWithRequest:request];
-        if (handle)
+        CURLTransfer* transfer = [self newHandleWithRequest:request];
+        if (transfer)
         {
             if (self.mode != TEST_SYNCHRONOUS)
             {
@@ -356,7 +356,7 @@ static TestMode gModeToUse;
             STAssertNotNil(self.response, @"got unexpected response %@", self.response);
             STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
             
-            [handle release];
+            [transfer release];
         }
     }
 }
@@ -380,8 +380,8 @@ static TestMode gModeToUse;
         [request curl_setCreateIntermediateDirectories:YES];
         [request curl_setPreTransferCommands:@[@"SITE CHMOD 0777 Upload.txt"]];
 
-        CURLHandle* handle = [self newHandleWithRequest:request];
-        if (handle)
+        CURLTransfer* transfer = [self newHandleWithRequest:request];
+        if (transfer)
         {
             if (self.mode != TEST_SYNCHRONOUS)
             {
@@ -396,7 +396,7 @@ static TestMode gModeToUse;
             STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
             [reply release];
             
-            [handle release];
+            [transfer release];
         }
     }
 }
@@ -416,8 +416,8 @@ static TestMode gModeToUse;
         [request curl_setCreateIntermediateDirectories:YES];
         [request curl_setPreTransferCommands:@[@"MKD Subdirectory"]];
 
-        CURLHandle* handle = [self newHandleWithRequest:request];
-        if (handle)
+        CURLTransfer* transfer = [self newHandleWithRequest:request];
+        if (transfer)
         {
             if (self.mode != TEST_SYNCHRONOUS)
             {
@@ -438,7 +438,7 @@ static TestMode gModeToUse;
 
             STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
             
-            [handle release];
+            [transfer release];
         }
     }
 }

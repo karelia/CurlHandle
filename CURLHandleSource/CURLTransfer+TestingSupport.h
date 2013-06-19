@@ -1,11 +1,11 @@
 //
-//  CURLHandle+TestingSupport.h
+//  CURLTransfer+TestingSupport.h
 //  CURLHandle
 //
 //  Created by Sam Deane on 27/03/2013.
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 
-#import "CURLHandle.h"
+#import "CURLTransfer.h"
 
 
 /**
@@ -14,29 +14,18 @@
  use these functions in their unit tests.
  */
 
-@interface CURLHandle(TestingSupport)
+@interface CURLTransfer(TestingSupport)
 
 /** @name Testing Methods */
 
 /**
- Has cancel been called on this handle?
-
+ Creates a CURLTransfer instance tied to a specific multi handle
+ 
  @warning Not intended for general use.
-
- @return YES if the handle has been cancelled.
+ 
+ @return A new CURLTransfer object.
  */
-
-- (BOOL)isCancelled;
-
-/**
- Is this handle managed by a multi?
-
- @warning Not intended for general use.
-
- @return YES if the handle is managed by a multi.
- */
-
-- (BOOL)handledByMulti;
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLMultiHandle*)multi __attribute((nonnull(1,5)));
 
 /**
  Returns a new CURLMulti, for use in testing.
@@ -50,7 +39,7 @@
  @return A new CURLMulti object.
  */
 
-+ (CURLMulti*)standaloneMultiForTestPurposes;
++ (CURLMultiHandle*)standaloneMultiForTestPurposes;
 
 /**
  Clean up a multi that was created by standaloneMultiForTestPurposes.
@@ -60,6 +49,6 @@
  @param multi The multi to clean up.
  */
 
-+ (void)cleanupStandaloneMulti:(CURLMulti*)multi;
++ (void)cleanupStandaloneMulti:(CURLMultiHandle*)multi;
 @end
 
