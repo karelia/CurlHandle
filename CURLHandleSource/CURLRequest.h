@@ -52,22 +52,6 @@
 @end
 
 
-@interface NSURLRequest (CURLProtocol)
-- (BOOL)shouldUseCurlHandle;
-@end
-
-
-@interface NSMutableURLRequest (CURLProtocol)
-/**
- Setting to YES automatically registers CURLProtocol with NSURLProtocol. You can do so earlier, manually if required
- 
- @param useCurl should this request use CURL?
- */
-
-- (void)setShouldUseCurlHandle:(BOOL)useCurl;
-@end
-
-
 
 
 

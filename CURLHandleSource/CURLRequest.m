@@ -8,8 +8,6 @@
 #import "CURLRequest.h"
 #import "CURLProtocol.h"
 
-static NSString *const UseCurlHandleKey = @"useCurlHandle";
-
 @implementation NSURLRequest (CURLOptionsFTP)
 
 - (curl_usessl)curl_desiredSSLLevel;
@@ -110,27 +108,6 @@ static NSString *const UseCurlHandleKey = @"useCurlHandle";
     {
         [NSURLProtocol removePropertyForKey:@"curl_SSHKnownHostsFileURL" inRequest:self];
     }
-}
-
-@end
-
-
-@implementation NSURLRequest (CURLProtocol)
-
-- (BOOL)shouldUseCurlHandle;
-{
-    return [[NSURLProtocol propertyForKey:UseCurlHandleKey inRequest:self] boolValue];
-}
-
-@end
-
-
-@implementation NSMutableURLRequest (CURLProtocol)
-
-- (void)setShouldUseCurlHandle:(BOOL)useCurl;
-{
-    [NSURLProtocol setProperty:[NSNumber numberWithBool:useCurl] forKey:UseCurlHandleKey inRequest:self];
-    [NSURLProtocol registerClass:[CURLProtocol class]];
 }
 
 @end
