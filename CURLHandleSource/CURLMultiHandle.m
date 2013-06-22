@@ -183,10 +183,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         
         NSAssert(![self.transfers containsObject:transfer], @"shouldn't add a transfer twice");
         
+        CURLMultiLog(@"adding transfer %@", transfer);
+        
         CURLMcode result = curl_multi_add_handle(_multi, [transfer curlHandle]);
         if (result == CURLM_OK)
         {
-            CURLMultiLog(@"added transfer %@", transfer);
             [_transfers addObject:transfer];
         }
         else
