@@ -365,17 +365,17 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             registration = [[CURLSocketRegistration alloc] init];
             [self.sockets addObject:registration];
             curl_multi_assign(_multi, socket, registration);
-            CURLMultiLog(@"new socket:%@", socket);
+            CURLMultiLog(@"new socket:%@", registration);
             [registration release];
         }
 
         [registration updateSourcesForSocket:socket mode:what multi:self];
-        CURLMultiLog(@"updated socket:%@", socket);
+        CURLMultiLog(@"updated socket:%@", registration);
 
         if (what == CURL_POLL_REMOVE)
         {
             NSAssert(registration != nil, @"should have socket");
-            CURLMultiLog(@"removed socket:%@", socket);
+            CURLMultiLog(@"removed socket:%@", registration);
             [self.sockets removeObject:registration];
             curl_multi_assign(_multi, socket, nil);
         }
@@ -468,7 +468,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         dispatch_source_t timer = self.timer;
         NSAssert(timer != nil, @"should still have a timer");
 
-        CURLMultiLog(@"timeout changed to %ldms", (long)timeout);
+        CURLMultiLog(@"timeout changed to %ldms", (long)timeout_ms);
         
         if (timer)
         {
@@ -512,13 +512,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         if (!source)
         {
-            CURLMultiLog(@"%@ dispatch source added for socket %d", [self nameForType:type], raw);
+            CURLMultiLog(@"%@ dispatch source added for socket %d", [self nameForType:type], socket);
             source = dispatch_source_create(type, socket, 0, self.queue);
 
             NSAssert(_multi != nil, @"should never be called without a multi value");
             int action = (type == DISPATCH_SOURCE_TYPE_READ) ? CURL_CSELECT_IN : CURL_CSELECT_OUT;
             dispatch_source_set_event_handler(source, ^{
-                CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], raw, dispatch_source_get_data(source));
+                CURLMultiLog(@"%@ dispatch source fired for socket %d with value %ld", [self nameForType:type], socket, dispatch_source_get_data(source));
                 BOOL sourceIsActive = [self.sockets containsObject:registration] && [registration ownsSource:source];
                 NSAssert(sourceIsActive, @"should have active source");
                 if (sourceIsActive)
@@ -528,7 +528,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             });
 
             dispatch_source_set_cancel_handler(source, ^{
-                CURLMultiLog(@"%@ removed dispatch source for socket %d", [self nameForType:type], raw);
+                CURLMultiLog(@"%@ removed dispatch source for socket %d", [self nameForType:type], socket);
                 dispatch_release(source);
             });
 
@@ -537,7 +537,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
     else if (source)
     {
-        CURLMultiLog(@"%@ removing dispatch source for socket %d", [self nameForType:type], raw);
+        CURLMultiLog(@"%@ removing dispatch source for socket %d", [self nameForType:type], socket);
         dispatch_source_cancel(source);
         source = nil;
     }
