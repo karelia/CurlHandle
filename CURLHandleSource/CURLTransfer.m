@@ -673,10 +673,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (![self tryToPerformSelectorOnDelegate:@selector(transfer:didCompleteWithError:) usingBlock:^{
         
         [self.delegate transfer:self didCompleteWithError:error];
-        [self cleanupIncludingHandle:YES];
+        [self cleanupIncludingHandle:(self.multi != nil)];
     }])
     {
-        [self cleanupIncludingHandle:YES];
+        [self cleanupIncludingHandle:(self.multi != nil)];
     }
 }
 
