@@ -633,7 +633,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
     else    // synchronous usage
     {
-        [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+        _state = CURLTransferStateCanceling;
     }
 }
 
@@ -949,7 +949,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	size_t written = inSize*inNumber;
     CURLHandleLog(@"write %ld at %p", written, inPtr);
 
-	if (self.delegate)
+	if (self.state < CURLTransferStateCanceling || self.multi)
 	{
         NSData *data = [NSData dataWithBytes:inPtr length:written];
 
@@ -974,7 +974,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	}
     else
     {
-        // no delegate means we've been cancelled (or something else is badly wrong)
+        // we've been cancelled while running synchronously (or something else is badly wrong)
 		written = -1;
 	}
 
@@ -985,7 +985,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     NSInteger result;
 
-    if (self.delegate)
+    if (self.state < CURLTransferStateCanceling || self.multi)
     {
         result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
         if (result < 0)
@@ -1014,7 +1014,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
     else
     {
-        // no delegate means we've been cancelled (or something else is badly wrong)
+        // we've been cancelled while running synchronously (or something else is badly wrong)
         result = CURL_READFUNC_ABORT;
     }
 
