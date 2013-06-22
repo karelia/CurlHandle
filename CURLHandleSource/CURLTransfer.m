@@ -687,6 +687,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     NSAssert(_delegate == nil, @"CURLTransfer can only service a single request at a time");
     _delegate = [delegate retain];
     
+    _state = CURLTransferStateRunning;  // reset after previous transfer
+    
     [_request release]; // -setupRequest:É will fill it back in
     CURLcode result = [self setupRequest:request credential:credential];
     
