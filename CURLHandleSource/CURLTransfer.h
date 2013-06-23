@@ -13,6 +13,11 @@
 #define CURLHandleLog(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLHandleLog NSLog
 #endif
 
+#ifndef CURLHandleLogDetail
+#define CURLHandleLogDetail(...) // no logging by default - to enable it, add something like this to the prefix: #define CURLHandleLogDetail NSLog
+#endif
+
+
 @class CURLMultiHandle;
 
 @protocol CURLTransferDelegate;

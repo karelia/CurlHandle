@@ -229,7 +229,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	[_proxies release];
     [_uploadStream release];
 
-    CURLHandleLog(@"dealloced");
+    CURLHandleLogDetail(@"dealloced");
     
 	[super dealloc];
 }
@@ -561,7 +561,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)cleanupIncludingHandle:(BOOL)cleanupHandleToo;
 {
-    CURLHandleLog(@"cleanup");
+    CURLHandleLogDetail(@"cleanup");
 
     // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
     // (the curl_easy_reset below should fix this anyway by unregistering the callbacks, but let's be paranoid...)
@@ -1094,7 +1094,7 @@ int curlDebugFunction(CURL *curl, curl_infotype infoType, char *info, size_t inf
                 }
             }
 
-            CURLHandleLog(@"%@ - %@", [self.class nameForType:infoType], string);
+            CURLHandleLogDetail(@"%@ - %@", [self.class nameForType:infoType], string);
 
             [self tryToPerformSelectorOnDelegate:@selector(transfer:didReceiveDebugInformation:ofType:) usingBlock:^{
                 
