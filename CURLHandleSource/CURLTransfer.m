@@ -620,13 +620,16 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             {
                 _state = CURLTransferStateCanceling;
                 
-                [multi suspendTransfer:self];
-                
-                // Report self as completed once any pending work on the queue is performed
-                // Removing will have stopped any new events, but there may be some already
-                // received, sitting in the queue
+                // Bounce over to doing suspension in background as libcurl sometimes blocks for a long time on that
                 dispatch_async(queue, ^{
-                    [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+                    [multi suspendTransfer:self];
+                    
+                    // Report self as completed once any pending work on the queue is performed
+                    // Removing will have stopped any new events, but there may be some already
+                    // received, sitting in the queue
+                    dispatch_async(queue, ^{
+                        [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+                    });
                 });
             }
         });
