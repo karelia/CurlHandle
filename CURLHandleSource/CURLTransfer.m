@@ -642,7 +642,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
 {
-    CURLHandleLog(@"completed with %@ code %d", code, isMulti ? @"multi" : @"easy");
+    CURLHandleLog(@"completed with %@ code %d", isMultiCode ? @"multi" : @"easy", code);
     
     NSError *error = nil;
     if (code != (isMultiCode ? CURLM_OK : CURLE_OK))
