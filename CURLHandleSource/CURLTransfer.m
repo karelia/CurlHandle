@@ -1009,7 +1009,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
         if (result >= 0) [self tryToPerformSelectorOnDelegate:@selector(transfer:willSendBodyDataOfLength:) usingBlock:^{
             
-            CURLHandleLog(@"sending %ld bytes from %p", inSize * inNumber, inPtr);
+            CURLHandleLog(@"sending %ld bytes (max %ld) from %p", (size_t)result, inSize*inNumber, inPtr);
             [self.delegate transfer:self willSendBodyDataOfLength:result];
             if (_uploadStream.streamStatus == NSStreamStatusAtEnd)
             {
