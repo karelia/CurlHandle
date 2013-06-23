@@ -431,7 +431,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             // CURLM will command us to resume the timer when it's ready
 
             dispatch_source_set_event_handler(timer, ^{
-                CURLMultiLogDetail(@"timer fired");
+                CURLMultiLog(@"timer fired");
 
                 // perform processing
                 [self processMulti:_multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
