@@ -513,7 +513,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         if (!source)
         {
-            CURLMultiLog(@"%@ dispatch source added for socket %d", [self nameForType:type], socket);
+            CURLMultiLog(@"added %@ dispatch source for socket %d", [self nameForType:type], socket);
             source = dispatch_source_create(type, socket, 0, self.queue);
 
             NSAssert(_multi != nil, @"should never be called without a multi value");
@@ -529,7 +529,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             });
 
             dispatch_source_set_cancel_handler(source, ^{
-                CURLMultiLog(@"%@ removed dispatch source for socket %d", [self nameForType:type], socket);
+                CURLMultiLog(@"removed %@ dispatch source for socket %d", [self nameForType:type], socket);
                 dispatch_release(source);
             });
 
@@ -538,7 +538,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
     else if (source)
     {
-        CURLMultiLog(@"%@ removing dispatch source for socket %d", [self nameForType:type], socket);
+        CURLMultiLog(@"removing %@ dispatch source for socket %d", [self nameForType:type], socket);
         dispatch_source_cancel(source);
         source = nil;
     }
