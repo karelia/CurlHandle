@@ -640,7 +640,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 }
 
-- (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
+- (void)completeWithCode:(int)code isMulti:(BOOL)isMultiCode;
 {
     CURLHandleLog(@"completed with %@ code %d", isMultiCode ? @"multi" : @"easy", code);
     

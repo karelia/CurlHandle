@@ -38,7 +38,7 @@
 
  */
 
-- (void)completeWithCode:(NSInteger)code isMulti:(BOOL)isMultiCode;
+- (void)completeWithCode:(int)code isMulti:(BOOL)isMultiCode;
 
 /**
  Has the transfer completed?
