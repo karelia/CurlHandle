@@ -191,8 +191,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             [_transfers addObject:transfer];
             
             // http://curl.haxx.se/libcurl/c/curl_multi_socket_action.html suggests you typically fire a timeout to get it started
-            int runningHandles;
-            curl_multi_socket_action(_multi, CURL_SOCKET_TIMEOUT, 0, &runningHandles);
+            [self processMulti:_multi action:CURL_SOCKET_TIMEOUT forSocket:0];
         }
         else
         {
