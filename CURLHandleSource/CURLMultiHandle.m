@@ -355,7 +355,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
 }
 
-- (void)updateRegistration:(CURLSocketRegistration *)registration forSocket:(curl_socket_t)socket to:(NSInteger)what
+- (void)updateRegistration:(CURLSocketRegistration *)registration forSocket:(curl_socket_t)socket to:(int)what
 {
     NSAssert(_multi != nil, @"should never be called without a multi value");
     {
