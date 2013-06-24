@@ -647,6 +647,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     NSError *error = nil;
     if (code != (isMultiCode ? CURLM_OK : CURLE_OK))
     {
+        if (isMultiCode) NSAssert(code != CURLM_CALL_MULTI_SOCKET, @"CURLM_CALL_MULTI_SOCKET doesn't make sense as a transfer failure code");
+        
         error = (isMultiCode ?
                  [NSError errorWithDomain:CURLMcodeErrorDomain code:(CURLMcode)code userInfo:nil] :
                  [self errorForURL:self.originalRequest.URL code:(CURLcode)code]);
