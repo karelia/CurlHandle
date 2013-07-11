@@ -385,7 +385,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     RETURN_IF_FAILED([self setOption:CURLOPT_USERNAME string:username]);
     RETURN_IF_FAILED([self setOption:CURLOPT_SSH_PRIVATE_KEYFILE url:privateKey justPath:YES]);
-    RETURN_IF_FAILED([self setOption:CURLOPT_SSH_PUBLIC_KEYFILE url:[credential ck2_publicKeyURL] justPath:YES]);
+    
+    // libcurl treats empty string as signal to use no public key file
+    // Passing nil instead sets it back to the default $HOME/.ssh/id_dsa.pub
+    NSString *publicKey = [credential.ck2_publicKeyURL path];
+    RETURN_IF_FAILED([self setOption:CURLOPT_SSH_PUBLIC_KEYFILE string:(publicKey ? publicKey : @"")]);
+    
     if (privateKey)
     {
         RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSH_AUTH_TYPES, CURLSSH_AUTH_PUBLICKEY));
