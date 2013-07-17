@@ -66,7 +66,7 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
 //  
 //    * Custom Accept-Encoding: HTTP headers are specially handled to set the CURLOPT_ENCODING option
 //
-//  Delegate messages are delivered on an arbitrary thread; you should bounce over a specific thread if required for thread safety, or doing any significant work
+//  Delegate messages are delivered on the specified queue
 //
 //  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
 - (id)initWithRequest:(NSURLRequest *)request
