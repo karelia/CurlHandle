@@ -880,6 +880,22 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return kInfoNames[type];
 }
 
++ (NSURL *)URLFromString:(NSString *)string;
+{
+    CURL *handle = curl_easy_init();
+    if (!handle) return nil;
+    
+    if (curl_easy_setopt(handle, CURLOPT_URL, [string UTF8String]) != CURLE_OK) return nil;
+    
+    char *url;
+    if (curl_easy_getinfo(handle, CURLINFO_EFFECTIVE_URL, &url) != CURLE_OK) return nil;
+    
+    NSString *result = [NSString stringWithCString:url encoding:NSUTF8StringEncoding];
+    if (!result) return nil;
+    
+    return [NSURL URLWithString:result];
+}
+
 - (NSString*)description
 {
     return [NSString stringWithFormat:@"<EASY %p (%p)>", self, self.curlHandle];

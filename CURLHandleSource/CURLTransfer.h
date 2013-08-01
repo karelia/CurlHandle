@@ -105,6 +105,11 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
 + (NSString *)curlVersion;
 + (NSString*)nameForType:(curl_infotype)type;
 
+/**
+ Exposes libcurl's URL encoding mechanism
+ */
++ (NSURL *)URLFromString:(NSString *)string;
+
 @end
 
 #pragma mark - Old API

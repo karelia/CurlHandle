@@ -443,4 +443,16 @@ static TestMode gModeToUse;
     }
 }
 
+- (void)testURLFromString;
+{
+    NSURL *url = [CURLTransfer URLFromString:@"http://example.com"];
+    STAssertEqualObjects(url.absoluteString, @"http://example.com", nil);
+}
+
+- (void)testURLFromInvalidString;
+{
+    NSURL *url = [CURLTransfer URLFromString:@"http://example.com/path with spaces/"];
+    STAssertEqualObjects(url.absoluteString, @"http://example.com/path%20with%20spaces/", nil);
+}
+
 @end
