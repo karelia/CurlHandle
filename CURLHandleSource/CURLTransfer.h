@@ -181,6 +181,9 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
 
 /**
  Optional method, called to ask how to transfer a host fingerprint.
+ 
+ Important: **Only** called if the request's `curl_SSHKnownHostsFileURL`
+ property is non-`nil`.
 
  If not implemented, only matching keys are accepted; all else is rejected
  I've found that CURLKHSTAT_FINE_ADD_TO_FILE only bothers appending to the file if not already present

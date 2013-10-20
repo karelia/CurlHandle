@@ -30,7 +30,11 @@
 @property(nonatomic, readonly) NSNumber *curl_newFilePermissions;
 @property(nonatomic, readonly) NSNumber *curl_newDirectoryPermissions;
 
-// Default is nil, which means no checking
+/**
+ The location of an OpenSSH file of known hosts to check the server against.
+ 
+ Default is `nil`, which means no checking.
+ */
 @property(nonatomic, readonly) NSURL *curl_SSHKnownHostsFileURL;
 
 @end
