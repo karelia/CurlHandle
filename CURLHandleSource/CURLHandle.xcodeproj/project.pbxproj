@@ -1091,6 +1091,7 @@
 					"\"$(SRCROOT)/../SFTP\"",
 				);
 				PRODUCT_NAME = CURLHandle;
+				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -1112,6 +1113,7 @@
 					"\"$(SRCROOT)/../SFTP\"",
 				);
 				PRODUCT_NAME = CURLHandle;
+				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
