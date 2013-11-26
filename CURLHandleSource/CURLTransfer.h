@@ -102,6 +102,7 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
  */
 
 - (NSString *)initialFTPPath;
+- (NSString *)primaryIPAddress;
 + (NSString *)curlVersion;
 + (NSString*)nameForType:(curl_infotype)type;
 

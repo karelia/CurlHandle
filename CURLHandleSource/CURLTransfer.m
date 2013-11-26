@@ -720,6 +720,15 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return (entryPath ? [NSString stringWithUTF8String:entryPath] : nil);
 }
 
+- (NSString *)primaryIPAddress;
+{
+    char *address;
+    curl_easy_getinfo(self.curlHandle, CURLINFO_PRIMARY_IP, &address);
+    
+    return [NSString stringWithCString:address
+                              encoding:NSUTF8StringEncoding];  // guessing here!
+}
+
 #pragma mark Error Construction
 
 - (NSError*)errorForURL:(NSURL*)url code:(CURLcode)code
