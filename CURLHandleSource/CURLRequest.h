@@ -14,6 +14,7 @@
 @property(nonatomic, readonly) curl_usessl curl_desiredSSLLevel;
 
 @property(nonatomic, readonly) BOOL curl_shouldVerifySSLCertificate;    // CURLOPT_SSL_VERIFYPEER
+@property(nonatomic, readonly) BOOL curl_shouldVerifySSLHost;           // CURLOPT_SSL_VERIFYHOST
 
 // An array of strings. Executed in turn before/after the main request is done
 // NOTE: We have seen crashes (mishandling of buffers) when using post-transfer commands for a request that doesn't actually do a transfer. This may be a bug in libcurl; we don't know yet!
@@ -43,6 +44,7 @@
 
 - (void)curl_setDesiredSSLLevel:(curl_usessl)level;
 - (void)curl_setShouldVerifySSLCertificate:(BOOL)verify;
+- (void)curl_setShouldVerifySSLHost:(BOOL)verify;
 - (void)curl_setCreateIntermediateDirectories:(NSUInteger)createIntermediateDirectories;
 
 - (void)curl_setPreTransferCommands:(NSArray *)commands;

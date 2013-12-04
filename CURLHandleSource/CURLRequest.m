@@ -21,6 +21,12 @@
     return (result ? [result boolValue] : YES);
 }
 
+- (BOOL)curl_shouldVerifySSLHost;
+{
+    NSNumber *result = [NSURLProtocol propertyForKey:@"curl_shouldVerifySSLHost" inRequest:self];
+    return (result ? [result boolValue] : YES);
+}
+
 - (NSArray *)curl_preTransferCommands;
 {
     return [NSURLProtocol propertyForKey:@"curl_preTransferCommands" inRequest:self];
@@ -53,6 +59,11 @@
 - (void)curl_setShouldVerifySSLCertificate:(BOOL)verify;
 {
     [NSURLProtocol setProperty:@(verify) forKey:@"curl_shouldVerifySSLCertificate" inRequest:self];
+}
+
+- (void)curl_setShouldVerifySSLHost:(BOOL)verify;
+{
+    [NSURLProtocol setProperty:@(verify) forKey:@"curl_shouldVerifySSLHost" inRequest:self];
 }
 
 - (void)curl_setCreateIntermediateDirectories:(NSUInteger)value;
