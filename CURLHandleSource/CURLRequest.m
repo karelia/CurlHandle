@@ -52,7 +52,7 @@
 
 - (void)curl_setShouldVerifySSLCertificate:(BOOL)verify;
 {
-    [NSURLProtocol setProperty:[NSNumber numberWithBool:verify] forKey:@"curl_shouldVerifySSLCertificate" inRequest:self];
+    [NSURLProtocol setProperty:@(verify) forKey:@"curl_shouldVerifySSLCertificate" inRequest:self];
 }
 
 - (void)curl_setCreateIntermediateDirectories:(NSUInteger)value;
