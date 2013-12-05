@@ -758,6 +758,30 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     [userInfo release];
     
     
+    if (code == CURLE_SSL_CACERT)
+    {
+        // Use Keith's patch to grab SecTrust. Have to hardcode the value for now
+        // until I figure out the build search paths properly
+        SecTrustRef trust;
+        if (curl_easy_getinfo(_handle, /*CURLINFO_SSL_TRUST = */ 0x500000 + 43, &trust) == CURLE_OK && trust)
+        {
+            NSMutableDictionary *userInfo = [[NSMutableDictionary alloc] initWithDictionary:result.userInfo];
+            [userInfo setObject:result forKey:NSUnderlyingErrorKey];
+            [userInfo setObject:(id)trust forKey:NSURLErrorFailingURLPeerTrustErrorKey];
+            
+            result = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorSecureConnectionFailed userInfo:userInfo];
+            [userInfo release];
+            return result;
+        }
+        
+        struct curl_certinfo *certInfo = NULL;
+        if (curl_easy_getinfo(_handle, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
+        {
+            // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
+        }
+    }
+    
+    
     // Try to generate a Cocoa-friendly error on top of the raw libCurl one
     switch (code)
     {
@@ -828,17 +852,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         case CURLE_REMOTE_FILE_NOT_FOUND:
             result = [self errorWithDomain:NSURLErrorDomain code:NSURLErrorResourceUnavailable underlyingError:result];
             break;
-            
-        case CURLE_SSL_CACERT:
-        {
-            struct curl_certinfo *certInfo = NULL;
-            if (curl_easy_getinfo(_handle, CURLINFO_CERTINFO, &certInfo) == CURLE_OK)
-            {
-                // TODO: Extract something interesting from the certificate info. Unfortunately I seem to get back no info!
-            }
-            
-            break;
-        }
             
         /*
          CURLE_REMOTE_ACCESS_DENIED would seem to translate to NSURLErrorNoPermissionsToReadFile quite
