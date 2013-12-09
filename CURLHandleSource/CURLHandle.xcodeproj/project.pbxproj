@@ -477,11 +477,7 @@
 		0867D69AFE84028FC02AAC07 /* Libraries & Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				22BCCE4516ADE52700DFFE8D /* libssl.dylib */,
-				809AE1C71602C7DD001D02E1 /* libcurl.dylib */,
-				22BCCE2716ADD53000DFFE8D /* libssh2.dylib */,
-				22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */,
-				80080379166C5B40004D39F5 /* libcares.dylib */,
+				27643E1B185626C400573D58 /* Libraries */,
 				1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */,
 			);
 			name = "Libraries & Frameworks";
@@ -662,6 +658,18 @@
 			);
 			name = "Standalone Tests";
 			path = ../Tests;
+			sourceTree = "<group>";
+		};
+		27643E1B185626C400573D58 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				22BCCE4516ADE52700DFFE8D /* libssl.dylib */,
+				809AE1C71602C7DD001D02E1 /* libcurl.dylib */,
+				22BCCE2716ADD53000DFFE8D /* libssh2.dylib */,
+				22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */,
+				80080379166C5B40004D39F5 /* libcares.dylib */,
+			);
+			name = Libraries;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
