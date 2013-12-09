@@ -182,6 +182,9 @@
 		2721F6021771FB35009A07FE /* CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2721F6011771FB35009A07FE /* CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
+		27643E18185623F600573D58 /* libssl.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
+		27643E19185623F600573D58 /* libssh2.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
+		27643E1A1856243F00573D58 /* libcrypto.dylib in Copy Files - Frameworks */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
 		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D77E111672BBB50091EF91 /* CK2SSHCredential.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
@@ -297,6 +300,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				27643E1A1856243F00573D58 /* libcrypto.dylib in Copy Files - Frameworks */,
+				27643E18185623F600573D58 /* libssl.dylib in Copy Files - Frameworks */,
+				27643E19185623F600573D58 /* libssh2.dylib in Copy Files - Frameworks */,
 				8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Files - Frameworks */,
 				8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Files - Frameworks */,
 			);
