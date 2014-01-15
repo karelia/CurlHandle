@@ -868,8 +868,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 + (CURLMultiHandle*)standaloneMultiForTestPurposes
 {
     CURLMultiHandle* multi = [[[CURLMultiHandle alloc] init] autorelease];
-    [multi startup];
-
     return multi;
 }
 

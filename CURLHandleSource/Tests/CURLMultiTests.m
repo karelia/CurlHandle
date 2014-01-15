@@ -44,8 +44,6 @@
 {
     CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
 
-    [multi startup];
-
     [multi shutdown];
 
     [multi release];
@@ -54,9 +52,7 @@
 - (void)testHTTPDownload
 {
     CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
-
-    [multi startup];
-
+    
     NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
     CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
@@ -75,8 +71,6 @@
 - (void)testFTPDownload
 {
     CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
-
-    [multi startup];
     
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
@@ -101,8 +95,6 @@
 - (void)testFTPUpload
 {
     CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
-
-    [multi startup];
     
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
@@ -139,8 +131,6 @@
     self.pauseOnResponse = YES;
 
     CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
-
-    [multi startup];
 
     NSURL* largeFile = [NSURL URLWithString:@"https://github.com/karelia/CurlHandle/archive/master.zip"];
     NSURLRequest* request = [NSURLRequest requestWithURL:largeFile];

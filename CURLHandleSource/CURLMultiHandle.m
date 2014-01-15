@@ -101,7 +101,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[CURLMultiHandle alloc] init];
-        [instance startup];
     });
 
     return instance;
@@ -118,6 +117,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 #if COUNT_INSTANCES
             ++gInstanceCount;
 #endif
+
+            CURLMultiLog(@"started");
         }
         else
         {
@@ -148,13 +149,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 }
 
 #pragma mark - Startup / Shutdown
-
-- (void)startup
-
-{
-    CURLMultiLog(@"started");
-}
-
 
 - (void)shutdown
 {
