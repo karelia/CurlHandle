@@ -365,7 +365,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     
     
     // Wait for something to happen
-    result = curl_multi_wait(_multi, NULL, NULL, 5000, NULL);
+    result = curl_multi_wait(_multi,
+                             NULL, NULL,    // no extra file descriptors to track
+                             500,   // stops new transfers waiting too long to start
+                             NULL); // don't care about number of handles here
     if (result != CURLM_OK)
     {
         // If something went wrong in waiting, I guess there's not a lot we can do about it. Might
