@@ -319,7 +319,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     // Once there are fewer running handles than we are tracking, some should have finished
     if (runningHandles < self.transfers.count)
     {
-        [self readMutiInfo];
+        [self processTransferMessages];
         
         // Bail out once we've run out of handles/transfers, as there's no point burning CPU to
         // service an empty multi handle. Will be rescheduled when the next transfer starts
@@ -371,7 +371,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         if (result == CURLM_OK)
         {
             CURLMultiLogDetail(@"%d handles reported as running", running);
-            [self readMutiInfo];
+            [self processTransferMessages];
         }
         else
         {
@@ -382,7 +382,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
 }
 
-- (void)readMutiInfo
+- (void)processTransferMessages
 {
     CURLMsg* message;
     int count;
