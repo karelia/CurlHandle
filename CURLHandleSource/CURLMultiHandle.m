@@ -303,47 +303,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         if (result == CURLM_OK)
         {
             CURLMultiLogDetail(@"%d handles reported as running", running);
-            CURLMsg* message;
-            int count;
-            while ((message = curl_multi_info_read(multi, &count)) != NULL)
-            {
-                CURLMultiLog(@"got message (%d remaining)", count);
-                if (message->msg == CURLMSG_DONE)
-                {
-                    CURLcode code = message->data.result;
-                    CURL* easy = message->easy_handle;
-                    CURLTransfer* transfer = [self transferForHandle:easy];
-                    if (transfer)
-                    {
-                        const char* url;
-                        curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &url);
-                        CURLMultiLog(@"done msg result %d for %@ %s", code, transfer, url);
-                        [transfer retain];
-
-                        // the order is important here - we remove the transfer from the multi first...
-                        [self suspendTransfer:transfer];
-
-                        // ...then tell the easy transfer to complete, which can cause curl_easy_cleanup to be called
-                        [transfer completeWithCode:code isMulti:NO];
-
-                        // ...then tell it that it's no longer in use by the multi, which breaks the reference cycle between us
-                        //[transfer removedByMulti:self];
-
-                        [transfer autorelease];
-                    }
-                    else
-                    {
-                        // this really shouldn't happen - there should always be a matching CURLTransfer - but just in case...
-                        CURLMultiLogError(@"SOMETHING WRONG: done msg result %d for easy without a matching CURLTransfer %p", code, easy);
-                        result = curl_multi_remove_handle(multi, message->easy_handle);
-                        NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
-                    }
-                }
-                else
-                {
-                    CURLMultiLogError(@"got unexpected multi message %d", message->msg);
-                }
-            }
+            [self readMutiInfo];
         }
         else
         {
@@ -352,6 +312,51 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
 
     CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
+}
+
+- (void)readMutiInfo
+{
+    CURLMsg* message;
+    int count;
+    while ((message = curl_multi_info_read(_multi, &count)) != NULL)
+    {
+        CURLMultiLog(@"got message (%d remaining)", count);
+        if (message->msg == CURLMSG_DONE)
+        {
+            CURLcode code = message->data.result;
+            CURL* easy = message->easy_handle;
+            CURLTransfer* transfer = [self transferForHandle:easy];
+            if (transfer)
+            {
+                const char* url;
+                curl_easy_getinfo(easy, CURLINFO_EFFECTIVE_URL, &url);
+                CURLMultiLog(@"done msg result %d for %@ %s", code, transfer, url);
+                [transfer retain];
+                
+                // the order is important here - we remove the transfer from the multi first...
+                [self suspendTransfer:transfer];
+                
+                // ...then tell the easy transfer to complete, which can cause curl_easy_cleanup to be called
+                [transfer completeWithCode:code isMulti:NO];
+                
+                // ...then tell it that it's no longer in use by the multi, which breaks the reference cycle between us
+                //[transfer removedByMulti:self];
+                
+                [transfer autorelease];
+            }
+            else
+            {
+                // this really shouldn't happen - there should always be a matching CURLTransfer - but just in case...
+                CURLMultiLogError(@"SOMETHING WRONG: done msg result %d for easy without a matching CURLTransfer %p", code, easy);
+                CURLMcode result = curl_multi_remove_handle(_multi, message->easy_handle);
+                NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
+            }
+        }
+        else
+        {
+            CURLMultiLogError(@"got unexpected multi message %d", message->msg);
+        }
+    }
 }
 
 - (void)updateRegistration:(CURLSocketRegistration *)registration forSocket:(curl_socket_t)socket to:(int)what
