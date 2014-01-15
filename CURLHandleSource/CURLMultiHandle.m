@@ -63,6 +63,7 @@
 @end
 
 
+#define USE_MULTI_SOCKET NO             // buggy for now in my testing
 #define USE_GLOBAL_QUEUE YES            // turn this on to share one queue across all instances
 #define COUNT_INSTANCES NO              // turn this on for a bit of debugging to ensure that things are getting cleaned up properly
 
@@ -190,8 +191,30 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         {
             [_transfers addObject:transfer];
             
+#if USE_MULTI_SOCKET
             // http://curl.haxx.se/libcurl/c/curl_multi_socket_action.html suggests you typically fire a timeout to get it started
             [self processMulti:_multi action:CURL_SOCKET_TIMEOUT forSocket:0];
+#else
+            
+            int runningHandles;
+            do
+            {
+                do
+                {
+                    result = curl_multi_perform(_multi, &runningHandles);
+                }
+                while (result == CURLM_CALL_MULTI_PERFORM);
+            
+                result = curl_multi_wait(_multi, NULL, NULL, 5000, NULL);
+                if (result != CURLM_OK)
+                {
+                    break;
+                }
+            }
+            while (runningHandles);
+            
+            [self readMutiInfo];
+#endif
         }
         else
         {
@@ -235,11 +258,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)multiCreate;
 {
-    CURLMcode result = CURLM_OK;
     _multi = curl_multi_init();
+    
+#if USE_MULTI_SOCKET
     if (_multi)
     {
-        result = curl_multi_setopt(_multi, CURLMOPT_TIMERFUNCTION, timeout_callback);
+        CURLMcode result = curl_multi_setopt(_multi, CURLMOPT_TIMERFUNCTION, timeout_callback);
+        
         if (result == CURLM_OK)
         {
             result = curl_multi_setopt(_multi, CURLMOPT_TIMERDATA, self);
@@ -261,6 +286,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             _multi = nil;
         }
     }
+#endif
 }
 
 - (void)cleanupMulti;
@@ -434,6 +460,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         dispatch_queue_t queue = [self createQueue];
         if (queue)
         {
+#if USE_MULTI_SOCKET
             dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
             _timerIsSuspended = YES;
             // CURLM will command us to resume the timer when it's ready
@@ -462,11 +489,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             });
 
             self.timer = timer;
+#endif
+            
             self.queue = queue;
         }
     }
 
-    return _multi && self.timer && self.queue;
+    return _multi /*&& self.timer*/ && self.queue;
 }
 
 - (void)setTimeout:(long)timeout_ms
