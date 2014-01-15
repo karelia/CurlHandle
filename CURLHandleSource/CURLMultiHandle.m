@@ -312,7 +312,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         // an error in the overall management of transfers, not one particular easy handle. Might as
         // well try to soldier on after logging about it; you never know it might work, or we'll
         // crash or something!
-        NSLog(@"curl_multi_wait() returned %i", result);
+        CURLMultiLogError(@"curl_multi_wait() returned %i", result);
     }
     
     
@@ -340,7 +340,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         // If something went wrong in waiting, I guess there's not a lot we can do about it. Might
         // as well carry on processing the handle and use up more CPU, but log about it
-        NSLog(@"curl_multi_wait() returned %i", result);
+        CURLMultiLogError(@"curl_multi_wait() returned %i", result);
     }
     
     
