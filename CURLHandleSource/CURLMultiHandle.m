@@ -57,13 +57,12 @@
 
 @property (readonly, copy, nonatomic) NSArray* transfers;
 @property (strong, nonatomic) NSMutableArray* sockets;
-@property (assign, nonatomic) dispatch_queue_t queue;
-@property (assign, nonatomic) dispatch_source_t timer;
+@property (readonly, nonatomic) dispatch_source_t timer;
 
 @end
 
 
-#define USE_MULTI_SOCKET NO             // buggy for now in my testing
+#define USE_MULTI_SOCKET 1             // buggy for now in my testing
 #define USE_GLOBAL_QUEUE YES            // turn this on to share one queue across all instances
 #define COUNT_INSTANCES NO              // turn this on for a bit of debugging to ensure that things are getting cleaned up properly
 
@@ -108,25 +107,68 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (id)init
 {
-    if ((self = [super init]) != nil)
+    if (self = [super init])
     {
-        if ([self createTimer])
+        // Setup multi handle
+        [self multiCreate];
+        if (!_multi)
         {
-            _transfers = [[NSMutableArray alloc] init];
-            self.sockets = [NSMutableArray array];
-#if COUNT_INSTANCES
-            ++gInstanceCount;
+            [self release]; return nil;
+        }
+        
+        
+        // Setup queue
+        _queue = [self createQueue];
+        if (!_queue)
+        {
+            [self release]; return nil;
+        }
+        
+        
+#if USE_MULTI_SOCKET
+        // Create timer
+        _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _queue);
+        if (!_timer)
+        {
+            [self release]; return nil;
+        }
+        
+        _timerIsSuspended = YES;
+        // CURLM will command us to resume the timer when it's ready
+        
+        dispatch_source_set_event_handler(_timer, ^{
+            CURLMultiLog(@"timer fired");
+            
+            // perform processing
+            [self processMulti:_multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
+        });
+        
+        dispatch_source_set_cancel_handler(_timer, ^{
+            
+            NSAssert(self.timer == nil, @"timer property should have been cleared by now");
+            
+            [self cleanupMulti];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                dispatch_release(_timer); _timer = NULL;
+                dispatch_release(_queue); _queue = NULL;
+                CURLMultiLog(@"released queue and timer");
+            });
+        });
+        
 #endif
-
-            CURLMultiLog(@"started");
-        }
-        else
-        {
-            [self release];
-            self = nil;
-        }
+        
+        
+        // Setup other ivars
+        _transfers = [[NSMutableArray alloc] init];
+        self.sockets = [NSMutableArray array];
+#if COUNT_INSTANCES
+        ++gInstanceCount;
+#endif
+        
+        CURLMultiLog(@"started");
     }
-
+    
     return self;
 }
 
@@ -157,7 +199,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     if (timer)
     {
         CURLMultiLog(@"shutdown");
-        self.timer = nil;
+        _timer = NULL;  // released later
         dispatch_source_cancel(timer);
     }
     else
@@ -496,53 +538,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 #pragma mark - Timer Management
 
 @synthesize timer = _timer;
-
-- (BOOL)createTimer
-{
-    [self multiCreate];
-    
-    if (_multi)
-    {
-        dispatch_queue_t queue = [self createQueue];
-        if (queue)
-        {
-#if USE_MULTI_SOCKET
-            dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue);
-            _timerIsSuspended = YES;
-            // CURLM will command us to resume the timer when it's ready
-
-            dispatch_source_set_event_handler(timer, ^{
-                CURLMultiLog(@"timer fired");
-
-                // perform processing
-                [self processMulti:_multi action:0 forSocket:CURL_SOCKET_TIMEOUT];
-            });
-
-            dispatch_source_set_cancel_handler(timer, ^{
-
-                NSAssert(self.timer == nil, @"timer property should have been cleared by now");
-
-                [self cleanupMulti];
-
-                dispatch_queue_t queue = self.queue;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    dispatch_release(timer);
-                    dispatch_release(queue);
-                    CURLMultiLog(@"released queue and timer");
-                });
-
-                self.queue = nil;
-            });
-
-            self.timer = timer;
-#endif
-            
-            self.queue = queue;
-        }
-    }
-
-    return _multi /*&& self.timer*/ && self.queue;
-}
 
 - (void)setTimeout:(long)timeout_ms
 {
