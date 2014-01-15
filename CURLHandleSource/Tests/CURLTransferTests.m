@@ -23,11 +23,7 @@ typedef enum
     TEST_MODE_COUNT
 } TestMode;
 
-static const NSUInteger kIterationsToPerform = TEST_MODE_COUNT;
 
-// Each test will run kIterationsToPerform times, working its way through the modes in the TestMode enum.
-// You can re-order the enums, and reduce the value of kIterationsToPerform if you only want to use some of these modes.
-//
 // In mode TEST_WITH_SHARED_MULTI  all the tests use the shared multi from [CURLMulti sharedInstance].
 // Using the shared multi is potentially dubious because the state of the multi is retained across tests.
 // However, it's also how things are in the real world.
