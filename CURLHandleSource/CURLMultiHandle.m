@@ -284,9 +284,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         [self suspendTransfer:aTransfer];
     }
 
+#if USE_MULTI_SOCKET
     // give handles a last chance to process
     // I'm not sure this is strictly the right thing to do, since timeout hasn't actually been reached. Mike
     [self processMulti:_multi action:0 forSocket:CURL_SOCKET_TIMEOUT];;
+#endif
 
     [_transfers release]; _transfers = nil;
     self.sockets = nil;
@@ -295,7 +297,41 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
 }
 
-#if !USE_MULTI_SOCKET
+#if USE_MULTI_SOCKET
+
+- (void)processMulti:(CURLM*)multi action:(int)action forSocket:(int)socket
+{
+    //BOOL isTimeout = socket == CURL_SOCKET_TIMEOUT;
+    
+    // process the multi
+    //if (!isTimeout)
+    {
+        int running;
+        CURLMultiLogDetail(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action]);
+        
+        CURLMcode result;
+        do
+        {
+            result = curl_multi_socket_action(_multi, socket, action, &running);
+        }
+        while (result == CURLM_CALL_MULTI_SOCKET);
+        
+        if (result == CURLM_OK)
+        {
+            CURLMultiLogDetail(@"%d handles reported as running", running);
+            [self processTransferMessages];
+        }
+        else
+        {
+            CURLMultiLogError(@"curl_multi_socket_action returned error %d", result);
+        }
+    }
+    
+    CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
+}
+
+#else
+
 - (void)processAvailableData
 {
     CURLMcode result;
@@ -349,38 +385,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         [self processAvailableData];
     });
 }
+
 #endif
-
-- (void)processMulti:(CURLM*)multi action:(int)action forSocket:(int)socket
-{
-    //BOOL isTimeout = socket == CURL_SOCKET_TIMEOUT;
-
-    // process the multi
-    //if (!isTimeout)
-    {
-        int running;
-        CURLMultiLogDetail(@"\n\nSTART processing for socket %d action %@", socket, kActionNames[action]);
-        
-        CURLMcode result;
-        do
-        {
-            result = curl_multi_socket_action(_multi, socket, action, &running);
-        }
-        while (result == CURLM_CALL_MULTI_SOCKET);
-
-        if (result == CURLM_OK)
-        {
-            CURLMultiLogDetail(@"%d handles reported as running", running);
-            [self processTransferMessages];
-        }
-        else
-        {
-            CURLMultiLogError(@"curl_multi_socket_action returned error %d", result);
-        }
-    }
-
-    CURLMultiLogDetail(@"\nDONE processing for socket %d action %@\n\n", socket, kActionNames[action]);
-}
 
 - (void)processTransferMessages
 {
@@ -588,6 +594,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket registration:(CURLSocketRegistration *)registration required:(BOOL)required
 {
+#if USE_MULTI_SOCKET
     if (required)
     {
         if (!source)
@@ -621,9 +628,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         dispatch_source_cancel(source);
         source = nil;
     }
+#endif
 
     return source;
 }
+
 
 #pragma mark - Utilities
 
