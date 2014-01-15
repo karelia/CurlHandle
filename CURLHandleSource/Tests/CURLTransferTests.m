@@ -130,7 +130,6 @@ static TestMode gModeToUse;
             {
                 NSLog(@"Using custom multi");
                 self.multi = [[[CURLMultiHandle alloc] init] autorelease];
-                [self.multi startup];
             }
             break;
 

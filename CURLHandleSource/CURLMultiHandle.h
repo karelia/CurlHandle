@@ -63,13 +63,7 @@
 + (CURLMultiHandle*)sharedInstance;
 
 
-/** Prepare the multi for work. Needs to be called once before beginTransfer is called. Should be matched with a call to shutdown
- * before the multi is destroyed.
- */
-
-- (void)startup;
-
-/** 
+/**
  * Shut down the multi and clean up all resources that it was using.
  */
 

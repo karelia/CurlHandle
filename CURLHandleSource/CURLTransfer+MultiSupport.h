@@ -32,13 +32,23 @@
  Called by <CURLMulti> to tell the transfer that it has completed.
  
  @param code The completion code.
- @param isMultiCode Is the code a result from the handle itself, or the multi managing it?
  
  @warning Not intended for general use.
 
  */
 
-- (void)completeWithCode:(int)code isMulti:(BOOL)isMultiCode;
+- (void)completeWithCode:(CURLcode)code;
+
+/**
+ Called by <CURLMulti> to tell the transfer that it has completed.
+ 
+ @param error The failure error if there was one.
+ 
+ @warning Not intended for general use.
+ 
+ */
+
+- (void)completeWithError:(NSError *)error;
 
 /**
  Has the transfer completed?
