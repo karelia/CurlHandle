@@ -62,7 +62,7 @@
 @end
 
 
-#define USE_MULTI_SOCKET 1             // buggy for now in my testing
+#define USE_MULTI_SOCKET 0              // buggy for now in my testing
 #define USE_GLOBAL_QUEUE YES            // turn this on to share one queue across all instances
 #define COUNT_INSTANCES NO              // turn this on for a bit of debugging to ensure that things are getting cleaned up properly
 
