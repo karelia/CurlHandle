@@ -195,25 +195,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             // http://curl.haxx.se/libcurl/c/curl_multi_socket_action.html suggests you typically fire a timeout to get it started
             [self processMulti:_multi action:CURL_SOCKET_TIMEOUT forSocket:0];
 #else
-            
-            int runningHandles;
-            do
+            // Start up the queue again if needed
+            if (_transfers.count == 1)
             {
-                do
-                {
-                    result = curl_multi_perform(_multi, &runningHandles);
-                }
-                while (result == CURLM_CALL_MULTI_PERFORM);
-            
-                result = curl_multi_wait(_multi, NULL, NULL, 5000, NULL);
-                if (result != CURLM_OK)
-                {
-                    break;
-                }
+                [self processAvailableData];
             }
-            while (runningHandles);
-            
-            [self readMutiInfo];
 #endif
         }
         else
@@ -308,6 +294,53 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMcode result = curl_multi_cleanup(_multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
 }
+
+#if !USE_MULTI_SOCKET
+- (void)processAvailableData
+{
+    CURLMcode result;
+    int runningHandles;
+    do
+    {
+        result = curl_multi_perform(_multi, &runningHandles);
+    }
+    while (result == CURLM_CALL_MULTI_PERFORM);
+    
+    
+    // Once there are fewer running handles than we are tracking, some should have finished
+    if (runningHandles < self.transfers.count)
+    {
+        [self readMutiInfo];
+        
+        // Bail out once we've run out of handles/transfers, as there's no point burning CPU to
+        // service an empty multi handle. Will be rescheduled when the next transfer starts
+        if (runningHandles == 0)
+        {
+            NSAssert(self.transfers.count == 0, @"No handles running, but still CURLTransfers being tracked");
+            return;
+        }
+    }
+    
+    NSAssert(self.transfers.count, @"Servicing a multi handle without any CURLTransfers");
+    NSAssert(runningHandles > 0, @"There are still running handles, but apparently still CURLTransfers being tracked");
+    
+    
+    // Wait for something to happen
+    result = curl_multi_wait(_multi, NULL, NULL, 5000, NULL);
+    if (result != CURLM_OK)
+    {
+        // If something went wrong in waiting, I guess there's not a lot we can do about it. Might
+        // as well carry on processing the handle and use up more CPU, but log about it
+        NSLog(@"curl_multi_wait() returned %i", result);
+    }
+    
+    
+    // Reschedule such that new transfers can make it into the queue
+    dispatch_async(self.queue, ^{
+        [self processAvailableData];
+    });
+}
+#endif
 
 - (void)processMulti:(CURLM*)multi action:(int)action forSocket:(int)socket
 {
