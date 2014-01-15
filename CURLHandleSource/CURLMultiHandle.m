@@ -306,6 +306,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     }
     while (result == CURLM_CALL_MULTI_PERFORM);
     
+    if (result != CURLM_OK)
+    {
+        // If something went wrong, I guess there's not a lot we can do about it. After all, this is
+        // an error in the overall management of transfers, not one particular easy handle. Might as
+        // well try to soldier on after logging about it; you never know it might work, or we'll
+        // crash or something!
+        NSLog(@"curl_multi_wait() returned %i", result);
+    }
+    
     
     // Once there are fewer running handles than we are tracking, some should have finished
     if (runningHandles < self.transfers.count)
