@@ -199,7 +199,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         else
         {
             CURLMultiLogError(@"failed to add transfer %@", transfer);
-            [transfer completeWithCode:result isMulti:YES];
+            NSAssert(result != CURLM_CALL_MULTI_SOCKET, @"CURLM_CALL_MULTI_SOCKET doesn't make sense as a transfer failure code");
+            [transfer completeWithError:[NSError errorWithDomain:CURLMcodeErrorDomain code:result userInfo:nil]];
         }
     });
 }
@@ -408,7 +409,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 [self suspendTransfer:transfer];
                 
                 // ...then tell the easy transfer to complete, which can cause curl_easy_cleanup to be called
-                [transfer completeWithCode:code isMulti:NO];
+                [transfer completeWithCode:code];
                 
                 // ...then tell it that it's no longer in use by the multi, which breaks the reference cycle between us
                 //[transfer removedByMulti:self];

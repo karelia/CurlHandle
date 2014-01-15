@@ -207,7 +207,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         }
         else
         {
-            [self completeWithCode:code isMulti:NO];
+            [self completeWithCode:code];
         }
     }
     
@@ -646,18 +646,14 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 }
 
-- (void)completeWithCode:(int)code isMulti:(BOOL)isMultiCode;
+- (void)completeWithCode:(CURLcode)code;
 {
     CURLHandleLog(@"completed with %@ code %d", isMultiCode ? @"multi" : @"easy", code);
     
     NSError *error = nil;
-    if (code != (isMultiCode ? CURLM_OK : CURLE_OK))
+    if (code != CURLE_OK)
     {
-        if (isMultiCode) NSAssert(code != CURLM_CALL_MULTI_SOCKET, @"CURLM_CALL_MULTI_SOCKET doesn't make sense as a transfer failure code");
-        
-        error = (isMultiCode ?
-                 [NSError errorWithDomain:CURLMcodeErrorDomain code:(CURLMcode)code userInfo:nil] :
-                 [self errorForURL:self.originalRequest.URL code:(CURLcode)code]);
+        error = [self errorForURL:self.originalRequest.URL code:(CURLcode)code];
         NSAssert(error, @"Failed to created error");
     }
     
@@ -708,7 +704,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         result = curl_easy_perform(self.curlHandle);
     }
     
-    [self completeWithCode:result isMulti:NO];
+    [self completeWithCode:result];
 }
 
 #pragma mark Post-Request Info
