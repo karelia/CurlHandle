@@ -422,7 +422,14 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     
     // Reschedule such that new transfers can make it into the queue
     dispatch_async(self.queue, ^{
-        [self processAvailableData];
+        // Catch and report exceptions since GCD will just crash on us
+        @try
+        {
+            [self processAvailableData];
+        }
+        @catch (NSException *exception) {
+            [[NSClassFromString(@"NSApplication") sharedApplication] reportException:exception];
+        }
     });
 }
 
