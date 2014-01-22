@@ -46,7 +46,7 @@ static TestMode gModeToUse;
 
 + (id) defaultTestSuite
 {
-    NSArray* modes = @[@(TEST_SYNCHRONOUS), @(TEST_WITH_OWN_MULTI), @(TEST_WITH_SHARED_MULTI)];
+    NSArray* modes = @[@(TEST_WITH_SHARED_MULTI), @(TEST_SYNCHRONOUS), @(TEST_WITH_OWN_MULTI)];
 
     SenTestSuite* result = [[SenTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Collection", NSStringFromClass(self)]];
     for (NSNumber* mode in modes)
