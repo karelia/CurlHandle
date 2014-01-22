@@ -241,9 +241,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             [self processMulti:_multi action:CURL_SOCKET_TIMEOUT forSocket:0];
 #else
             // Start up the queue again if needed
-            if (_transfers.count == 1)
+            if (!_isRunningProcessingLoop)
             {
-                [self processAvailableData];
+                _isRunningProcessingLoop = [self runProcessingLoop];
             }
 #endif
         }
@@ -384,7 +384,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #else
 
-- (void)processAvailableData
+- (BOOL)runProcessingLoop;
 {
     CURLMcode result;
     int runningHandles;
@@ -414,7 +414,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         if (runningHandles == 0)
         {
             NSAssert(self.transfers.count == 0, @"No handles running, but still CURLTransfers being tracked");
-            return;
+            return NO;
         }
     }
     
@@ -443,14 +443,14 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             // If all in-process transfers have been cancelled, we'll arrive at this point with no
             // transfers registered with us, and no handles registered with the multi handle either.
             // Thus it's time to stop processing until a new transfer starts
-            if (self.transfers.count == 0) return;
-            
-            [self processAvailableData];
+            _isRunningProcessingLoop = (self.transfers.count ? [self runProcessingLoop] : NO);
         }
         @catch (NSException *exception) {
             [[NSClassFromString(@"NSApplication") sharedApplication] reportException:exception];
         }
     });
+    
+    return YES;
 }
 
 #endif
