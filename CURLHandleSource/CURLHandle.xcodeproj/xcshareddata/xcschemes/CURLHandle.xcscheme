@@ -39,6 +39,12 @@
             </BuildableReference>
             <SkippedTests>
                <Test
+                  Identifier = "CURLMultiTests/testFTPDownload">
+               </Test>
+               <Test
+                  Identifier = "CURLMultiTests/testFTPUpload">
+               </Test>
+               <Test
                   Identifier = "CURLProtocolTests/testCancelling">
                </Test>
                <Test
