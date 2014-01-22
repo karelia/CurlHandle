@@ -45,6 +45,7 @@
 {
     CURLM *_multi;
     NSMutableArray* _transfers;
+    BOOL            _isRunningProcessingLoop;
     NSMutableArray* _sockets;
     dispatch_queue_t _queue;
     
