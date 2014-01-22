@@ -79,7 +79,7 @@
  * @param transfer The transfer to manage. Will be retained by the multi until removed (completion automatically performs removal).
  */
 
-- (void)beginTransfer:(CURLTransfer*)transfer;
+- (void)beginTransfer:(CURLTransfer*)transfer __attribute((nonnull));
 
 /** 
  * This removes the transfer from the multi. *
@@ -94,7 +94,7 @@
  * @param transfer The transfer to cancel. Should have previously been added with beginTransfer:.
  */
 
-- (void)suspendTransfer:(CURLTransfer*)transfer;
+- (void)suspendTransfer:(CURLTransfer*)transfer __attribute((nonnull));
 
 /**
  Update the dispatch source for a given socket and type.

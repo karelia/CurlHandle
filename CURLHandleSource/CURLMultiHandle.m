@@ -175,6 +175,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)dealloc
 {
     CURLMultiLog(@"deallocing");
+    [self cleanupMulti];
+    
+    if (_queue)
+    {
+        dispatch_release(_queue); _queue = NULL;
+    }
+    
     NSAssert((_multi == NULL) && (_timer == NULL) && (_queue == NULL), @"should have been shut down by the time we're dealloced");
 
     [_transfers release];
@@ -194,6 +201,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)shutdown
 {
+#if USE_MULTI_SOCKET
     // if the queue is gone, we've already been shut down and are probably being disposed
     dispatch_source_t timer = self.timer;
     if (timer)
@@ -206,6 +214,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         CURLMultiLogError(@"shutdown called multiple times");
     }
+#endif
 }
 
 #pragma mark - Transfer Management
@@ -316,6 +325,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLMultiLog(@"cleaning up");
 
+    dispatch_sync(_queue, ^{    // might as well serialise access
+        
     for (CURLTransfer *aTransfer in self.transfers)
     {
         [self suspendTransfer:aTransfer];
@@ -330,8 +341,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     [_transfers release]; _transfers = nil;
     self.sockets = nil;
 
+    if (!_multi) return;
     CURLMcode result = curl_multi_cleanup(_multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
+    _multi = NULL;
+        
+    });
 }
 
 #if USE_MULTI_SOCKET
@@ -425,6 +440,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         // Catch and report exceptions since GCD will just crash on us
         @try
         {
+            // If all in-process transfers have been cancelled, we'll arrive at this point with no
+            // transfers registered with us, and no handles registered with the multi handle either.
+            // Thus it's time to stop processing until a new transfer starts
+            if (self.transfers.count == 0) return;
+            
             [self processAvailableData];
         }
         @catch (NSException *exception) {
