@@ -339,6 +339,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     [_transfers release]; _transfers = nil;
     self.sockets = nil;
 
+    if (!_multi) return;
     CURLMcode result = curl_multi_cleanup(_multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
     _multi = NULL;
