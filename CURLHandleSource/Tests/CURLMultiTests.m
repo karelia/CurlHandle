@@ -128,28 +128,16 @@
 
 - (void)testCancelling
 {
-    self.pauseOnResponse = YES;
-
     CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
 
     NSURL* largeFile = [NSURL URLWithString:@"https://github.com/karelia/CurlHandle/archive/master.zip"];
     NSURLRequest* request = [NSURLRequest requestWithURL:largeFile];
     CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
-    // CURL seems to die horribly if we create and shutdown the multi without actually adding at least one easy transfer to it - so wait until
-    // we've at least received the response
-    
-    [self runUntilPaused];
-
     [transfer cancel];
-
     STAssertTrue(transfer.state >= CURLTransferStateCanceling, @"should have been cancelled");
 
-    // wait until the multi actually gets round to removing the transfer
-    while (transfer.state != CURLTransferStateCompleted)
-    {
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
-    }
+    [self runUntilPaused];
 
     STAssertFalse(self.finished, @"shouldn't have finished by the time we get here");
     
