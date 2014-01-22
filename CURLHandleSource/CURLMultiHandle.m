@@ -425,6 +425,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         // Catch and report exceptions since GCD will just crash on us
         @try
         {
+            // If all in-process transfers have been cancelled, we'll arrive at this point with no
+            // transfers registered with us, and no handles registered with the multi handle either.
+            // Thus it's time to stop processing until a new transfer starts
+            if (self.transfers.count == 0) return;
+            
             [self processAvailableData];
         }
         @catch (NSException *exception) {
