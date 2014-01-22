@@ -201,6 +201,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)shutdown
 {
+#if USE_MULTI_SOCKET
     // if the queue is gone, we've already been shut down and are probably being disposed
     dispatch_source_t timer = self.timer;
     if (timer)
@@ -213,6 +214,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     {
         CURLMultiLogError(@"shutdown called multiple times");
     }
+#endif
 }
 
 #pragma mark - Transfer Management
