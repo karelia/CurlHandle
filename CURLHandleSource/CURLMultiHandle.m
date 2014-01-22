@@ -325,6 +325,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLMultiLog(@"cleaning up");
 
+    dispatch_sync(_queue, ^{    // might as well serialise access
+        
     for (CURLTransfer *aTransfer in self.transfers)
     {
         [self suspendTransfer:aTransfer];
@@ -343,6 +345,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMcode result = curl_multi_cleanup(_multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
     _multi = NULL;
+        
+    });
 }
 
 #if USE_MULTI_SOCKET
