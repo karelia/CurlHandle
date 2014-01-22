@@ -175,6 +175,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)dealloc
 {
     CURLMultiLog(@"deallocing");
+    [self cleanupMulti];
     NSAssert((_multi == NULL) && (_timer == NULL) && (_queue == NULL), @"should have been shut down by the time we're dealloced");
 
     [_transfers release];
@@ -332,6 +333,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     CURLMcode result = curl_multi_cleanup(_multi);
     NSAssert(result == CURLM_OK, @"cleaning up multi failed unexpectedly with error %d", result);
+    _multi = NULL;
 }
 
 #if USE_MULTI_SOCKET
