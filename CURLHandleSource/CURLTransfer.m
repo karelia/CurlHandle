@@ -754,7 +754,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     [userInfo release];
     
     
-    if (code == CURLE_SSL_CACERT)
+    if (code == CURLE_PEER_FAILED_VERIFICATION ||   // seen on 10.7
+        code == CURLE_SSL_CACERT)                   // seen on 10.9
     {
         // Use Keith's patch to grab SecTrust. Have to hardcode the value for now
         // until I figure out the build search paths properly
