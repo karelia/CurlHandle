@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>2359B156-6DBA-4BF3-A913-B517EC5D54A2</string>
+	<key>IDESourceControlProjectName</key>
+	<string>CURLHandle</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>6DD1C111-9683-4666-95FE-DF0E5C52656E</key>
+		<string>https://github.com/bagder/c-ares.git</string>
+		<key>8E8110FB-A23F-4E1C-8761-9ECA49487BCA</key>
+		<string>https://github.com/karelia/CurlHandle.git</string>
+		<key>B29BEE58-D36B-4C7C-9922-79E808863BCA</key>
+		<string>https://github.com/karelia/curl.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>CURLHandleSource/CURLHandle.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>6DD1C111-9683-4666-95FE-DF0E5C52656E</key>
+		<string>../../../c-ares</string>
+		<key>8E8110FB-A23F-4E1C-8761-9ECA49487BCA</key>
+		<string>../../..</string>
+		<key>B29BEE58-D36B-4C7C-9922-79E808863BCA</key>
+		<string>../../../curl</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/karelia/CurlHandle.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>8E8110FB-A23F-4E1C-8761-9ECA49487BCA</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>6DD1C111-9683-4666-95FE-DF0E5C52656E</string>
+			<key>IDESourceControlWCCName</key>
+			<string>c-ares</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B29BEE58-D36B-4C7C-9922-79E808863BCA</string>
+			<key>IDESourceControlWCCName</key>
+			<string>curl</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8E8110FB-A23F-4E1C-8761-9ECA49487BCA</string>
+			<key>IDESourceControlWCCName</key>
+			<string>CurlHandle</string>
+		</dict>
+	</array>
+</dict>
+</plist>
