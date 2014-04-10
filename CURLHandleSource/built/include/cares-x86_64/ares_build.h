@@ -97,7 +97,7 @@
 #endif
 
 /* The size of `long', as computed by sizeof. */
-#define CARES_SIZEOF_LONG 8
+/* #undef CARES_SIZEOF_LONG */
 
 /* Integral data type used for ares_socklen_t. */
 #define CARES_TYPEOF_ARES_SOCKLEN_T socklen_t
