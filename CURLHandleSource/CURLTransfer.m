@@ -662,6 +662,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void)completeWithError:(NSError *)error;
 {
+    // Ignore any attempt to complete after the first one
+    // This can happen when reading body data fails, there'll be one completion with the error from
+    // the stream, and then another error from libcurl that the transfer was aborted.
+    if (self.state == CURLTransferStateCompleted) return;
+    
     _error = [error copy];
     _state = CURLTransferStateCompleted;
     
