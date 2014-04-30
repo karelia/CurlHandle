@@ -1025,11 +1025,14 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
         if (result < 0)
         {
+            NSError *error = [_uploadStream streamError];
+            [self completeWithError:error];
+            
+            // Report error to transcript too. This may be unnecessary now; I'm just maintaining the
+            // existing setup until I have reason to change it (e.g. turns out there's dupes appearing)
             [self tryToPerformSelectorOnDelegate:@selector(transfer:didReceiveDebugInformation:ofType:) usingBlock:^{
                 
-                NSError *error = [_uploadStream streamError];
-                
-                [self.delegate transfer:self
+               [self.delegate transfer:self
            didReceiveDebugInformation:[NSString stringWithFormat:@"Read failed: %@", [error debugDescription]]
                                ofType:CURLINFO_HEADER_IN];
             }];
