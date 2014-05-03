@@ -3,6 +3,7 @@ libcares is a git submodule - be sure to update it via git
 How to build libcares:
 1. Update the source to a new version if desired.
 2. Select the target "libcares" in the Scheme popup (32- or 64-bit doesn't matter).
+	(Use the "Libraries" target to build both libcares and libcurl at once.)
 3. Build. Just a regular Cmd-B build. No archiving or anything.
     Because the builds are controlled by scripts, not Xcode, they always build for "release", but also with debug info.
     Note also that the build outputs are:
