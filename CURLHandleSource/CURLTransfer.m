@@ -665,6 +665,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     // Ignore any attempt to complete after the first one
     // This can happen when reading body data fails, there'll be one completion with the error from
     // the stream, and then another error from libcurl that the transfer was aborted.
+    // Cancellation can also have a bit of a race condition where the transfer wants to cancel at
+    // the same time as it naturally finishes/fails
     if (self.state == CURLTransferStateCompleted) return;
     
     _error = [error copy];
