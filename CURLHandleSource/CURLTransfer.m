@@ -628,6 +628,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                 
                 // Bounce over to doing suspension in background as libcurl sometimes blocks for a long time on that
                 dispatch_async(queue, ^{
+                    // But of course by the time we arrive here, the transfer may have naturally
+                    // completed, and so been removed from the multi. If so, reporting that to the
+                    // delegate should already be taken care of and we can bail out early.
+                    if (_state == CURLTransferStateCanceling) return;
+                    
                     [multi suspendTransfer:self];
                     
                     // Report self as completed once any pending work on the queue is performed
