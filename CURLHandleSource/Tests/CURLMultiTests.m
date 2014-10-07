@@ -112,10 +112,10 @@
 
         [self runUntilPaused];
 
-        STAssertTrue(self.sending, @"should have set sending flag");
-        STAssertNil(self.error, @"got error %@", self.error);
-        STAssertNotNil(self.response, @"expected response");
-        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+        XCTAssertTrue(self.sending, @"should have set sending flag");
+        XCTAssertNil(self.error, @"got error %@", self.error);
+        XCTAssertNotNil(self.response, @"expected response");
+        XCTAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
         
         [transfer release];
     }
@@ -135,11 +135,11 @@
     CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
 
     [transfer cancel];
-    STAssertTrue(transfer.state >= CURLTransferStateCanceling, @"should have been cancelled");
+    XCTAssertTrue(transfer.state >= CURLTransferStateCanceling, @"should have been cancelled");
 
     [self runUntilPaused];
 
-    STAssertFalse(self.finished, @"shouldn't have finished by the time we get here");
+    XCTAssertFalse(self.finished, @"shouldn't have finished by the time we get here");
     
     [transfer release];
 

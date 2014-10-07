@@ -71,7 +71,7 @@
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
     
-    STAssertNotNil(connection, @"failed to get connection for request %@", request);
+    XCTAssertNotNil(connection, @"failed to get connection for request %@", request);
 
     [self runUntilPaused];
 
@@ -86,7 +86,7 @@
     request.shouldUseCurlHandle = YES;
 
     NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    STAssertNotNil(connection, @"failed to get connection for request %@", request);
+    XCTAssertNotNil(connection, @"failed to get connection for request %@", request);
 
     [self runUntilPaused];
 
@@ -107,7 +107,7 @@
         request.shouldUseCurlHandle = YES;
 
         NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-        STAssertNotNil(connection, @"failed to get connection for request %@", request);
+        XCTAssertNotNil(connection, @"failed to get connection for request %@", request);
 
         [self runUntilPaused];
         
@@ -132,7 +132,7 @@
         [request setHTTPBody:[testNotes dataUsingEncoding:NSUTF8StringEncoding]];
 
         NSURLConnection* connection = [NSURLConnection connectionWithRequest:request delegate:self];
-        STAssertNotNil(connection, @"failed to get connection for request %@", request);
+        XCTAssertNotNil(connection, @"failed to get connection for request %@", request);
 
         [self runUntilPaused];
 
@@ -140,9 +140,9 @@
         if ([response respondsToSelector:@selector(statusCode)])
         {
             NSUInteger code = [(id)response statusCode];
-            STAssertEquals(code, (NSInteger) 226, @"got unexpected code %ld", code);
-            STAssertNil(self.error, @"got error %@", self.error);
-            STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
+            XCTAssertEqual(code, (NSInteger) 226, @"got unexpected code %ld", code);
+            XCTAssertNil(self.error, @"got error %@", self.error);
+            XCTAssertTrue([self.buffer length] == 0, @"got unexpected data %@", self.buffer);
         }
     }
 }

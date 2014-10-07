@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "223FD091160B523700BE1C80"
-               BuildableName = "CURLHandleTests.octest"
+               BuildableName = "CURLHandleTests.xctest"
                BlueprintName = "CURLHandleTests"
                ReferencedContainer = "container:CURLHandle.xcodeproj">
             </BuildableReference>

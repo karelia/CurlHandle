@@ -122,7 +122,6 @@
 		221EAD11160B167900E4F270 /* CURLMultiHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 221EAD0F160B167900E4F270 /* CURLMultiHandle.h */; };
 		221EAD12160B167900E4F270 /* CURLMultiHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 221EAD10160B167900E4F270 /* CURLMultiHandle.m */; };
 		221F8B7B17255229004E7B9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
-		223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 223FD094160B523700BE1C80 /* SenTestingKit.framework */; };
 		223FD0A1160B523700BE1C80 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 223FD09F160B523700BE1C80 /* InfoPlist.strings */; };
 		223FD0A4160B523700BE1C80 /* CURLMultiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0A3160B523700BE1C80 /* CURLMultiTests.m */; };
 		223FD0AC160B5F1200BE1C80 /* CURLTransferTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 223FD0AB160B5F1200BE1C80 /* CURLTransferTests.m */; };
@@ -322,7 +321,6 @@
 		221EAD0F160B167900E4F270 /* CURLMultiHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMultiHandle.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLMultiHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMultiHandle.m; sourceTree = "<group>"; };
 		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		223FD094160B523700BE1C80 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
 		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		223FD0A3160B523700BE1C80 /* CURLMultiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLMultiTests.m; sourceTree = "<group>"; };
@@ -417,7 +415,6 @@
 			files = (
 				22BCCE3C16ADD73400DFFE8D /* (null) in Frameworks */,
 				22BCCE3316ADD66900DFFE8D /* Security.framework in Frameworks */,
-				223FD095160B523700BE1C80 /* SenTestingKit.framework in Frameworks */,
 				226B358D16ADAA6D004780A7 /* CURLHandle.framework in Frameworks */,
 				22F9473F1709C00000F0E6E1 /* libcurl.dylib in Frameworks */,
 				22F947401709C00B00F0E6E1 /* libcares.dylib in Frameworks */,
@@ -503,7 +500,6 @@
 		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				223FD094160B523700BE1C80 /* SenTestingKit.framework */,
 				79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
 				27D77E151672BD9B0091EF91 /* Security.framework */,
@@ -717,7 +713,7 @@
 			name = CURLHandleTests;
 			productName = CURLHandleTests;
 			productReference = 223FD092160B523700BE1C80 /* CURLHandleTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		22C9CFBE17035A0A004610FE /* Standalone Test */ = {
 			isa = PBXNativeTarget;
@@ -762,6 +758,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0600;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Karelia Software";
 			};
@@ -1185,7 +1182,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/built/include/curl-x86_64\"";
@@ -1196,7 +1193,6 @@
 					"\"$(SRCROOT)/built\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
@@ -1204,7 +1200,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/built/include/curl-x86_64\"";
 				INFOPLIST_FILE = "Tests/CURLHandleTests-Info.plist";
@@ -1214,7 +1210,6 @@
 					"\"$(SRCROOT)/built\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
 		};

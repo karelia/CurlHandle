@@ -129,9 +129,9 @@
 
 - (BOOL)checkDownloadedBufferWasCorrect
 {
-    STAssertNotNil(self.response, @"got no response");
-    STAssertTrue([self.buffer length] > 0, @"got no data, expected %ld", self.expected);
-    STAssertNil(self.error, @"got error %@", self.error);
+    XCTAssertNotNil(self.response, @"got no response");
+    XCTAssertTrue([self.buffer length] > 0, @"got no data, expected %ld", self.expected);
+    XCTAssertNil(self.error, @"got error %@", self.error);
 
     NSError* error = nil;
     NSURL* testFileURL = [self testFileURL];
@@ -139,7 +139,7 @@
     NSString* receivedNotes = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
 
     BOOL result = [receivedNotes isEqualToString:testNotes];
-    STAssertTrue(result, @"received notes didn't match: was:\n'%@'\n\nshould have been:\n'%@'", receivedNotes, testNotes);
+    XCTAssertTrue(result, @"received notes didn't match: was:\n'%@'\n\nshould have been:\n'%@'", receivedNotes, testNotes);
 
     // clear the buffer
     [self.buffer setLength:0];
@@ -168,7 +168,7 @@
     }
     else
     {
-        STAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleFTPTestURL \"ftp://user:password@ftp.test.com\"");
+        XCTAssertNotNil(ftpTest, @"need to set a test server address using defaults, e.g: defaults write otest CURLHandleFTPTestURL \"ftp://user:password@ftp.test.com\"");
         result = [NSURL URLWithString:ftpTest];
     }
 

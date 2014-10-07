@@ -49,13 +49,13 @@ static TestMode gModeToUse;
     NSArray* modes = @[@(TEST_WITH_SHARED_MULTI), @(TEST_SYNCHRONOUS)];
     // Not testing TEST_WITH_OWN_MULTI as tends to hang trying to clean up after mock server
 
-    SenTestSuite* result = [[SenTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Collection", NSStringFromClass(self)]];
+    XCTestSuite* result = [[XCTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Collection", NSStringFromClass(self)]];
     for (NSNumber* mode in modes)
     {
         // in order to re-use the default SenTest mechanism for building up a suite of tests, we set some global variables
         // to indicate the test configuration we want, then call on to the defaultTestSuite to get a set of tests using that configuration.
         gModeToUse = (TestMode)[mode unsignedIntegerValue];
-        SenTestSuite* suite = [[SenTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Using%@", NSStringFromClass(self), [CURLTransferTests nameForMode:gModeToUse]]];
+        XCTestSuite* suite = [[XCTestSuite alloc] initWithName:[NSString stringWithFormat:@"%@Using%@", NSStringFromClass(self), [CURLTransferTests nameForMode:gModeToUse]]];
         [suite addTest:[super defaultTestSuite]];
         [result addTest:suite];
         [suite release];
@@ -185,7 +185,7 @@ static TestMode gModeToUse;
             [self runUntilPaused];
         }
 
-        STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
+        XCTAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
         
         [transfer release];
     }
@@ -220,13 +220,13 @@ static TestMode gModeToUse;
             [self runUntilPaused];
         }
 
-        STAssertTrue(self.sending, @"should have set sending flag");
-        STAssertNil(self.error, @"got error %@", self.error);
+        XCTAssertTrue(self.sending, @"should have set sending flag");
+        XCTAssertNil(self.error, @"got error %@", self.error);
 
         NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
-        STAssertTrue([response respondsToSelector:@selector(statusCode)], @"got response of class %@", [response class]);
-        STAssertEquals([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
-        STAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
+        XCTAssertTrue([response respondsToSelector:@selector(statusCode)], @"got response of class %@", [response class]);
+        XCTAssertEqual([response statusCode], (NSInteger) 226, @"got unexpected code %ld", [response statusCode]);
+        XCTAssertTrue([self.buffer length] == 0, @"got unexpected data %@", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
         
         [transfer release];
     }
@@ -238,7 +238,7 @@ static TestMode gModeToUse;
 {
     NSString* version = [CURLTransfer curlVersion];
     NSLog(@"curl version %@", version);
-    STAssertTrue([version isEqualToString:@"libcurl/7.31.0-DEV SecureTransport zlib/1.2.5 c-ares/1.10.0-DEV libssh2/1.4.3_DEV"], @"version was \n\n%@\n\n", version);
+    XCTAssertTrue([version isEqualToString:@"libcurl/7.31.0-DEV SecureTransport zlib/1.2.5 c-ares/1.10.0-DEV libssh2/1.4.3_DEV"], @"version was \n\n%@\n\n", version);
 }
 
 - (void)testHTTPDownload
@@ -252,7 +252,7 @@ static TestMode gModeToUse;
             [self runUntilPaused];
         }
 
-        STAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
+        XCTAssertTrue([self checkDownloadedBufferWasCorrect], @"download ok");
         
         [transfer release];
     }
@@ -348,9 +348,9 @@ static TestMode gModeToUse;
                 [self runUntilPaused];
             }
 
-            STAssertNil(self.error, @"got error %@", self.error);
-            STAssertNotNil(self.response, @"got unexpected response %@", self.response);
-            STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
+            XCTAssertNil(self.error, @"got error %@", self.error);
+            XCTAssertNotNil(self.response, @"got unexpected response %@", self.response);
+            XCTAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
             
             [transfer release];
         }
@@ -384,12 +384,12 @@ static TestMode gModeToUse;
                 [self runUntilPaused];
             }
 
-            STAssertNil(self.error, @"got error %@", self.error);
-            STAssertNotNil(self.response, @"got unexpected response %@", self.response);
+            XCTAssertNil(self.error, @"got error %@", self.error);
+            XCTAssertNotNil(self.response, @"got unexpected response %@", self.response);
 
             NSString* reply = [[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding];
             BOOL result = [reply isEqualToString:@""];
-            STAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
+            XCTAssertTrue(result, @"reply didn't match: was:\n'%@'\n\nshould have been:\n'%@'", reply, @"");
             [reply release];
             
             [transfer release];
@@ -423,16 +423,16 @@ static TestMode gModeToUse;
             if (self.error)
             {
                 NSInteger curlResponse = [[[self.error userInfo] objectForKey:[NSNumber numberWithInt:CURLINFO_RESPONSE_CODE]] integerValue];
-                STAssertTrue((self.error.code == 21) && (curlResponse == 550), @"got unexpected error %@", self.error);
+                XCTAssertTrue((self.error.code == 21) && (curlResponse == 550), @"got unexpected error %@", self.error);
             }
             else
             {
                 NSHTTPURLResponse* response = (NSHTTPURLResponse*)self.response;
-                STAssertNotNil(response, @"expecting response");
-                STAssertTrue(response.statusCode == 257, @"unexpected response code %ld", response.statusCode);
+                XCTAssertNotNil(response, @"expecting response");
+                XCTAssertTrue(response.statusCode == 257, @"unexpected response code %ld", response.statusCode);
             }
 
-            STAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
+            XCTAssertTrue([self.buffer length] == 0, @"got unexpected data: '%@'", [[[NSString alloc] initWithData:self.buffer encoding:NSUTF8StringEncoding] autorelease]);
             
             [transfer release];
         }
