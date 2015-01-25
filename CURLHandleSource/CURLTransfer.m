@@ -696,7 +696,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     
     _state = CURLTransferStateRunning;  // reset after previous transfer
     
-    [_request release]; // -setupRequest:É will fill it back in
+    [_request release]; // -setupRequest: will fill it back in
     CURLcode result = [self setupRequest:request credential:credential];
     
     if (result == CURLE_OK)
