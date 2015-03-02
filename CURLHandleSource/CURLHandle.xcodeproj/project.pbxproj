@@ -320,7 +320,7 @@
 		2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StandaloneGcdTest.m; sourceTree = "<group>"; };
 		221EAD0F160B167900E4F270 /* CURLMultiHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CURLMultiHandle.h; sourceTree = "<group>"; };
 		221EAD10160B167900E4F270 /* CURLMultiHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CURLMultiHandle.m; sourceTree = "<group>"; };
-		223FD092160B523700BE1C80 /* CURLHandleTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		223FD092160B523700BE1C80 /* CURLHandleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CURLHandleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		223FD09E160B523700BE1C80 /* CURLHandleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CURLHandleTests-Info.plist"; sourceTree = "<group>"; };
 		223FD0A0160B523700BE1C80 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		223FD0A3160B523700BE1C80 /* CURLMultiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CURLMultiTests.m; sourceTree = "<group>"; };
@@ -450,7 +450,7 @@
 			isa = PBXGroup;
 			children = (
 				8DC2EF5B0486A6940098B216 /* CURLHandle.framework */,
-				223FD092160B523700BE1C80 /* CURLHandleTests.octest */,
+				223FD092160B523700BE1C80 /* CURLHandleTests.xctest */,
 				22C9CFBF17035A0A004610FE /* Standalone Test */,
 			);
 			name = Products;
@@ -712,7 +712,7 @@
 			);
 			name = CURLHandleTests;
 			productName = CURLHandleTests;
-			productReference = 223FD092160B523700BE1C80 /* CURLHandleTests.octest */;
+			productReference = 223FD092160B523700BE1C80 /* CURLHandleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		22C9CFBE17035A0A004610FE /* Standalone Test */ = {
