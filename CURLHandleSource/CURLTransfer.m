@@ -535,6 +535,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, (long)[request curl_shouldVerifySSLCertificate]));
     RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYHOST, (long)(request.curl_shouldVerifySSLHost ? 2 : 0)));
     RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FTP_USE_EPSV, 0));     // Disable EPSV for FTP transfers. I've found that some servers claim to support EPSV but take a very long time to respond to it, if at all, often causing the overall connection to fail. Note IPv6 connections will ignore this and use EPSV anyway
+    RETURN_IF_FAILED(curl_easy_setopt(_handle, CURLOPT_FTP_RESPONSE_TIMEOUT, (long)request.timeoutInterval));
 
     // functions
     RETURN_IF_FAILED([self setOption:CURLOPT_SOCKOPTFUNCTION data:CURLOPT_SOCKOPTDATA function:curlSocketOptFunction]);
