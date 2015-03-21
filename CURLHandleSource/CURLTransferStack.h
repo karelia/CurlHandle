@@ -21,8 +21,13 @@
 #define CURLMultiLogDetail CURLMultiLog
 #endif
 
-@class CURLTransfer;
+@class CURLTransferStack, CURLTransfer;
 @class CURLSocketRegistration;
+
+
+@protocol CURLTransferStackDelegate <NSObject>
+@end
+
 
 /**
  * Wrapper for a curl_multi handle.
@@ -41,6 +46,8 @@
 
 @interface CURLTransferStack : NSObject
 {
+    NSOperationQueue    *_delegateQueue;
+    
     CURLM *_multi;
     NSMutableArray* _transfers;
     BOOL            _isRunningProcessingLoop;
@@ -61,6 +68,10 @@
 
 + (CURLTransferStack*)sharedTransferStack;
 
+/**
+ Creates a stack
+ */
++ (CURLTransferStack *)transferStackWithDelegate:(id <CURLTransferStackDelegate>)delegate delegateQueue:(NSOperationQueue *)queue;
 
 /**
  * Shut down the multi and clean up all resources that it was using.

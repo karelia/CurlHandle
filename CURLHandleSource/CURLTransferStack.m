@@ -98,16 +98,28 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     static CURLTransferStack* instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instance = [[CURLTransferStack alloc] init];
+        instance = [[CURLTransferStack alloc] initWithDelegateQueue:nil];
     });
 
     return instance;
 }
 
-- (id)init
-{
-    if (self = [super init])
++ (CURLTransferStack *)transferStackWithDelegate:(id <CURLTransferStackDelegate>)delegate delegateQueue:(NSOperationQueue *)queue {
+    CURLTransferStack *result = [[self alloc] initWithDelegateQueue:queue];
+    return [result autorelease];
+}
+
+- (id)initWithDelegateQueue:(NSOperationQueue *)queue {
+    if (self = [self init])
     {
+        // Delegate queue
+        if (!queue) {
+            queue = [[[NSOperationQueue alloc] init] autorelease];
+            queue.maxConcurrentOperationCount = 1;
+            queue.name = @"com.karelia.ConnectionKit.CURLTransferStack.delegateQueue";
+        }
+        _delegateQueue = [queue retain];
+        
         // Setup multi handle
         [self multiCreate];
         if (!_multi)
