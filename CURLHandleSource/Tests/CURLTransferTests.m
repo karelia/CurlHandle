@@ -136,7 +136,7 @@ static TestMode gModeToUse;
 
         case TEST_SYNCHRONOUS:
         case TEST_WITH_SHARED_MULTI:
-            self.multi = [CURLTransferStack sharedInstance];
+            self.multi = [CURLTransferStack sharedTransferStack];
             break;
 
         default:

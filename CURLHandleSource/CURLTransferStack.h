@@ -59,7 +59,7 @@
  * @return The shared instance.
  */
 
-+ (CURLTransferStack*)sharedInstance;
++ (CURLTransferStack*)sharedTransferStack;
 
 
 /**

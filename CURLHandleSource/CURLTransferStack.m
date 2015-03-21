@@ -93,7 +93,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Object Lifecycle
 
-+ (CURLTransferStack*)sharedInstance;
++ (CURLTransferStack*)sharedTransferStack;
 {
     static CURLTransferStack* instance = nil;
     static dispatch_once_t onceToken;

@@ -174,7 +174,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return [self initWithRequest:request
                       credential:credential
                         delegate:delegate delegateQueue:queue
-                           multi:[CURLTransferStack sharedInstance]];
+                           multi:[CURLTransferStack sharedTransferStack]];
 }
 
 - (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLTransferStack *)multi;
