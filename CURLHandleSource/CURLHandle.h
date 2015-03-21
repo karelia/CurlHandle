@@ -7,6 +7,7 @@
 //
 
 
+#import <CURLHandle/CURLTransferStack.h>
 #import <CURLHandle/CURLTransfer.h>
 #import <CURLHandle/CURLRequest.h>
 #import <CURLHandle/CURLProtocol.h>
