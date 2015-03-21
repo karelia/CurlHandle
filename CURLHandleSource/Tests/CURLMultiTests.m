@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Karelia Software. All rights reserved.
 //
 
-#import "CURLMultiHandle.h"
+#import "CURLTransferStack.h"
 #import "CURLHandleBasedTest.h"
 #import "CURLTransfer+TestingSupport.h"
 
@@ -42,7 +42,7 @@
 
 - (void)testStartupShutdown
 {
-    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
+    CURLTransferStack* multi = [[CURLTransferStack alloc] init];
 
     [multi shutdown];
 
@@ -51,7 +51,7 @@
 
 - (void)testHTTPDownload
 {
-    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
+    CURLTransferStack* multi = [[CURLTransferStack alloc] init];
     
     NSURLRequest* request = [NSURLRequest requestWithURL:[self testFileRemoteURL]];
     CURLTransfer* transfer = [[CURLTransfer alloc] initWithRequest:request credential:nil delegate:self delegateQueue:[NSOperationQueue mainQueue] multi:multi];
@@ -70,7 +70,7 @@
 
 - (void)testFTPDownload
 {
-    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
+    CURLTransferStack* multi = [[CURLTransferStack alloc] init];
     
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
@@ -94,7 +94,7 @@
 
 - (void)testFTPUpload
 {
-    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
+    CURLTransferStack* multi = [[CURLTransferStack alloc] init];
     
     NSURL* ftpRoot = [self ftpTestServer];
     if (ftpRoot)
@@ -128,7 +128,7 @@
 
 - (void)testCancelling
 {
-    CURLMultiHandle* multi = [[CURLMultiHandle alloc] init];
+    CURLTransferStack* multi = [[CURLTransferStack alloc] init];
 
     NSURL* largeFile = [NSURL URLWithString:@"https://github.com/karelia/CurlHandle/archive/master.zip"];
     NSURLRequest* request = [NSURLRequest requestWithURL:largeFile];

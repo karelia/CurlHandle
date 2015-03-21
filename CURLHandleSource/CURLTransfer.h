@@ -18,7 +18,7 @@
 #endif
 
 
-@class CURLMultiHandle;
+@class CURLTransferStack;
 
 @protocol CURLTransferDelegate;
 
@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
 @interface CURLTransfer : NSObject
 {
 	CURL                    *_handle;                         /*" Pointer to the actual CURL object that does all the hard work "*/
-    CURLMultiHandle               *_multi;
+    CURLTransferStack               *_multi;
     NSURLRequest            *_request;
 	id <CURLTransferDelegate> _delegate;
     NSOperationQueue        *_delegateQueue;

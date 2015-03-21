@@ -25,7 +25,7 @@
  
  @return A new CURLTransfer object.
  */
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLMultiHandle*)multi __attribute((nonnull(1,5)));
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLTransferStack*)multi __attribute((nonnull(1,5)));
 
 /**
  Returns a new CURLMulti, for use in testing.
@@ -39,7 +39,7 @@
  @return A new CURLMulti object.
  */
 
-+ (CURLMultiHandle*)standaloneMultiForTestPurposes;
++ (CURLTransferStack*)standaloneMultiForTestPurposes;
 
 /**
  Clean up a multi that was created by standaloneMultiForTestPurposes.
@@ -49,6 +49,6 @@
  @param multi The multi to clean up.
  */
 
-+ (void)cleanupStandaloneMulti:(CURLMultiHandle*)multi;
++ (void)cleanupStandaloneMulti:(CURLTransferStack*)multi;
 @end
 

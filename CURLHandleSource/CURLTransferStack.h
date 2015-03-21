@@ -1,5 +1,4 @@
 //
-//  CURLMultiHandle.h
 //  CURLHandle
 //
 //  Created by Sam Deane on 20/09/2012.
@@ -27,8 +26,7 @@
 
 /**
  * Wrapper for a curl_multi handle.
- * In general you shouldn't use this class directly - use the extensions in NSURLRequest+CURLHandle
- * instead, and work with normal NSURLConnections.
+ * Roughly analogous to NSURLSession for curl.
  *
  * CURLProtocol uses the global sharedInstance to implement the NSURLRequest/NSURLConnection 
  * integration.
@@ -41,7 +39,7 @@
  * happens that needs attention.
  */
 
-@interface CURLMultiHandle : NSObject
+@interface CURLTransferStack : NSObject
 {
     CURLM *_multi;
     NSMutableArray* _transfers;
@@ -61,7 +59,7 @@
  * @return The shared instance.
  */
 
-+ (CURLMultiHandle*)sharedInstance;
++ (CURLTransferStack*)sharedInstance;
 
 
 /**

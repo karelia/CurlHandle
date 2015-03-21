@@ -7,7 +7,7 @@
 //
 
 #import "CURLProtocol.h"
-#import "CURLMultiHandle.h"
+#import "CURLTransferStack.h"
 #import "CURLTransfer+MultiSupport.h"
 #import "CURLRequest.h"
 

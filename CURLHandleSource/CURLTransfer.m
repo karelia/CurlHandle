@@ -11,7 +11,7 @@
 #import "CURLTransfer+TestingSupport.h"
 
 #import "CURLList.h"
-#import "CURLMultiHandle.h"
+#import "CURLTransferStack.h"
 #import "CURLRequest.h"
 #import "CURLResponse.h"
 
@@ -73,7 +73,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (size_t) curlSendDataTo:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @property (strong, nonatomic) NSMutableArray* lists;
-@property (strong, nonatomic, readonly) CURLMultiHandle* multi;
+@property (strong, nonatomic, readonly) CURLTransferStack* multi;
 
 @end
 
@@ -174,10 +174,10 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     return [self initWithRequest:request
                       credential:credential
                         delegate:delegate delegateQueue:queue
-                           multi:[CURLMultiHandle sharedInstance]];
+                           multi:[CURLTransferStack sharedInstance]];
 }
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLMultiHandle *)multi;
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLTransferStack *)multi;
 {
     NSParameterAssert(multi);
     
@@ -608,7 +608,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     CURLHandleLog(@"cancelled");
     
-    CURLMultiHandle *multi = self.multi;
+    CURLTransferStack *multi = self.multi;
     if (multi)
     {
         // Mark as cancelling. There's a slim chance we've been asked to cancel at
@@ -887,13 +887,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 #pragma mark - Multi Support
 
-+ (CURLMultiHandle*)standaloneMultiForTestPurposes
++ (CURLTransferStack*)standaloneMultiForTestPurposes
 {
-    CURLMultiHandle* multi = [[[CURLMultiHandle alloc] init] autorelease];
+    CURLTransferStack* multi = [[[CURLTransferStack alloc] init] autorelease];
     return multi;
 }
 
-+ (void)cleanupStandaloneMulti:(CURLMultiHandle*)multi
++ (void)cleanupStandaloneMulti:(CURLTransferStack*)multi
 {
     [multi shutdown];
 }

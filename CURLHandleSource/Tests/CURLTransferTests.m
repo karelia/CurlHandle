@@ -8,7 +8,7 @@
 
 #import "CURLHandleBasedTest.h"
 #import "CURLTransfer+TestingSupport.h"
-#import "CURLMultiHandle.h"
+#import "CURLTransferStack.h"
 
 #import "CURLRequest.h"
 
@@ -35,7 +35,7 @@ typedef enum
 
 @interface CURLTransferTests : CURLHandleBasedTest
 
-@property (strong, nonatomic) CURLMultiHandle* multi;
+@property (strong, nonatomic) CURLTransferStack* multi;
 @property (assign, nonatomic) TestMode mode;
 
 @end
@@ -130,13 +130,13 @@ static TestMode gModeToUse;
             if (!self.multi)
             {
                 NSLog(@"Using custom multi");
-                self.multi = [[[CURLMultiHandle alloc] init] autorelease];
+                self.multi = [[[CURLTransferStack alloc] init] autorelease];
             }
             break;
 
         case TEST_SYNCHRONOUS:
         case TEST_WITH_SHARED_MULTI:
-            self.multi = [CURLMultiHandle sharedInstance];
+            self.multi = [CURLTransferStack sharedInstance];
             break;
 
         default:

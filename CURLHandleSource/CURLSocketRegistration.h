@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class CURLMultiHandle;
+@class CURLTransferStack;
 
 /**
  * Internal wrapper for dispatch sources that monitor each of the curl sockets.
@@ -30,7 +30,7 @@
  * @param multi The multi that this object is working with.
  */
 
-- (void)updateSourcesForSocket:(int)socket mode:(int)mode multi:(CURLMultiHandle*)multi;
+- (void)updateSourcesForSocket:(int)socket mode:(int)mode multi:(CURLTransferStack*)multi;
 
 /**
  Indicates whether a given source is owned by this socket.
