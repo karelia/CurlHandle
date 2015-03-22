@@ -27,10 +27,10 @@ extern NSString * const CURLMcodeErrorDomain;
 extern NSString * const CURLSHcodeErrorDomain;
 
 typedef NS_ENUM(NSInteger, CURLTransferState) {
-    CURLTransferStateRunning = 0,
-    CURLTransferStateSuspended = 1,
-    CURLTransferStateCanceling = 2,
-    CURLTransferStateCompleted = 3,
+    CURLTransferStateSuspended,
+    CURLTransferStateRunning,
+    CURLTransferStateCanceling,
+    CURLTransferStateCompleted,
 };
 
 /**
