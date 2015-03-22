@@ -28,6 +28,7 @@ extern NSString * const CURLSHcodeErrorDomain;
 
 typedef NS_ENUM(NSInteger, CURLTransferState) {
     CURLTransferStateRunning = 0,
+    CURLTransferStateSuspended = 1,
     CURLTransferStateCanceling = 2,
     CURLTransferStateCompleted = 3,
 };
@@ -39,10 +40,9 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
 @interface CURLTransfer : NSObject
 {
 	CURL                    *_handle;                         /*" Pointer to the actual CURL object that does all the hard work "*/
-    CURLTransferStack               *_multi;
+    CURLTransferStack       *_stack;
     NSURLRequest            *_request;
 	id <CURLTransferDelegate> _delegate;
-    NSOperationQueue        *_delegateQueue;
     CURLTransferState         _state;
     NSError                 *_error;
     
@@ -53,26 +53,6 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
 	NSDictionary            *_proxies;                      /*" Dictionary of proxy information; it's released when the transfer is deallocated since it's needed for the transfer."*/
     NSInputStream           *_uploadStream;
 }
-
-//  Loading respects as many of NSURLRequest's built-in features as possible, including:
-//  
-//    * An HTTP method of @"HEAD" turns on the CURLOPT_NOBODY option, regardless of protocol (e.g. handy for FTP)
-//    * Similarly, @"PUT" turns on the CURLOPT_UPLOAD option (again handy for FTP uploads)
-//  
-//    * Supply -HTTPBody or -HTTPBodyStream to switch Curl into uploading mode, regardless of protocol
-//  
-//    * Custom Range: HTTP headers are specially handled to set the CURLOPT_RANGE option, regardless of protocol in use
-//      (you should still construct the header as though it were HTTP, e.g. bytes=500-999)
-//  
-//    * Custom Accept-Encoding: HTTP headers are specially handled to set the CURLOPT_ENCODING option
-//
-//  Delegate messages are delivered on the specified queue
-//
-//  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
-- (id)initWithRequest:(NSURLRequest *)request
-           credential:(NSURLCredential *)credential
-             delegate:(id <CURLTransferDelegate>)delegate
-        delegateQueue:(NSOperationQueue *)queue __attribute((nonnull(1)));
 
 @property (readonly, copy) NSURLRequest *originalRequest;  // auth might cause a slightly different request to be sent out
 
@@ -94,6 +74,8 @@ typedef NS_ENUM(NSInteger, CURLTransferState) {
  * This property will be nil in the event that no error occurred.
  */
 @property (readonly, copy) NSError *error;
+
+- (void)resume;
 
 /**
  CURLINFO_FTP_ENTRY_PATH. Only suitable once transfer has finished.

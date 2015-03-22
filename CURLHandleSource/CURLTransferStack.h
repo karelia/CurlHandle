@@ -73,38 +73,30 @@
  */
 + (CURLTransferStack *)transferStackWithDelegate:(id <CURLTransferStackDelegate>)delegate delegateQueue:(NSOperationQueue *)queue;
 
+@property (readonly) NSOperationQueue *delegateQueue;
+
 /**
  * Shut down the multi and clean up all resources that it was using.
  */
 
 - (void)shutdown;
 
-/**
- * Assign a CURLTransfer to the multi to manage.
- * CURLTransfer uses this method internally when you call loadRequest:withMulti: on a transfer,
- * so generally you don't need to call it directly.
- * The multi will retain the transfer for as long as it needs it, but will silently release it once
- * the transfer has completed or failed.
- *
- * @param transfer The transfer to manage. Will be retained by the multi until removed (completion automatically performs removal).
+/**  Loading respects as many of NSURLRequest's built-in features as possible, including:
+    * An HTTP method of @"HEAD" turns on the CURLOPT_NOBODY option, regardless of protocol (e.g. handy for FTP)
+    * Similarly, @"PUT" turns on the CURLOPT_UPLOAD option (again handy for FTP uploads)
+
+    * Supply -HTTPBody or -HTTPBodyStream to switch Curl into uploading mode, regardless of protocol
+
+    * Custom Range: HTTP headers are specially handled to set the CURLOPT_RANGE option, regardless of protocol in use
+      (you should still construct the header as though it were HTTP, e.g. bytes=500-999)
+
+    * Custom Accept-Encoding: HTTP headers are specially handled to set the CURLOPT_ENCODING option
+
+  Delegate messages are delivered on the specified queue
+
+  Redirects are *not* automatically followed. If you want that behaviour, NSURLConnection is likely a better match for your needs
  */
-
-- (void)beginTransfer:(CURLTransfer*)transfer __attribute((nonnull));
-
-/** 
- * This removes the transfer from the multi. *
- * It is safe to call this method for a transfer that has already been cancelled, or has completed,
- * (or indeed was never managed by the multi). Doing so will simply do nothing.
- *
- * @warning ONLY call this on the receiver's queue
- *
- * To cancel the transfer, call [transfer cancel] instead - it will end up calling this method too,
- * if the transfer was being managed by a multi.
- *
- * @param transfer The transfer to cancel. Should have previously been added with beginTransfer:.
- */
-
-- (void)suspendTransfer:(CURLTransfer*)transfer __attribute((nonnull));
+- (CURLTransfer *)transferWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id)delegate;
 
 /**
  Update the dispatch source for a given socket and type.

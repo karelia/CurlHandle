@@ -91,9 +91,8 @@
 
 - (void)startLoadingWithCredential:(NSURLCredential *)credential;
 {
-    CURLTransfer *transfer = [[CURLTransfer alloc] initWithRequest:[self request] credential:credential delegate:self delegateQueue:nil];
+    CURLTransfer *transfer = [[CURLTransferStack sharedTransferStack] transferWithRequest:self.request credential:credential delegate:self];
     self.transfer = transfer;
-    [transfer release];
 }
 
 - (void)stopLoading;

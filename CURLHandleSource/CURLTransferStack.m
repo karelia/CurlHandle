@@ -183,6 +183,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     return self;
 }
 
+@synthesize delegateQueue = _delegateQueue;
+
 - (void)dealloc
 {
     CURLMultiLog(@"deallocing");
@@ -231,6 +233,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 #pragma mark - Transfer Management
 
 - (NSArray *)transfers; { return [[_transfers copy] autorelease]; }
+
+- (CURLTransfer *)transferWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id)delegate {
+    CURLTransfer *result = [[CURLTransfer alloc] initWithRequest:request credential:credential delegate:delegate delegateQueue:_delegateQueue stack:self];
+    return result;
+}
 
 - (void)beginTransfer:(CURLTransfer *)transfer;
 {

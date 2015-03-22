@@ -73,7 +73,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 - (size_t) curlSendDataTo:(void *)inPtr size:(size_t)inSize number:(size_t)inNumber;
 
 @property (strong, nonatomic) NSMutableArray* lists;
-@property (strong, nonatomic, readonly) CURLTransferStack* multi;
+@property (strong, nonatomic, readonly) CURLTransferStack* stack;
 
 @end
 
@@ -84,7 +84,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @synthesize state = _state;
 @synthesize error = _error;
 @synthesize lists = _lists;
-@synthesize multi = _multi;
+@synthesize stack = _stack;
 
 
 /*"	CURLTransfer is a wrapper around a CURL.
@@ -169,41 +169,22 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark Lifecycle
 // -----------------------------------------------------------------------------
 
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id<CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue;
-{
-    return [self initWithRequest:request
-                      credential:credential
-                        delegate:delegate delegateQueue:queue
-                           multi:[CURLTransferStack sharedTransferStack]];
-}
-
-- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue multi:(CURLTransferStack *)multi;
-{
-    NSParameterAssert(multi);
+- (id)initWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id <CURLTransferDelegate>)delegate delegateQueue:(NSOperationQueue *)queue stack:(CURLTransferStack *)stack {
+    NSParameterAssert(request);
+    NSParameterAssert(stack);
     
     if (self = [self init])
     {
+        _state = CURLTransferStateSuspended;
         _delegate = [delegate retain];
         
-        if (queue)
-        {
-            _delegateQueue = [queue retain];
-        }
-        else
-        {
-            // Make our own queue for the delegate to use
-            _delegateQueue = [[NSOperationQueue alloc] init];
-            _delegateQueue.maxConcurrentOperationCount = 1;
-        }
-
         // Turn automatic redirects off by default, so can properly report them to delegate
         curl_easy_setopt([self curlHandle], CURLOPT_FOLLOWLOCATION, NO);
                 
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
-            _multi = [multi retain];
-            [multi beginTransfer:self];
+            _stack = [_stack retain];
         }
         else
         {
@@ -217,12 +198,11 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void) dealloc
 {
-    NSAssert(_multi == nil, @"by the time we're thrown away, any multi should be done with us");
+    NSAssert(_stack == nil, @"by the time we're thrown away, any multi should be done with us");
 
     [self cleanupIncludingHandle:YES];
 
     [_delegate release];
-    [_delegateQueue release];
     [_request release];
     [_error release];
 	[_headerBuffer release];
@@ -572,7 +552,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     // curl_easy_cleanup() can sometimes call into our callback funcs - need to guard against this by setting _delegate to nil here
     // (the curl_easy_reset below should fix this anyway by unregistering the callbacks, but let's be paranoid...)
     [_delegate release]; _delegate = nil;
-    [_delegateQueue release]; _delegateQueue = nil;
 
     if (_handle)
     {
@@ -597,7 +576,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
     [self.lists removeAllObjects];
     
-    [_multi release]; _multi = nil;
+    [_stack release]; _stack = nil;
 
     _executing = NO;
 }
@@ -608,8 +587,8 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     CURLHandleLog(@"cancelled");
     
-    CURLTransferStack *multi = self.multi;
-    if (multi)
+    CURLTransferStack *stack = self.stack;
+    if (stack)
     {
         // Mark as cancelling. There's a slim chance we've been asked to cancel at
         // the same time as the operation is actually completing anyway. If so skip
@@ -619,7 +598,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         // deliberately make the usage synchronous so that self.state is correct upon
         // returning from this method. Deadlock *shouldn't* be possible since client
         // code should always run on _delegateQueue rather than CURLMulti's.
-        dispatch_queue_t queue = multi.queue;
+        dispatch_queue_t queue = stack.queue;
         dispatch_sync(queue, ^{
             
             if (_state < CURLTransferStateCanceling)
@@ -633,7 +612,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                     // delegate should already be taken care of and we can bail out early.
                     if (_state == CURLTransferStateCanceling) return;
                     
-                    [multi suspendTransfer:self];
+                    [stack suspendTransfer:self];
                     
                     // Report self as completed once any pending work on the queue is performed
                     // Removing will have stopped any new events, but there may be some already
@@ -692,10 +671,17 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     if (![self tryToPerformSelectorOnDelegate:@selector(transfer:didCompleteWithError:) usingBlock:^{
         
         [self.delegate transfer:self didCompleteWithError:error];
-        [self cleanupIncludingHandle:(self.multi != nil)];
+        [self cleanupIncludingHandle:(self.stack != nil)];
     }])
     {
-        [self cleanupIncludingHandle:(self.multi != nil)];
+        [self cleanupIncludingHandle:(self.stack != nil)];
+    }
+}
+
+- (void)resume {
+    if (self.state == CURLTransferStateSuspended) {
+        _state = CURLTransferStateRunning;
+        [_stack beginTransfer:self];
     }
 }
 
@@ -926,9 +912,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     if ([self.delegate respondsToSelector:selector])
     {
-        if (_delegateQueue)
+        if (self.stack.delegateQueue)
         {
-            [_delegateQueue addOperationWithBlock:block];
+            [self.stack.delegateQueue addOperationWithBlock:block];
         }
         else
         {
@@ -991,7 +977,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 	size_t written = inSize*inNumber;
     CURLHandleLog(@"write %ld at %p", written, inPtr);
 
-	if (self.state < CURLTransferStateCanceling || self.multi)
+	if (self.state < CURLTransferStateCanceling || self.stack)
 	{
         NSData *data = [NSData dataWithBytes:inPtr length:written];
 
@@ -1027,7 +1013,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 {
     NSInteger result;
 
-    if (self.state < CURLTransferStateCanceling || self.multi)
+    if (self.state < CURLTransferStateCanceling || self.stack)
     {
         result = [_uploadStream read:inPtr maxLength:inSize * inNumber];
         if (result < 0)
@@ -1075,7 +1061,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         result = [self.delegate transfer:self didFindHostFingerprint:foundKey knownFingerprint:knownkey match:match];
     }])
     {
-        [_delegateQueue waitUntilAllOperationsAreFinished]; // ideally ought to wait till just the op finishes
+        [self.stack.delegateQueue waitUntilAllOperationsAreFinished]; // ideally ought to wait till just the op finishes
         return result;
     }
     else
