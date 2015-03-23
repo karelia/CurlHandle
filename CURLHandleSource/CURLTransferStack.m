@@ -504,14 +504,12 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 CURLMultiLog(@"done msg result %d for %@ %s", code, transfer, url);
                 [transfer retain];
                 
-                // the order is important here - we remove the transfer from the multi first...
+                // the order is important here - we remove the transfer from the multi first, which
+                // breaks the reference cycle between us…
                 [self suspendTransfer:transfer];
                 
                 // ...then tell the easy transfer to complete, which can cause curl_easy_cleanup to be called
                 [transfer completeWithCode:code];
-                
-                // ...then tell it that it's no longer in use by the multi, which breaks the reference cycle between us
-                //[transfer removedByMulti:self];
                 
                 [transfer autorelease];
             }
