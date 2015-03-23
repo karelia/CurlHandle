@@ -234,6 +234,15 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (NSArray *)transfers; { return [[_transfers copy] autorelease]; }
 
+- (void)getTransfersWithCompletionHandler:(void (^)(NSArray *))completionHandler {
+    dispatch_async(self.queue, ^{
+        NSArray *transfers = self.transfers;
+        [self.delegateQueue addOperationWithBlock:^{
+            completionHandler(transfers);
+        }];
+    });
+}
+
 - (CURLTransfer *)transferWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id)delegate {
     CURLTransfer *result = [[CURLTransfer alloc] initWithRequest:request credential:credential delegate:delegate delegateQueue:_delegateQueue stack:self];
     return result;

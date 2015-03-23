@@ -98,6 +98,15 @@
  */
 - (CURLTransfer *)transferWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id)delegate;
 
+#pragma mark Managing the Stack
+
+/**
+ Asynchronously calls a completion callback with all outstanding transfers in the stack.
+ 
+ @param completionHandler This handler is executed on the delegate queue.
+ */
+- (void)getTransfersWithCompletionHandler:(void (^)(NSArray *transfers))completionHandler;
+
 /**
  Update the dispatch source for a given socket and type.
  
