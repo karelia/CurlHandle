@@ -184,7 +184,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         CURLcode code = [self setupRequest:request credential:credential];
         if (code == CURLE_OK)
         {
-            _stack = [_stack retain];
+            _stack = [stack retain];
         }
         else
         {
