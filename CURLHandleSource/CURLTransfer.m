@@ -607,75 +607,82 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
             return;
         }
         
-        _state = state;
-        
-        NSAssert(_error == nil, @"Error shouldn't have been filled in yet");
-        _error = error;
-        
-        switch (state) {
-            case CURLTransferStateSuspended:
-                [NSException raise:NSInvalidArgumentException format:@"We don't support suspending transfers at the moment"];
-                
-            case CURLTransferStateRunning:
-                _state = CURLTransferStateRunning;
-                [_stack beginTransfer:self];
-                break;
-                
-            case CURLTransferStateCanceling: {
-                
-                CURLHandleLog(@"cancelled");
-                
-                CURLTransferStack *stack = self.stack;
-                if (stack)
-                {
-                    // Bounce over to doing suspension in background as libcurl sometimes blocks for a long time on that
-                    dispatch_async(stack.queue, ^{
-                        // But of course by the time we arrive here, the transfer may have naturally
-                        // completed, and so been removed from the multi. If so, reporting that to the
-                        // delegate should already be taken care of and we can bail out early.
-                        if (_state == CURLTransferStateCanceling) return;
-                        
-                        [stack suspendTransfer:self];
-                        
-                        // Report self as completed once any pending work on the queue is performed
-                        // Removing will have stopped any new events, but there may be some already
-                        // received, sitting in the queue
-                        [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
-                    });
-                }
-                else    // synchronous usage
-                {
-                    _state = CURLTransferStateCanceling;
-                }
-                
-                break;
-            }
-            case CURLTransferStateCompleted: {
-                
-                [self notifyDelegateOfResponseIfNeeded];
-                
-                NSError *error = self.error;
-                if (error) {
-                    CURLHandleLog(@"failed with error %@", error);
-                }
-                else {
-                    CURLHandleLog(@"finished");
-                }
-                
-                // We run cleanup after delegate messages are all delivered if possible
-                if (![self tryToPerformSelectorOnDelegate:@selector(transfer:didCompleteWithError:) usingBlock:^{
+        // Post KVO notifications around overall change
+        if (error) [self willChangeValueForKey:@"error"];
+        [self willChangeValueForKey:@"state"];
+        {{
+            _state = state;
+            
+            NSAssert(_error == nil, @"Error shouldn't have been filled in yet");
+            _error = error;
+            
+            switch (state) {
+                case CURLTransferStateSuspended:
+                    [NSException raise:NSInvalidArgumentException format:@"We don't support suspending transfers at the moment"];
                     
-                    [self.delegate transfer:self didCompleteWithError:error];
-                    [self cleanupIncludingHandle:(self.stack != nil)];
-                }])
-                {
-                    [self cleanupIncludingHandle:(self.stack != nil)];
+                case CURLTransferStateRunning:
+                    _state = CURLTransferStateRunning;
+                    [_stack beginTransfer:self];
+                    break;
+                    
+                case CURLTransferStateCanceling: {
+                    
+                    CURLHandleLog(@"cancelled");
+                    
+                    CURLTransferStack *stack = self.stack;
+                    if (stack)
+                    {
+                        // Bounce over to doing suspension in background as libcurl sometimes blocks for a long time on that
+                        dispatch_async(stack.queue, ^{
+                            // But of course by the time we arrive here, the transfer may have naturally
+                            // completed, and so been removed from the multi. If so, reporting that to the
+                            // delegate should already be taken care of and we can bail out early.
+                            if (_state == CURLTransferStateCanceling) return;
+                            
+                            [stack suspendTransfer:self];
+                            
+                            // Report self as completed once any pending work on the queue is performed
+                            // Removing will have stopped any new events, but there may be some already
+                            // received, sitting in the queue
+                            [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
+                        });
+                    }
+                    else    // synchronous usage
+                    {
+                        _state = CURLTransferStateCanceling;
+                    }
+                    
+                    break;
                 }
-                break;
+                case CURLTransferStateCompleted: {
+                    
+                    [self notifyDelegateOfResponseIfNeeded];
+                    
+                    NSError *error = self.error;
+                    if (error) {
+                        CURLHandleLog(@"failed with error %@", error);
+                    }
+                    else {
+                        CURLHandleLog(@"finished");
+                    }
+                    
+                    // We run cleanup after delegate messages are all delivered if possible
+                    if (![self tryToPerformSelectorOnDelegate:@selector(transfer:didCompleteWithError:) usingBlock:^{
+                        
+                        [self.delegate transfer:self didCompleteWithError:error];
+                        [self cleanupIncludingHandle:(self.stack != nil)];
+                    }])
+                    {
+                        [self cleanupIncludingHandle:(self.stack != nil)];
+                    }
+                    break;
+                }
+                default:
+                    [NSException raise:NSInvalidArgumentException format:@"Unrecognised state: %@", @(state)];
             }
-            default:
-                [NSException raise:NSInvalidArgumentException format:@"Unrecognised state: %@", @(state)];
-        }
+        }}
+        [self didChangeValueForKey:@"state"];
+        if (error) [self didChangeValueForKey:@"state"];
     }
 }
 
