@@ -304,10 +304,20 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     });
 }
 
-- (void)suspendTransfer:(CURLTransfer *)transfer;
-{
+- (void)suspendTransfer:(CURLTransfer *)transfer completionHandler:(void (^)(void))completionHandler {
     dispatch_async(self.queue, ^{
-        [self removeTransfer:transfer];
+
+        // By the time we arrive here, the transfer may have naturally completed, and so been
+        // removed from the multi. If we carried on blithely, that would throw an exception. So
+        // we're lenient and check for that first
+        if ([self.transfers containsObject:transfer]) {
+            [self removeTransfer:transfer];
+        }
+        else {
+            NSAssert(transfer.state == CURLTransferStateCompleted, @"Transfer appears to have completed at the same time as it was being cancelled, yet state claims not to be completed yet");
+        }
+        
+        completionHandler();
     });
 }
 

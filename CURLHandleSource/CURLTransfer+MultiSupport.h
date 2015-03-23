@@ -39,8 +39,9 @@
  * if the transfer was being managed by a multi.
  *
  * @param transfer The transfer to cancel. Should have previously been added with beginTransfer:.
+ * @param completionHandler Executed on the stack's private serial queue, once transfer has been removed from the stack.
  */
-- (void)suspendTransfer:(CURLTransfer*)transfer __attribute((nonnull));
+- (void)suspendTransfer:(CURLTransfer*)transfer completionHandler:(void (^)(void))completionHandler __attribute((nonnull));
 
 /**
  Update the dispatch source for a given socket and type.

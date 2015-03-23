@@ -633,19 +633,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
                     if (stack)
                     {
                         // Bounce over to doing suspension in background as libcurl sometimes blocks for a long time on that
-                        dispatch_async(stack.queue, ^{
-                            // But of course by the time we arrive here, the transfer may have naturally
-                            // completed, and so been removed from the multi. If so, reporting that to the
-                            // delegate should already be taken care of and we can bail out early.
-                            if (_state == CURLTransferStateCanceling) return;
+                        [stack suspendTransfer:self completionHandler:^{
                             
-                            [stack suspendTransfer:self];
-                            
-                            // Report self as completed once any pending work on the queue is performed
-                            // Removing will have stopped any new events, but there may be some already
-                            // received, sitting in the queue
+                            // If the transfer happened to already complete at the same time, this
+                            // second completion attempt will go cheerfully ignored.
                             [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
-                        });
+                        }];
                     }
                     else    // synchronous usage
                     {
