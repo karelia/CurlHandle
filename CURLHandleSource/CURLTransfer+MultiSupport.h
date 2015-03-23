@@ -33,7 +33,7 @@
  * It is safe to call this method for a transfer that has already been cancelled, or has completed,
  * (or indeed was never managed by the multi). Doing so will simply do nothing.
  *
- * @warning ONLY call this on the receiver's queue
+ * Can be called on any thread; internally gets bounced over to correct queue.
  *
  * To cancel the transfer, call [transfer cancel] instead - it will end up calling this method too,
  * if the transfer was being managed by a multi.

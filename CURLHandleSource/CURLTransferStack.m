@@ -246,6 +246,24 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     });
 }
 
+/**
+ Raw method that removes a transfer from the stack's knowledge.
+ 
+ @warning MUST be called on our private queue.
+ 
+ Throws if transfer is not being managed by the receiver.
+ */
+- (void)removeTransfer:(CURLTransfer *)transfer {
+    NSParameterAssert(transfer);
+    NSAssert([_transfers containsObject:transfer], @"we should be managing this transfer");
+    
+    CURLMultiLog(@"removed transfer %@", transfer);
+    CURLMcode result = curl_multi_remove_handle(_multi, [transfer curlHandle]);
+    
+    NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
+    [_transfers removeObject:transfer];
+}
+
 - (CURLTransfer *)transferWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id)delegate {
     CURLTransfer *result = [[CURLTransfer alloc] initWithRequest:request credential:credential delegate:delegate delegateQueue:_delegateQueue stack:self];
     return result;
@@ -288,13 +306,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)suspendTransfer:(CURLTransfer *)transfer;
 {
-    NSAssert([_transfers containsObject:transfer], @"we should be managing this transfer");
-    
-    CURLMultiLog(@"removed transfer %@", transfer);
-    CURLMcode result = curl_multi_remove_handle(_multi, [transfer curlHandle]);
-    
-    NSAssert(result == CURLM_OK, @"failed to remove curl easy from curl multi - something odd going on here");
-    [_transfers removeObject:transfer];
+    dispatch_async(self.queue, ^{
+        [self removeTransfer:transfer];
+    });
 }
 
 - (CURLTransfer*)transferForHandle:(CURL*)easy
@@ -359,7 +373,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         
     for (CURLTransfer *aTransfer in self.transfers)
     {
-        [self suspendTransfer:aTransfer];
+        [self removeTransfer:aTransfer];
     }
 
 #if USE_MULTI_SOCKET
@@ -506,7 +520,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
                 
                 // the order is important here - we remove the transfer from the multi first, which
                 // breaks the reference cycle between us…
-                [self suspendTransfer:transfer];
+                [self removeTransfer:transfer];
                 
                 // ...then tell the easy transfer to complete, which can cause curl_easy_cleanup to be called
                 [transfer completeWithCode:code];
