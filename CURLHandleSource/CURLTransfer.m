@@ -176,17 +176,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     {
         _state = CURLTransferStateSuspended;
         _delegate = [delegate retain];
+        _stack = [stack retain];
         
         // Turn automatic redirects off by default, so can properly report them to delegate
         curl_easy_setopt([self curlHandle], CURLOPT_FOLLOWLOCATION, NO);
                 
         CURLcode code = [self setupRequest:request credential:credential];
-        if (code == CURLE_OK)
-        {
-            _stack = [stack retain];
-        }
-        else
-        {
+        if (code != CURLE_OK) {
             [self completeWithCode:code];
         }
     }
@@ -197,10 +193,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 - (void) dealloc
 {
-    NSAssert(_stack == nil, @"by the time we're thrown away, any multi should be done with us");
-
     [self cleanupIncludingHandle:YES];
 
+    [_stack release];
     [_delegate release];
     [_request release];
     [_error release];
@@ -574,8 +569,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     }
 
     [self.lists removeAllObjects];
-    
-    [_stack release]; _stack = nil;
 
     _executing = NO;
 }
