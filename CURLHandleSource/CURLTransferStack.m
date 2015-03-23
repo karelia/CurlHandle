@@ -194,7 +194,6 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 - (void)dealloc
 {
     CURLMultiLog(@"deallocing");
-    [self cleanupMulti];
     
     dispatch_release(_queue);
     
@@ -296,6 +295,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             if (!_isRunningProcessingLoop)
             {
                 _isRunningProcessingLoop = [self runProcessingLoop];
+                if (!_isRunningProcessingLoop && _invalidated) {
+                    [self cleanupMulti];
+                }
             }
 #endif
         }
@@ -405,7 +407,21 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 }
 
 - (void)finishTransfersAndInvalidate {
-    _invalidated = YES;
+    dispatch_async(self.queue, ^{
+        
+        // When already invalidated, nothing more to do
+        if (_invalidated) return;
+        
+        _invalidated = YES;
+        
+        // If we're not processing, that should be because there are no transfers active, and so can
+        // shut down immediately. Otherwise it's up to the processing loop to clean up once it's
+        // finished.
+        NSAssert(_isRunningProcessingLoop = (self.transfers.count > 0), @"Processing loop and number of transfers don't tally");
+        if (!_isRunningProcessingLoop) {
+            [self cleanupMulti];
+        }
+    });
 }
 
 #if USE_MULTI_SOCKET
@@ -503,6 +519,11 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             // transfers registered with us, and no handles registered with the multi handle either.
             // Thus it's time to stop processing until a new transfer starts
             _isRunningProcessingLoop = (self.transfers.count ? [self runProcessingLoop] : NO);
+            
+            // Once finished, if invalidated, we can now shut down
+            if (!_isRunningProcessingLoop && _invalidated) {
+                [self cleanupMulti];
+            }
         }
         @catch (NSException *exception) {
             [[NSClassFromString(@"NSApplication") sharedApplication] reportException:exception];

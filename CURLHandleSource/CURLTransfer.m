@@ -901,7 +901,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 
 + (void)cleanupStandaloneMulti:(CURLTransferStack*)multi
 {
-    [multi shutdown];
+    [multi finishTransfersAndInvalidate];
 }
 
 #pragma mark Utilities

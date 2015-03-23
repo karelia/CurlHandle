@@ -76,12 +76,6 @@
 
 @property (readonly) NSOperationQueue *delegateQueue;
 
-/**
- * Shut down the multi and clean up all resources that it was using.
- */
-
-- (void)shutdown;
-
 /**  Loading respects as many of NSURLRequest's built-in features as possible, including:
     * An HTTP method of @"HEAD" turns on the CURLOPT_NOBODY option, regardless of protocol (e.g. handy for FTP)
     * Similarly, @"PUT" turns on the CURLOPT_UPLOAD option (again handy for FTP uploads)
