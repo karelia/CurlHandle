@@ -232,6 +232,9 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 #pragma mark - Transfer Management
 
+/**
+ To synchronise access, this should *only* be called from our private queue.
+ */
 - (NSArray *)transfers; { return [[_transfers copy] autorelease]; }
 
 - (void)getTransfersWithCompletionHandler:(void (^)(NSArray *))completionHandler {
