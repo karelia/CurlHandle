@@ -388,10 +388,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
     dispatch_sync(_queue, ^{    // might as well serialise access
         
-    for (CURLTransfer *aTransfer in self.transfers)
-    {
-        [self removeTransfer:aTransfer];
-    }
+        NSAssert(self.transfers.count == 0, @"A CURLTransferStack should never be cleaned up while transfers are still running");
 
 #if USE_MULTI_SOCKET
     // give handles a last chance to process
