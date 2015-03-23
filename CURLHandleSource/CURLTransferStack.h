@@ -47,6 +47,7 @@
 @interface CURLTransferStack : NSObject
 {
     NSOperationQueue    *_delegateQueue;
+    BOOL                _invalidated;
     
     CURLM *_multi;
     NSMutableArray* _transfers;
@@ -106,5 +107,10 @@
  @param completionHandler This handler is executed on the delegate queue.
  */
 - (void)getTransfersWithCompletionHandler:(void (^)(NSArray *transfers))completionHandler;
+
+/**
+ Invalidates the stack, allowing any outstanding transfers to finish.
+ */
+- (void)finishTransfersAndInvalidate;
 
 @end

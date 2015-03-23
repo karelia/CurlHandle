@@ -271,12 +271,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 }
 
 - (CURLTransfer *)transferWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id)delegate {
+    if (_invalidated) [NSException raise:NSInvalidArgumentException format:@"Session has been invalidated"];
     CURLTransfer *result = [[CURLTransfer alloc] initWithRequest:request credential:credential delegate:delegate delegateQueue:_delegateQueue stack:self];
     return result;
 }
 
-- (void)beginTransfer:(CURLTransfer *)transfer;
-{
+- (void)beginTransfer:(CURLTransfer *)transfer {
+    if (_invalidated) [NSException raise:NSInvalidArgumentException format:@"Session has been invalidated"];
     NSAssert(self.queue, @"need queue");
     
     dispatch_async(self.queue, ^{
@@ -407,6 +408,10 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     _multi = NULL;
         
     });
+}
+
+- (void)finishTransfersAndInvalidate {
+    _invalidated = YES;
 }
 
 #if USE_MULTI_SOCKET
