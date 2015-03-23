@@ -7,9 +7,10 @@
 //
 
 #import "CURLSocketRegistration.h"
-#import "CURLTransferStack.h"
+#import "CURLTransfer+MultiSupport.h"
 
 #import <curl/curl.h>
+
 
 @interface CURLSocketRegistration()
 

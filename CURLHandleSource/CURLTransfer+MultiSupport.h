@@ -42,6 +42,21 @@
  */
 - (void)suspendTransfer:(CURLTransfer*)transfer __attribute((nonnull));
 
+/**
+ Update the dispatch source for a given socket and type.
+ 
+ @warning The routine is used internally by <CURLMulti> / <CURLSocket>, and shouldn't be called from your code.
+ 
+ @param source The current dispatch source for the given type
+ @param type Is this the source for reading or writing?
+ @param socket The raw system socket that the dispatch source should be monitoring.
+ @param registration The <CURLSocketRegistration> object that owns the source.
+ @param required Is the source required? If not, an existing source will be cancelled. If required and the source parameter is nil, and new one will be created.
+ @return The new/updated dispatch source.
+ */
+
+- (dispatch_source_t)updateSource:(dispatch_source_t)source type:(dispatch_source_type_t)type socket:(int)socket registration:(CURLSocketRegistration *)registration required:(BOOL)required;
+
 @end
 
 
