@@ -81,7 +81,6 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 @implementation CURLTransfer
 
 @synthesize originalRequest = _request;
-@synthesize state = _state;
 @synthesize error = _error;
 @synthesize lists = _lists;
 @synthesize stack = _stack;
@@ -581,53 +580,93 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     _executing = NO;
 }
 
-#pragma mark - Completion
+#pragma mark State
 
-- (void)cancel;
-{
-    CURLHandleLog(@"cancelled");
+@synthesize state = _state;
+- (void)setState:(CURLTransferState)state {
     
-    CURLTransferStack *stack = self.stack;
-    if (stack)
-    {
-        // Mark as cancelling. There's a slim chance we've been asked to cancel at
-        // the same time as the operation is actually completing anyway. If so skip
-        // the "canceling" state entirely, as it's a bit confusing otherwise.
-        //
-        // We use the CURLMulti's queue to synchronize access to this ivar, and
-        // deliberately make the usage synchronous so that self.state is correct upon
-        // returning from this method. Deadlock *shouldn't* be possible since client
-        // code should always run on _delegateQueue rather than CURLMulti's.
-        dispatch_queue_t queue = stack.queue;
-        dispatch_sync(queue, ^{
-            
-            if (_state < CURLTransferStateCanceling)
-            {
-                _state = CURLTransferStateCanceling;
+    // Clients can cancel on any thread of their choosing, so we need a serialization mechanism.
+    // The stack's queue might be tied up waiting on libcurl, and really we want state changes to be
+    // synchronous, so let's go with a simple synchronization. Maybe longterm a spinlock or similar
+    // is better
+    @synchronized(self) {
+        
+        // Ignore attempts to send state backwards, or if already at thate state
+        if (_state >= state) {
+            return;
+        }
+        
+        _state = state;
+        
+        switch (state) {
+            case CURLTransferStateSuspended:
+                [NSException raise:NSInvalidArgumentException format:@"We don't support suspending transfers at the moment"];
                 
-                // Bounce over to doing suspension in background as libcurl sometimes blocks for a long time on that
-                dispatch_async(queue, ^{
-                    // But of course by the time we arrive here, the transfer may have naturally
-                    // completed, and so been removed from the multi. If so, reporting that to the
-                    // delegate should already be taken care of and we can bail out early.
-                    if (_state == CURLTransferStateCanceling) return;
-                    
-                    [stack suspendTransfer:self];
-                    
-                    // Report self as completed once any pending work on the queue is performed
-                    // Removing will have stopped any new events, but there may be some already
-                    // received, sitting in the queue
-                    dispatch_async(queue, ^{
+            case CURLTransferStateRunning:
+                _state = CURLTransferStateRunning;
+                [_stack beginTransfer:self];
+                break;
+                
+            case CURLTransferStateCanceling: {
+                
+                CURLHandleLog(@"cancelled");
+                
+                CURLTransferStack *stack = self.stack;
+                if (stack)
+                {
+                    // Bounce over to doing suspension in background as libcurl sometimes blocks for a long time on that
+                    dispatch_async(stack.queue, ^{
+                        // But of course by the time we arrive here, the transfer may have naturally
+                        // completed, and so been removed from the multi. If so, reporting that to the
+                        // delegate should already be taken care of and we can bail out early.
+                        if (_state == CURLTransferStateCanceling) return;
+                        
+                        [stack suspendTransfer:self];
+                        
+                        // Report self as completed once any pending work on the queue is performed
+                        // Removing will have stopped any new events, but there may be some already
+                        // received, sitting in the queue
                         [self completeWithError:[NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil]];
                     });
-                });
+                }
+                else    // synchronous usage
+                {
+                    _state = CURLTransferStateCanceling;
+                }
+                
+                break;
             }
-        });
+            case CURLTransferStateCompleted: {
+                
+                [self notifyDelegateOfResponseIfNeeded];
+                
+                NSError *error = self.error;
+                if (error) {
+                    CURLHandleLog(@"failed with error %@", error);
+                }
+                else {
+                    CURLHandleLog(@"finished");
+                }
+                
+                // We run cleanup after delegate messages are all delivered if possible
+                if (![self tryToPerformSelectorOnDelegate:@selector(transfer:didCompleteWithError:) usingBlock:^{
+                    
+                    [self.delegate transfer:self didCompleteWithError:error];
+                    [self cleanupIncludingHandle:(self.stack != nil)];
+                }])
+                {
+                    [self cleanupIncludingHandle:(self.stack != nil)];
+                }
+                break;
+            }
+            default:
+                [NSException raise:NSInvalidArgumentException format:@"Unrecognised state: %@", @(state)];
+        }
     }
-    else    // synchronous usage
-    {
-        _state = CURLTransferStateCanceling;
-    }
+}
+
+- (void)cancel {
+    self.state = CURLTransferStateCanceling;
 }
 
 - (void)completeWithCode:(CURLcode)code;
@@ -651,38 +690,13 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     // the stream, and then another error from libcurl that the transfer was aborted.
     // Cancellation can also have a bit of a race condition where the transfer wants to cancel at
     // the same time as it naturally finishes/fails
-    if (self.state == CURLTransferStateCompleted) return;
     
-    _error = [error copy];
-    _state = CURLTransferStateCompleted;
-    
-    [self notifyDelegateOfResponseIfNeeded];
-    
-    if (!error)
-    {
-        CURLHandleLog(@"finished");
-    }
-    else
-    {
-        CURLHandleLog(@"failed with error %@", error);
-    }
-    
-    // We run cleanup after delegate messages are all delivered if possible
-    if (![self tryToPerformSelectorOnDelegate:@selector(transfer:didCompleteWithError:) usingBlock:^{
-        
-        [self.delegate transfer:self didCompleteWithError:error];
-        [self cleanupIncludingHandle:(self.stack != nil)];
-    }])
-    {
-        [self cleanupIncludingHandle:(self.stack != nil)];
-    }
+    if (self.state != CURLTransferStateCompleted) _error = [error copy];
+    self.state = CURLTransferStateCompleted;
 }
 
 - (void)resume {
-    if (self.state == CURLTransferStateSuspended) {
-        _state = CURLTransferStateRunning;
-        [_stack beginTransfer:self];
-    }
+    self.state = CURLTransferStateRunning;
 }
 
 #pragma mark Synchronous Loading
