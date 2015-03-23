@@ -107,9 +107,4 @@
  */
 - (void)getTransfersWithCompletionHandler:(void (^)(NSArray *transfers))completionHandler;
 
-/**
- The serial queue the instance schedules sources on
- */
-@property (readonly, assign, nonatomic) dispatch_queue_t queue;
-
 @end

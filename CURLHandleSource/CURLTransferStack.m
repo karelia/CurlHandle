@@ -55,6 +55,12 @@
 #pragma mark - Private Properties
 
 @property (readonly, copy, nonatomic) NSArray* transfers;
+
+/**
+ The serial queue the instance schedules sources on
+ */
+@property (readonly, assign, nonatomic) dispatch_queue_t queue;
+
 @property (strong, nonatomic) NSMutableArray* sockets;
 @property (readonly, nonatomic) dispatch_source_t timer;
 
