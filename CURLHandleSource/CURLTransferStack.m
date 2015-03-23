@@ -196,10 +196,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     CURLMultiLog(@"deallocing");
     [self cleanupMulti];
     
-    if (_queue)
-    {
-        dispatch_release(_queue); _queue = NULL;
-    }
+    dispatch_release(_queue);
     
     NSAssert((_multi == NULL) && (_timer == NULL) && (_queue == NULL), @"should have been shut down by the time we're dealloced");
 
