@@ -576,7 +576,25 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 #pragma mark State
 
 @synthesize state = _state;
-- (void)setState:(CURLTransferState)state {
+
+/**
+ The core of our state machine.
+ 
+ @param state The state beign changed to. We ignore changes which have no effect, or which would
+ send the overall state backwards.
+ 
+ @param error Only to be supplied when changing to completed state. If already completed, this also
+ goes ignored; we go by the error value passed in when first changed to completed state.
+ 
+ It might seem weird to have possibility of completion happening more than once, but this can happen
+ when reading body data fails. There'll be one completion event with the error from the stream, and
+ then another error from libcurl that the transfer was aborted. Cancellation can also have a bit of
+ a race condition where the transfer wants to cancel at the same time as it naturally finishes/fails.
+ 
+ */
+- (void)setState:(CURLTransferState)state error:(NSError *)error {
+    
+    if (state != CURLTransferStateCompleted) NSParameterAssert(!error);
     
     // Clients can cancel on any thread of their choosing, so we need a serialization mechanism.
     // The stack's queue might be tied up waiting on libcurl, and really we want state changes to be
@@ -590,6 +608,9 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
         }
         
         _state = state;
+        
+        NSAssert(_error == nil, @"Error shouldn't have been filled in yet");
+        _error = error;
         
         switch (state) {
             case CURLTransferStateSuspended:
@@ -659,7 +680,7 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
 }
 
 - (void)cancel {
-    self.state = CURLTransferStateCanceling;
+    [self setState:CURLTransferStateCanceling error:nil];
 }
 
 - (void)completeWithCode:(CURLcode)code;
@@ -676,20 +697,12 @@ static int curlKnownHostsFunction(CURL *easy,     /* easy handle */
     [self completeWithError:error];
 }
 
-- (void)completeWithError:(NSError *)error;
-{
-    // Ignore any attempt to complete after the first one
-    // This can happen when reading body data fails, there'll be one completion with the error from
-    // the stream, and then another error from libcurl that the transfer was aborted.
-    // Cancellation can also have a bit of a race condition where the transfer wants to cancel at
-    // the same time as it naturally finishes/fails
-    
-    if (self.state != CURLTransferStateCompleted) _error = [error copy];
-    self.state = CURLTransferStateCompleted;
+- (void)completeWithError:(NSError *)error {
+    [self setState:CURLTransferStateCompleted error:error];
 }
 
 - (void)resume {
-    self.state = CURLTransferStateRunning;
+    [self setState:CURLTransferStateRunning error:nil];
 }
 
 #pragma mark Synchronous Loading
