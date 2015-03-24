@@ -50,10 +50,19 @@
 #import "CURLSocketRegistration.h"
 
 
+typedef NS_ENUM(NSUInteger, CURLTransferStackState) {
+    CURLTransferStackStateIdle,
+    CURLTransferStackStateProcessing,
+    CURLTransferStackStateInvalidating,
+    CURLTransferStackStateInvalidated,
+};
+
+
 @interface CURLTransferStack()
 
 #pragma mark - Private Properties
 
+@property (readonly) CURLTransferStackState state;
 @property (readonly, copy, nonatomic) NSArray* transfers;
 
 /**
@@ -212,7 +221,75 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
     [super dealloc];
 }
 
-#pragma mark - Startup / Shutdown
+#pragma mark State
+
+- (CURLTransferStackState)state {
+    return _state;
+}
+
+/**
+ The core of our state machine. Requests we change to a particular state.
+ 
+ Normally the machine can only move forward. The exception is it's allowed to move back from
+ processing to idle. Invalid state changes will raise an exception.
+ 
+ Note that by the time this method returns, the state may already have been automatically advanced
+ beyond what you requested. So trying to go to idle while invalidating is taken as the cue to finish
+ up invalidation.
+ 
+ @warning Access MUST be serialized by calling on our private queue
+ */
+- (void)setState:(CURLTransferStackState)state {
+    
+    NSAssert(state != CURLTransferStackStateInvalidated, @"Only the state machine itself should decide it's finished invalidating");
+    
+    if (state == CURLTransferStackStateIdle) {
+        // Are we invalidating? If so now we're finished processing and can finish up.
+        if (_state >= CURLTransferStackStateInvalidating) {
+            state = CURLTransferStackStateInvalidated;
+        }
+    }
+    else {
+        if (state < _state) {
+            [NSException raise:NSInvalidArgumentException format:@"State can't go backwards"];
+        }
+    }
+    if (state == _state) return;
+    
+    
+    // When invalidating, if already idle, we want to jump straight to being fully invalidated
+    if (state == CURLTransferStackStateInvalidating && _state == CURLTransferStackStateIdle) {
+        state = CURLTransferStackStateInvalidated;
+    }
+    
+    _state = state;
+    
+    switch (state) {
+        case CURLTransferStackStateIdle:
+            // Ah, this is the life. Nothing for us to do.
+            break;
+            
+        case CURLTransferStackStateProcessing:
+            // Start up the queue again
+            if (![self runProcessingLoop]) {
+                self.state = CURLTransferStackStateIdle;
+            }
+            break;
+            
+        case CURLTransferStackStateInvalidating:
+            // To actually get into this state, we ought to be busy processing and will finish up
+            // soon, so just sit back and wait for that to happen.
+            break;
+            
+        case CURLTransferStackStateInvalidated:
+            [self cleanupMulti];
+            break;
+            
+        default:
+            [NSException raise:NSInvalidArgumentException format:@"Unknown state requested: %@", @(state)];
+            break;
+    }
+}
 
 - (void)shutdown
 {
@@ -230,6 +307,16 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
         CURLMultiLogError(@"shutdown called multiple times");
     }
 #endif
+}
+
+/**
+ Helper method that can be called to pre-flight any work that shouldn't be allowed to happen once
+ the stack has been invalidated.
+ */
+- (void)throwIfInvalidated {
+    if (self.state >= CURLTransferStackStateInvalidating) {
+        [NSException raise:NSInvalidArgumentException format:@"Session has been invalidated"];
+    }
 }
 
 #pragma mark - Transfer Management
@@ -267,13 +354,13 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 }
 
 - (CURLTransfer *)transferWithRequest:(NSURLRequest *)request credential:(NSURLCredential *)credential delegate:(id)delegate {
-    if (_invalidated) [NSException raise:NSInvalidArgumentException format:@"Session has been invalidated"];
+    [self throwIfInvalidated];
     CURLTransfer *result = [[CURLTransfer alloc] initWithRequest:request credential:credential delegate:delegate delegateQueue:_delegateQueue stack:self];
     return result;
 }
 
 - (void)beginTransfer:(CURLTransfer *)transfer {
-    if (_invalidated) [NSException raise:NSInvalidArgumentException format:@"Session has been invalidated"];
+    [self throwIfInvalidated];
     NSAssert(self.queue, @"need queue");
     
     dispatch_async(self.queue, ^{
@@ -291,14 +378,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             // http://curl.haxx.se/libcurl/c/curl_multi_socket_action.html suggests you typically fire a timeout to get it started
             [self processMulti:_multi action:CURL_SOCKET_TIMEOUT forSocket:0];
 #else
-            // Start up the queue again if needed
-            if (!_isRunningProcessingLoop)
-            {
-                _isRunningProcessingLoop = [self runProcessingLoop];
-                if (!_isRunningProcessingLoop && _invalidated) {
-                    [self cleanupMulti];
-                }
-            }
+            self.state = CURLTransferStackStateProcessing;
 #endif
         }
         else
@@ -408,19 +488,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 
 - (void)finishTransfersAndInvalidate {
     dispatch_async(self.queue, ^{
-        
-        // When already invalidated, nothing more to do
-        if (_invalidated) return;
-        
-        _invalidated = YES;
-        
-        // If we're not processing, that should be because there are no transfers active, and so can
-        // shut down immediately. Otherwise it's up to the processing loop to clean up once it's
-        // finished.
-        NSAssert(_isRunningProcessingLoop = (self.transfers.count > 0), @"Processing loop and number of transfers don't tally");
-        if (!_isRunningProcessingLoop) {
-            [self cleanupMulti];
-        }
+        self.state = CURLTransferStackStateInvalidating;
     });
 }
 
@@ -518,11 +586,8 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
             // If all in-process transfers have been cancelled, we'll arrive at this point with no
             // transfers registered with us, and no handles registered with the multi handle either.
             // Thus it's time to stop processing until a new transfer starts
-            _isRunningProcessingLoop = (self.transfers.count ? [self runProcessingLoop] : NO);
-            
-            // Once finished, if invalidated, we can now shut down
-            if (!_isRunningProcessingLoop && _invalidated) {
-                [self cleanupMulti];
+            if (!self.transfers.count || ![self runProcessingLoop]) {
+                self.state = CURLTransferStackStateIdle;
             }
         }
         @catch (NSException *exception) {
