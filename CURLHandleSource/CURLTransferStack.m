@@ -465,7 +465,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLMultiLog(@"cleaning up");
 
-    dispatch_sync(_queue, ^{    // might as well serialise access
+    dispatch_async(_queue, ^{    // might as well serialise access
         
         NSAssert(self.transfers.count == 0, @"A CURLTransferStack should never be cleaned up while transfers are still running");
 
