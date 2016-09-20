@@ -325,7 +325,7 @@ static int socket_callback(CURL *easy, curl_socket_t s, int what, void *userp, v
 {
     CURLMultiLog(@"cleaning up");
 
-    dispatch_sync(_queue, ^{    // might as well serialise access
+    dispatch_async(_queue, ^{    // might as well serialise access
         
     for (CURLTransfer *aTransfer in self.transfers)
     {
