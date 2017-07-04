@@ -142,11 +142,11 @@
 		2287EBF516B7CF9A0039E555 /* KMSSendServerDataCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBEE16B7CF9A0039E555 /* KMSSendServerDataCommand.m */; };
 		2287EBF616B7CF9A0039E555 /* KMSSendStringCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 2287EBF016B7CF9A0039E555 /* KMSSendStringCommand.m */; };
 		229748FC1610C1AE0042A51A /* CURLHandleBasedTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 229748FB1610C1AE0042A51A /* CURLHandleBasedTest.m */; };
-		22BCCE3016ADD63500DFFE8D /* libssh2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
+		22BCCE3016ADD63500DFFE8D /* libssh2.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22BCCE3316ADD66900DFFE8D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
 		22BCCE3C16ADD73400DFFE8D /* (null) in Frameworks */ = {isa = PBXBuildFile; };
-		22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
-		22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
+		22BCCE4816ADE58B00DFFE8D /* libssl.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		22BCCE4916ADE58D00DFFE8D /* libcrypto.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22BF085516AEAA76009BE5A3 /* CURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2270F4A016108D44009B6F98 /* CURLRequest.m */; };
 		22BF085616AEAA7A009BE5A3 /* CK2SSHCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 27D77E121672BBB50091EF91 /* CK2SSHCredential.m */; };
 		22BF089C16AEECEC009BE5A3 /* KMSConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BF086316AEECEC009BE5A3 /* KMSConnection.m */; };
@@ -172,7 +172,7 @@
 		22C9D0091704C627004610FE /* CURLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0071704C627004610FE /* CURLList.m */; };
 		22C9D00A1704C627004610FE /* CURLList.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C9D0071704C627004610FE /* CURLList.m */; };
 		22DC488516CC115300211948 /* TestContent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 22DC488416CC115300211948 /* TestContent.txt */; };
-		22E67F091712C598001ECE34 /* CURLHandle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; };
+		22E67F091712C598001ECE34 /* CURLHandle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* CURLHandle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		22F9473E1709BF1100F0E6E1 /* StandaloneGcdTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2213AA4B1709BC92003F2557 /* StandaloneGcdTest.m */; };
 		22F9473F1709C00000F0E6E1 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
 		22F947401709C00B00F0E6E1 /* libcares.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
@@ -181,9 +181,9 @@
 		2721F6021771FB35009A07FE /* CURLHandle.h in Headers */ = {isa = PBXBuildFile; fileRef = 2721F6011771FB35009A07FE /* CURLHandle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3A14C83905007D0FF1 /* CURLProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 27229B3814C83905007D0FF1 /* CURLProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27229B3B14C83905007D0FF1 /* CURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 27229B3914C83905007D0FF1 /* CURLProtocol.m */; };
-		27643E18185623F600573D58 /* libssl.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; };
-		27643E19185623F600573D58 /* libssh2.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; };
-		27643E1A1856243F00573D58 /* libcrypto.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; };
+		27643E18185623F600573D58 /* libssl.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 22BCCE4516ADE52700DFFE8D /* libssl.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		27643E19185623F600573D58 /* libssh2.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 22BCCE2716ADD53000DFFE8D /* libssh2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		27643E1A1856243F00573D58 /* libcrypto.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 22BCCE2816ADD53000DFFE8D /* libcrypto.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		277D77E01603804900906915 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		27D77E131672BBB50091EF91 /* CK2SSHCredential.h in Headers */ = {isa = PBXBuildFile; fileRef = 27D77E111672BBB50091EF91 /* CK2SSHCredential.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		27D77E161672BD9B0091EF91 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27D77E151672BD9B0091EF91 /* Security.framework */; };
@@ -191,8 +191,8 @@
 		79B96CAC0A6360E00060AC12 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B96CA70A6360E00060AC12 /* SystemConfiguration.framework */; };
 		79B96CBF0A6360F90060AC12 /* CURLTransfer.h in Headers */ = {isa = PBXBuildFile; fileRef = 79B96CBB0A6360F90060AC12 /* CURLTransfer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		79B96CC00A6360F90060AC12 /* CURLTransfer.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B96CBC0A6360F90060AC12 /* CURLTransfer.m */; };
-		8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
-		8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
+		8008037C166C5BE3004D39F5 /* libcurl.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		8008037D166C5BE5004D39F5 /* libcares.dylib in Copy Libraries */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		8008037E166C5BF4004D39F5 /* libcurl.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 809AE1C71602C7DD001D02E1 /* libcurl.dylib */; };
 		8008037F166C5BF9004D39F5 /* libcares.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80080379166C5B40004D39F5 /* libcares.dylib */; };
 /* End PBXBuildFile section */
@@ -759,7 +759,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastTestingUpgradeCheck = 0600;
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Karelia Software";
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "CURLHandle" */;
@@ -1100,6 +1100,7 @@
 					"\"$(SRCROOT)/built\"",
 					"\"$(SRCROOT)/../SFTP\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.karelia.CURLHandle;
 				PRODUCT_NAME = CURLHandle;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
@@ -1121,6 +1122,7 @@
 					"\"$(SRCROOT)/built\"",
 					"\"$(SRCROOT)/../SFTP\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.karelia.CURLHandle;
 				PRODUCT_NAME = CURLHandle;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
@@ -1130,12 +1132,12 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_TESTABILITY = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1159,7 +1161,6 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1181,7 +1182,6 @@
 		223FD0A7160B523700BE1C80 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1192,6 +1192,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/built\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.karelia.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1199,7 +1200,6 @@
 		223FD0A8160B523700BE1C80 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREFIX_HEADER = "Tests/CURLHandleTests-Prefix.pch";
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/built/include/curl-x86_64\"";
@@ -1209,6 +1209,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/built\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.karelia.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1233,7 +1234,6 @@
 		22C9CFCA17035A0B004610FE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -1256,7 +1256,6 @@
 		22C9CFCB17035A0B004610FE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
